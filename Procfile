@@ -1,1 +1,1 @@
-web: gunicorn hikingbees.wsgi --log-file -
+web: gunicorn hikingbees.wsgi.application --log-file -
