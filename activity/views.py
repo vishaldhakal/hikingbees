@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Activity,ActivityCategory,ItineraryActivity,ActivityImage
-from .serializers import Destination,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer
+from .models import Activity,ActivityCategory,ItineraryActivity,ActivityImage,ActivityRegion
+from .serializers import Destination,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+import json
 
 @api_view(['GET'])
 def activities_collection(request):
@@ -36,8 +37,34 @@ def activities_all(request,slug):
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
+        
+        serializer_destination = DestinationSerializer(deatt)
 
-        return Response({"activities":serializer_activities.data,"activity_categories":serializer_activity_category.data})
+        return Response({"activities":serializer_activities.data,"activity_categories":serializer_activity_category.data,"destination_details":serializer_destination.data})
+
+@api_view(['GET'])
+def activities_all_region(request,slug):
+    if request.method == 'GET':
+
+        act_region = request.GET.get("region","All")
+        
+        act_category = ActivityCategory.objects.get(slug=slug)
+        
+        act_categoriess = ActivityCategory.objects.all()
+
+        if act_region == "All":
+            activities = Activity.objects.filter(activity_category=act_category)
+        else:
+            act_regionn = ActivityRegion.objects.get(slug=act_region)
+            activities = Activity.objects.filter(activity_category=act_category,activity_region=act_regionn)
+        
+        acts = ActivitySmallSerializer(activities,many=True)
+
+        print(activities)
+        activity_region = ActivityRegion.objects.filter(activity_category=act_category)
+        serializer_activity_region = ActivityRegionSerializer(activity_region, many=True)
+
+        return Response({"activities":acts.data,"activity_regions":serializer_activity_region.data})
 
 @api_view(['GET'])
 def activities_single(request,slug):

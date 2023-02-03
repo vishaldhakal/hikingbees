@@ -1,4 +1,4 @@
-from .models import Activity,ActivityCategory,ItineraryActivity,ActivityImage,Destination
+from .models import Activity,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion
 from rest_framework import serializers
 
 class DestinationSerializer(serializers.ModelSerializer):
@@ -6,6 +6,12 @@ class DestinationSerializer(serializers.ModelSerializer):
         model = Destination
         fields = '__all__'
         depth = 2
+
+class ActivityRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityRegion
+        fields = '__all__'
+        depth = 1
 
 class DestinationSerializerSmall(serializers.ModelSerializer):
     class Meta:
@@ -41,5 +47,5 @@ class ActivitySmallSerializer(serializers.ModelSerializer):
     destination = DestinationSerializerSmall()
     class Meta:
         model = Activity
-        fields = ('id','slug', 'activity_title', 'activity_category','location','duration','price','coverImg','ratings','popular','best_selling','destination')
+        fields = ('id','slug', 'activity_title', 'activity_category','location','duration','price','coverImg','ratings','popular','best_selling','destination','activity_region')
         depth = 1

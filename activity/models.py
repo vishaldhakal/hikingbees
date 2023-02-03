@@ -20,8 +20,19 @@ class ActivityCategory(models.Model):
      def __str__(self) -> str:
           return self.title
 
+class ActivityRegion(models.Model):
+     title = models.CharField(max_length=200)
+     activity_category = models.ForeignKey(ActivityCategory,on_delete=models.CASCADE)
+     slug = models.SlugField(blank=True)
+     image = models.ImageField(blank=True)
+     image_alt_description = models.CharField(max_length=200,default="Alt Description")
+
+     def __str__(self) -> str:
+          return self.title + " [ " + self.activity_category.title +" ]"
+
 class Activity(models.Model):
-    activity_category = models.ForeignKey(ActivityCategory,on_delete=models.DO_NOTHING)
+    activity_category = models.ManyToManyField(ActivityCategory)
+    activity_region = models.ForeignKey(ActivityRegion,on_delete=models.DO_NOTHING)
     destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
     activity_title = models.CharField(max_length=500)
     slug = models.SlugField(max_length=100)
@@ -37,6 +48,7 @@ class Activity(models.Model):
     priceSale = models.FloatField(blank=True)
     popular = models.BooleanField()
     best_selling = models.BooleanField()
+    featured = models.BooleanField(default=False)
     tour_description = SummernoteTextField()
     tour_highlights = SummernoteTextField()
     tour_includes = SummernoteTextField()
