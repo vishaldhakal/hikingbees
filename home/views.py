@@ -26,7 +26,7 @@ def teams(request):
         teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
         
         return Response({
-          "team-members":teammembers_serializer.data,
+          "team_members":teammembers_serializer.data,
         })
 
 @api_view(['GET'])
