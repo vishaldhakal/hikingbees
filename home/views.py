@@ -13,7 +13,7 @@ from activity.serializers import ActivityCategorySerializer,ActivitySmallSeriali
 def testimonials(request):
     if request.method == 'GET':
         testimonial = Testimonial.objects.all()
-        testimonial_serializer = TestimonialSerializer(testimonial)
+        testimonial_serializer = TestimonialSerializer(testimonial,many=True)
         
         return Response({
           "testimonials":testimonial_serializer.data,
@@ -24,7 +24,7 @@ def teams(request):
     if request.method == 'GET':
 
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = TeamMemberSerializer(teammembers)
+        teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
         
         return Response({
           "team-members":teammembers_serializer.data,
