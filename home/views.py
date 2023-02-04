@@ -22,10 +22,19 @@ def testimonials(request):
 @api_view(['GET'])
 def teams(request):
     if request.method == 'GET':
-
         teammembers = TeamMember.objects.all()
         teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
         
         return Response({
           "team-members":teammembers_serializer.data,
+        })
+
+@api_view(['GET'])
+def teams_single(request,id):
+    if request.method == 'GET':
+        teammembers = TeamMember.objects.get(id=id)
+        teammembers_serializer = TeamMemberSerializer(teammembers)
+        
+        return Response({
+          "team-member":teammembers_serializer.data,
         })
