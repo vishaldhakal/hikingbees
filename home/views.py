@@ -36,5 +36,5 @@ def teams_single(request,id):
         teammembers_serializer = TeamMemberSerializer(teammembers)
         
         return Response({
-          "team-member":teammembers_serializer.data,
+          "team_member":teammembers_serializer.data,
         })
