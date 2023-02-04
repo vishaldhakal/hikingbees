@@ -34,3 +34,13 @@ def landing_page(request):
           "activity_categories":activity_categories_serializer.data,
           "posts":posts_serializer.data,
         })
+
+@api_view(['GET'])
+def testimonials(request):
+    if request.method == 'GET':
+        testimonial = Testimonial.objects.all()[:1]
+        testimonial_serializer = TestimonialSerializer(testimonial)
+        
+        return Response({
+          "testimonials":testimonial_serializer.data,
+        })

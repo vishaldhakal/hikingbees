@@ -27,8 +27,8 @@ class Testimonial(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200,blank=True)
-    photo = models.ImageField(blank=True)
-    occupation = models.CharField(max_length=200,blank=True)
+    avatar = models.ImageField(blank=True)
+    role = models.CharField(max_length=200,blank=True)
     review = models.TextField(blank=True)
     rating = models.FloatField(default=5)
 
