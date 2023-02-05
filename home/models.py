@@ -1,13 +1,17 @@
 from django.db import models
+from solo.models import SingletonModel
 
-class HeroSectionContent(models.Model):
-    hero_section_title = models.CharField(max_length=328,default="Welcome to Hiking Bees : Your Ultimate Guide to Exploring the Great Outdoors")
-    hero_section_subtitle = models.CharField(max_length=328,default="Discover The Best Hiking Trails And Bee-Watching Spots On Your Next Adventure. Book A Trip Now")
+class SiteConfiguration(SingletonModel):
+    hero_title_line1 = models.CharField(max_length=328,default="Line 1")
+    hero_title_line2 = models.CharField(max_length=328,default="Line 2")
+    hero_title_line3 = models.CharField(max_length=328,default="Line 3")
+    hero_section_subtitle = models.TextField(default="Discover The Best Hiking Trails And Bee-Watching Spots On Your Next Adventure. Book A Trip Now")
     hero_section_image = models.ImageField(blank=True)
 
-    def __str__(self) -> str:
-        return "Hero Section"
-
+    def __str__(self):
+        return "Site Configuration"
+    class Meta:
+        verbose_name = "Site Configuration"
 
 class TeamMember(models.Model):
     name = models.CharField(max_length=200,blank=True)
@@ -35,3 +39,17 @@ class Testimonial(models.Model):
     def __str__(self) -> str:
         return self.name
 
+class Affiliations(models.Model):
+    name = models.CharField(max_length=200)
+    link_to_website = models.URLField(blank=True)
+    image = models.ImageField()
+
+    def __str__(self) -> str:
+        return self.name
+class Partners(models.Model):
+    name = models.CharField(max_length=200)
+    link_to_website = models.URLField(blank=True)
+    image = models.ImageField()
+
+    def __str__(self) -> str:
+        return self.name

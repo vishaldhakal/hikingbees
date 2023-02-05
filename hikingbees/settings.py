@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'activity',
     'blog',
     'django_summernote',
+    'solo',
 ]
 
 MIDDLEWARE = [
