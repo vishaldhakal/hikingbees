@@ -1,5 +1,36 @@
 from django.db import models
 from solo.models import SingletonModel
+from activity.models import Activity,ActivityCategory,Destination,ActivityRegion
+from django_summernote.fields import SummernoteTextField
+
+class DestinationNavDropdown(SingletonModel):
+    destinations = models.ManyToManyField(Destination,blank=True)
+
+    def __str__(self) -> str:
+        return "Destinations Nav Config"
+class OtherActivitiesNavDropdown(SingletonModel):
+    activity_categories = models.ManyToManyField(ActivityCategory,blank=True)
+
+    def __str__(self) -> str:
+        return "Destinations Nav Config"
+
+class InnerDropdown(models.Model):
+    activity_region = models.ForeignKey(ActivityRegion,on_delete=models.DO_NOTHING)
+    activites = models.ManyToManyField(Activity,blank=True)
+
+    def __str__(self) -> str:
+        return self.activity_region.title
+class ClimbingNavDropdown(SingletonModel):
+    innerdropdowns = models.ManyToManyField(InnerDropdown,blank=True)
+
+    def __str__(self) -> str:
+        return "Climbing Nav Config"
+
+class TreekingNavDropdown(SingletonModel):
+    innerdropdowns = models.ManyToManyField(InnerDropdown,blank=True)
+
+    def __str__(self) -> str:
+        return "Treeking Nav Config"
 
 class SiteConfiguration(SingletonModel):
     hero_title_line1 = models.CharField(max_length=328,default="Line 1")
@@ -14,9 +45,17 @@ class SiteConfiguration(SingletonModel):
         verbose_name = "Site Configuration"
 
 class TeamMember(models.Model):
+    TEAM_CHOICES = (
+    ("Executive Team", "Executive Team"),
+    ("Representative", "Representative"),
+    ("Trekking Guides", "Trekking Guides"),
+    ("Tour Guide", "Tour Guide"),
+    )
     name = models.CharField(max_length=200,blank=True)
     role = models.CharField(max_length=200,blank=True)
     photo = models.ImageField(blank=True)
+    about = SummernoteTextField(blank=True)
+    type = models.CharField(max_length=300,choices=TEAM_CHOICES,default="Representative")
     facebook = models.URLField(max_length=200,blank=True) 
     instagram = models.URLField(max_length=200,blank=True)
     linkedin = models.URLField(max_length=200,blank=True)

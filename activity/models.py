@@ -3,6 +3,7 @@ from django_summernote.fields import SummernoteTextField
 
 class Destination(models.Model):
      name = models.CharField(max_length=200)
+     destination_small_detail = models.TextField(blank=True)
      destination_detail = SummernoteTextField(blank=True)
      thumnail_image = models.ImageField(blank=True)
      thumnail_image_alt_description = models.CharField(max_length=200,default="Alt Description")

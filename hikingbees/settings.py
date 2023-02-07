@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-s$io6_xls$2hgu)%n(8w8&4pfiw0-vzju-ow!^b(2h2*wc!m3i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['63b8-103-186-197-167.ngrok.io','king-prawn-app-t9tni.ondigitalocean.app','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['7ba9-2404-7c00-43-9bfb-c133-7069-f9b9-8526.ngrok.io','king-prawn-app-t9tni.ondigitalocean.app','localhost','127.0.0.1']
 
 
 # Application definition
@@ -144,7 +144,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['https://63b8-103-186-197-167.ngrok.io','https://king-prawn-app-t9tni.ondigitalocean.app','http://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://7ba9-2404-7c00-43-9bfb-c133-7069-f9b9-8526.ngrok.io','https://king-prawn-app-t9tni.ondigitalocean.app','http://127.0.0.1']
 
 
 JAZZMIN_SETTINGS = {

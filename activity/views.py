@@ -8,9 +8,29 @@ import json
 @api_view(['GET'])
 def activities_collection(request):
     if request.method == 'GET':
+
+        act_cat = request.GET.get("category","All")
+        act_reg = request.GET.get("region","All")
+        act_des = request.GET.get("destination","All")
+
         activities = Activity.objects.all()
         serializer_activities = ActivitySmallSerializer(activities, many=True)
-        return Response(serializer_activities.data)
+        
+        activities_cat = ActivityCategory.objects.all()
+        serializer_activities_cat = ActivityCategorySerializer(activities_cat, many=True)
+        
+        activities_reg = ActivityRegion.objects.all()
+        serializer_activities_reg = ActivityRegionSerializer(activities_reg, many=True)
+        
+        destinations = Destination.objects.all()
+        serializer_destinations = DestinationSerializer(destinations, many=True)
+        
+        return Response({
+            "activities":serializer_activities.data,
+            "categories":serializer_activities_cat.data,
+            "regions":serializer_activities_reg.data,
+            "destinations":serializer_destinations.data,
+        })
 
 @api_view(['GET'])
 def activities_featured(request):

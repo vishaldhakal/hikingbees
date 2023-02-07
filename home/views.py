@@ -2,12 +2,35 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners
-from .serializers import TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer
+from .models import TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
+from .serializers import TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
+
+@api_view(['GET'])
+def navbar(request):
+    if request.method == 'GET':
+        destination_nav = DestinationNavDropdown.objects.get()
+        destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav,many=True)
+
+        other_nav = OtherActivitiesNavDropdown.objects.get()
+        other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav,many=True)
+        
+        climb_nav = ClimbingNavDropdown.objects.get()
+        climb_nav_serializer = ClimbingNavDropdownSerializer(climb_nav)
+
+        trek_nav = TreekingNavDropdown.objects.get()
+        trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav,many=True)
+        
+        return Response({
+          "destination_nav":destination_nav_serializer.data,
+          "other_activities_nav":other_nav_serializer.data,
+          "climbing_nav":climb_nav_serializer.data,
+          "trekking_nav":trek_nav_serializer.data,
+        })
+
 
 @api_view(['GET'])
 def landing_page(request):
