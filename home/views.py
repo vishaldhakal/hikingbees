@@ -13,16 +13,16 @@ from activity.serializers import ActivityCategorySerializer,ActivitySmallSeriali
 def navbar(request):
     if request.method == 'GET':
         destination_nav = DestinationNavDropdown.objects.get()
-        destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav,many=True)
+        destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav)
 
         other_nav = OtherActivitiesNavDropdown.objects.get()
-        other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav,many=True)
+        other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav)
         
         climb_nav = ClimbingNavDropdown.objects.get()
         climb_nav_serializer = ClimbingNavDropdownSerializer(climb_nav)
 
         trek_nav = TreekingNavDropdown.objects.get()
-        trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav,many=True)
+        trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
         
         return Response({
           "destination_nav":destination_nav_serializer.data,

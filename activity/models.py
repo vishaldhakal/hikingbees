@@ -13,6 +13,7 @@ class Destination(models.Model):
 
 class ActivityCategory(models.Model):
      title = models.CharField(max_length=200)
+     destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
      subtitle = models.TextField()
      image = models.ImageField(blank=True)
      slug = models.SlugField(blank=True)
@@ -23,13 +24,13 @@ class ActivityCategory(models.Model):
 
 class ActivityRegion(models.Model):
      title = models.CharField(max_length=200)
-     activity_category = models.ForeignKey(ActivityCategory,on_delete=models.CASCADE)
+     activity_category = models.ManyToManyField(ActivityCategory)
      slug = models.SlugField(blank=True)
      image = models.ImageField(blank=True)
      image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
      def __str__(self) -> str:
-          return self.title + " [ " + self.activity_category.title +" ]"
+          return self.title
 
 class Activity(models.Model):
     activity_category = models.ManyToManyField(ActivityCategory)
@@ -46,7 +47,7 @@ class Activity(models.Model):
     trip_grade = models.CharField(max_length=500)
     max_group_size = models.CharField(max_length=500)
     best_time = models.CharField(max_length=500)
-    priceSale = models.FloatField(blank=True)
+    priceSale = models.FloatField()
     popular = models.BooleanField()
     best_selling = models.BooleanField()
     featured = models.BooleanField(default=False)

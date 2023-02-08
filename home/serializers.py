@@ -25,6 +25,7 @@ class OtherActivitiesNavDropdownSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ClimbingNavDropdownSerializer(serializers.ModelSerializer):
+    
     innerdropdowns = InnerDropdownSerializer(many=True)
 
     class Meta:
@@ -32,6 +33,7 @@ class ClimbingNavDropdownSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TreekingNavDropdownSerializer(serializers.ModelSerializer):
+
     innerdropdowns = InnerDropdownSerializer(many=True)
 
     class Meta:
