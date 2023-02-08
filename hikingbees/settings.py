@@ -203,6 +203,16 @@ JAZZMIN_SETTINGS = {
 
 SUMMERNOTE_CONFIG = {
     'summernote': {
-        'width': '100%'
+        'width': '100%',
+        'toolbar': [
+            ['style', ['style',]],
+            ['font', ['fontname', 'fontsize', 'bold', 'italic', 'strikethrough', 'clear',]],
+            ['color', ['forecolor', 'backcolor', ]],
+            ['para', ['ul', 'ol', 'height']],
+            ['insert', ['link']],
+            ['misc', ['picture', 'fullscreen', 'codeview', 'print', 'help', ]],
+        ],
+        'fontNames': ['Roboto'],
     }
 }
+SUMMERNOTE_THEME = 'bs4'
