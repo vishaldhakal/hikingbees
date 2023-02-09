@@ -56,6 +56,7 @@ class TeamMember(models.Model):
     photo = models.ImageField(blank=True)
     about = SummernoteTextField(blank=True)
     type = models.CharField(max_length=300,choices=TEAM_CHOICES,default="Representative")
+    email = models.CharField(max_length=200) 
     facebook = models.URLField(max_length=200,blank=True) 
     instagram = models.URLField(max_length=200,blank=True)
     linkedin = models.URLField(max_length=200,blank=True)
