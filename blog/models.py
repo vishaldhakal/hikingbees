@@ -7,7 +7,7 @@ class Author(models.Model):
     name = models.CharField(max_length=200) 
     role = models.CharField(max_length=200)
     phone = models.CharField(max_length=200)
-    picture = models.ImageField()
+    picture = models.FileField()
     about = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -17,7 +17,7 @@ class Author(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=200, primary_key=True)
-    category_image = models.ImageField(blank=True)
+    category_image = models.FileField(blank=True)
 
     def __str__(self):
         return self.category_name

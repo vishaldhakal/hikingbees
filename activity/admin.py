@@ -1,16 +1,24 @@
 from django.contrib import admin
-from .models import ActivityCategory,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion
+from .models import ActivityCategory,ActivityPricing,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
 
 class ItineraryActivityInline(admin.StackedInline):
+    model = ItineraryActivity
+
+class ActivityFAQInline(admin.StackedInline):
     model = ItineraryActivity
 
 class ActivityImageInline(admin.StackedInline):
     model = ActivityImage
 
+class ActivityPricingInline(admin.StackedInline):
+    model = ActivityPricing
+
 class ActivityAdmin(admin.ModelAdmin):
     inlines = [
         ItineraryActivityInline,
         ActivityImageInline,
+        ActivityFAQInline,
+        ActivityPricing,
     ]
     
 admin.site.register(Destination)
@@ -18,4 +26,6 @@ admin.site.register(ActivityCategory)
 admin.site.register(Activity,ActivityAdmin)
 admin.site.register(ItineraryActivity)
 admin.site.register(ActivityImage)
+admin.site.register(ActivityFAQ)
+admin.site.register(ActivityPricing)
 admin.site.register(ActivityRegion)

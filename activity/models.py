@@ -5,7 +5,7 @@ class Destination(models.Model):
      name = models.CharField(max_length=200)
      destination_small_detail = models.TextField(blank=True)
      destination_detail = SummernoteTextField(blank=True)
-     thumnail_image = models.ImageField(blank=True)
+     thumnail_image = models.FileField(blank=True)
      thumnail_image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
      def __str__(self) -> str:
@@ -15,7 +15,7 @@ class ActivityCategory(models.Model):
      title = models.CharField(max_length=200)
      destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
      subtitle = models.TextField()
-     image = models.ImageField(blank=True)
+     image = models.FileField(blank=True)
      slug = models.SlugField(blank=True)
      image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
@@ -26,7 +26,7 @@ class ActivityRegion(models.Model):
      title = models.CharField(max_length=200)
      activity_category = models.ManyToManyField(ActivityCategory)
      slug = models.SlugField(blank=True)
-     image = models.ImageField(blank=True)
+     image = models.FileField(blank=True)
      image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
      def __str__(self) -> str:
@@ -39,9 +39,9 @@ class Activity(models.Model):
     activity_title = models.CharField(max_length=500)
     slug = models.SlugField(max_length=100)
     price = models.FloatField()
-    heroImg = models.ImageField()
+    heroImg = models.FileField()
     ratings = models.FloatField()
-    coverImg = models.ImageField()
+    coverImg = models.FileField()
     location = models.CharField(max_length=500)
     duration = models.CharField(max_length=500)
     trip_grade = models.CharField(max_length=500)
@@ -65,8 +65,26 @@ class Activity(models.Model):
     def __str__(self) -> str:
           return self.activity_title
 
+class ActivityFAQ(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='faqs')
+    
+    def __str__(self):
+        return self.question
+class ActivityPricing(models.Model):
+    group_size = models.CharField(max_length=500)
+    price = models.FloatField(max_length=1000)
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='prices')
+    
+    def __str__(self):
+        return self.group_size
+
 class ActivityImage(models.Model):
-    image = models.ImageField()
+    image = models.FileField()
     image_alt_description = models.CharField(max_length=428,default="Image Description")
     activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='gallery')
 

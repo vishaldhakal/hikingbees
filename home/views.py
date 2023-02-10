@@ -2,12 +2,24 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
-from .serializers import TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .models import FAQ,FAQCategory,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
+from .serializers import FAQSerializer,FAQCategorySerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
+
+
+@api_view(['GET'])
+def faq_list(request):
+    faqs = FAQ.objects.all()
+    serializer = FAQSerializer(faqs, many=True)
+    
+    faq_cats = FAQCategory.objects.all()
+    serializer_cat = FAQCategorySerializer(faq_cats, many=True)
+    
+    return Response({'faqs': serializer.data,"faq_categories":serializer_cat.data})
+
 
 @api_view(['GET'])
 def navbar(request):

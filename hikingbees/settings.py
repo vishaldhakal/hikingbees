@@ -135,12 +135,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_URL = "/static/"
+STATICFILES_DIRS = []
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 
@@ -169,7 +166,7 @@ JAZZMIN_SETTINGS = {
     # Copyright on the footer
     "copyright": "Baliyo Software",
     "search_model": ["blog.post","activity.activity"],
-    # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
+    # Field name on user model that contains avatar FileField/URLField/Charfield or a callable that receives the user
     "user_avatar": None,
     ############
     # Top Menu #
