@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TeamMember,Testimonial,Affiliations,SiteConfiguration,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown
+from .models import TeamMember,Testimonial,Affiliations,SiteConfiguration,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown,FAQ,FAQCategory
 from solo.admin import SingletonModelAdmin
 
 
@@ -12,4 +12,6 @@ admin.site.register(InnerDropdown)
 admin.site.register(Affiliations)
 admin.site.register(Partners)
 admin.site.register(TeamMember)
+admin.site.register(FAQ)
+admin.site.register(FAQCategory)
 admin.site.register(Testimonial)

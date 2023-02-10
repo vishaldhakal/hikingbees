@@ -5,7 +5,7 @@ class ItineraryActivityInline(admin.StackedInline):
     model = ItineraryActivity
 
 class ActivityFAQInline(admin.StackedInline):
-    model = ItineraryActivity
+    model = ActivityFAQ
 
 class ActivityImageInline(admin.StackedInline):
     model = ActivityImage
