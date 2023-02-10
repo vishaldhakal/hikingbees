@@ -18,7 +18,7 @@ class ActivityAdmin(admin.ModelAdmin):
         ItineraryActivityInline,
         ActivityImageInline,
         ActivityFAQInline,
-        ActivityPricing,
+        ActivityPricingInline,
     ]
     
 admin.site.register(Destination)
