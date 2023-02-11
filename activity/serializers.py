@@ -63,7 +63,6 @@ class ActivitySmallSerializer(serializers.ModelSerializer):
         depth = 1
 
 class ActivitySlugSerializer(serializers.ModelSerializer):
-    destination = DestinationSerializerSmall()
     class Meta:
         model = Activity
         fields = ('id','slug')
