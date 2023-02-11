@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import Destination,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+from .serializers import Destination,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
 import json
 
 @api_view(['GET'])
@@ -31,6 +31,13 @@ def activities_collection(request):
             "regions":serializer_activities_reg.data,
             "destinations":serializer_destinations.data,
         })
+
+@api_view(['GET'])
+def activities_slug(request):
+    if request.method == 'GET':
+        activities = Activity.objects.all()
+        serializer_activities = ActivitySlugSerializer(activities, many=True)
+        return Response(serializer_activities.data)
 
 @api_view(['GET'])
 def activities_featured(request):
