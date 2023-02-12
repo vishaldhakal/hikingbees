@@ -94,10 +94,10 @@ class ActivityImage(models.Model):
 class ItineraryActivity(models.Model):
     day = models.IntegerField()
     title = models.CharField(max_length=100)
-    trek_distance = models.CharField(max_length=100)
-    trek_duration = models.CharField(max_length=100)
-    highest_altitude = models.CharField(max_length=100)
-    meals = models.CharField(max_length=100)
+    trek_distance = models.CharField(max_length=100,blank=True)
+    trek_duration = models.CharField(max_length=100,blank=True)
+    highest_altitude = models.CharField(max_length=100,blank=True)
+    meals = models.CharField(max_length=100,blank=True)
     description = models.TextField()
     activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='itinerary')
 

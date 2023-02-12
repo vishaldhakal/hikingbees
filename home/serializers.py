@@ -77,6 +77,11 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+class TeamMemberSlugSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeamMember
+        fields = ('id',)
+
 class TestimonialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testimonial

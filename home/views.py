@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import FAQ,FAQCategory,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
-from .serializers import FAQSerializer,FAQCategorySerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .serializers import FAQSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity
@@ -91,6 +91,16 @@ def testimonials(request):
         
         return Response({
           "testimonials":testimonial_serializer.data,
+        })
+
+@api_view(['GET'])
+def teams_id(request):
+    if request.method == 'GET':
+        teammembers = TeamMember.objects.all()
+        teammembers_serializer = TeamMemberSlugSerializer(teammembers,many=True)
+        
+        return Response({
+          "team_members":teammembers_serializer.data,
         })
 
 @api_view(['GET'])
