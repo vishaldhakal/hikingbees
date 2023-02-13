@@ -5,6 +5,7 @@ urlpatterns = [
     path('activity-detail/<str:slug>/', views.activities_single),
     path('activities/', views.activities_collection),
     path('activities-slug/', views.activities_slug),
+    path('activities-search/', views.activities_search),
     path('activitiy-categories-slug/', views.activities_cat_slug),
     path('activities-region-slug/', views.activities_reg_slug),
     path('destinations-slug/', views.destination_slug),
