@@ -74,7 +74,7 @@ def landing_page(request):
         return Response({
           "hero_content":hero_content_serializer.data,
           "recent_posts":posts_serializer.data,
-          "featured_activities":serializer_activities.data.featured_tours,
+          "featured_activities":serializer_activities.data,
           "activity_categories":serializer_activity_category.data,
           "team_members":teammembers_serializer.data,
           "testimonials":testimonial_serializer.data,
