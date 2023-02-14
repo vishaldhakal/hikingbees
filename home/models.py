@@ -50,7 +50,7 @@ class TreekingNavDropdown(SingletonModel):
         return "Treeking Nav Config"
 
 class FeaturedTour(SingletonModel):
-    featured_tours = models.ManyToManyField(Activity,blank=True)
+    featured_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'featured': True})
 
     def __str__(self) -> str:
         return "Featured Tours"
