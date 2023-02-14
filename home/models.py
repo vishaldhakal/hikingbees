@@ -50,10 +50,12 @@ class TreekingNavDropdown(SingletonModel):
         return "Treeking Nav Config"
 
 class FeaturedTour(SingletonModel):
-    featured_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'featured': True})
+    featured_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'featured': True},related_name="featured_tours")
+    popular_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'popular': True},related_name="popular_tours")
+    best_selling_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'best_selling': True},related_name="best_selling_tours")
 
     def __str__(self) -> str:
-        return "Featured Tours"
+        return "Featured, Popular and Best Selling Tours"
 
 class SiteConfiguration(SingletonModel):
     hero_title_line1 = models.CharField(max_length=328,default="Line 1")

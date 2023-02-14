@@ -75,6 +75,8 @@ def landing_page(request):
           "hero_content":hero_content_serializer.data,
           "recent_posts":posts_serializer.data,
           "featured_activities":serializer_activities.data["featured_tours"],
+          "popular_activities":serializer_activities.data["popular_tours"],
+          "best_selling_activities":serializer_activities.data["best_selling_tours"],
           "activity_categories":serializer_activity_category.data,
           "team_members":teammembers_serializer.data,
           "testimonials":testimonial_serializer.data,

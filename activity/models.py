@@ -63,7 +63,17 @@ class Activity(models.Model):
         ordering = ['createdAt']
 
     def __str__(self) -> str:
-          return self.activity_title
+          strrr = "["
+          if self.popular:
+            strrr+=" Popular "
+          if self.best_selling:
+            strrr+=" Best Selling "
+          if self.featured:
+            strrr+=" Featured "
+          
+          strrr+="]"
+          return self.activity_title + strrr
+          
 
 class ActivityFAQ(models.Model):
     question = models.TextField()

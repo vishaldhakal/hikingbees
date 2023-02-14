@@ -10,9 +10,12 @@ class FAQCategorySerializer(serializers.ModelSerializer):
 
 class FeaturedTourSerializer(serializers.ModelSerializer):
     featured_tours = ActivitySmallSerializer(many=True)
+    popular_tours = ActivitySmallSerializer(many=True)
+    best_selling_tours = ActivitySmallSerializer(many=True)
     class Meta:
         model = FeaturedTour
         fields = '__all__'
+
 
 class FAQSerializer(serializers.ModelSerializer):
     category = FAQCategorySerializer(read_only=True)
