@@ -60,7 +60,7 @@ def landing_page(request):
         posts_serializer = PostSerializer(posts,many=True)
 
         activities = FeaturedTour.objects.get()
-        serializer_activities = ActivitySmallSerializer(activities)
+        serializer_activities = FeaturedTourSerializer(activities)
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
