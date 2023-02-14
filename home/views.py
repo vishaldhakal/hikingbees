@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ,FAQCategory,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
-from .serializers import FAQSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .models import FAQ,FAQCategory,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
+from .serializers import FAQSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity
@@ -59,8 +59,8 @@ def landing_page(request):
         posts = Post.objects.all()[:6]
         posts_serializer = PostSerializer(posts,many=True)
 
-        activities = Activity.objects.all()[0:6]
-        serializer_activities = ActivitySmallSerializer(activities, many=True)
+        activities = FeaturedTour.objects.get()
+        serializer_activities = ActivitySmallSerializer(activities)
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
@@ -74,7 +74,7 @@ def landing_page(request):
         return Response({
           "hero_content":hero_content_serializer.data,
           "recent_posts":posts_serializer.data,
-          "featured_activities":serializer_activities.data,
+          "featured_activities":serializer_activities.data.featured_tours,
           "activity_categories":serializer_activity_category.data,
           "team_members":teammembers_serializer.data,
           "testimonials":testimonial_serializer.data,
