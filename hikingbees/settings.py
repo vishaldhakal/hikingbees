@@ -143,7 +143,6 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR, 'media')
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Default primary key field type
@@ -151,8 +150,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['https://admin.hikingbees.com','https://king-prawn-app-t9tni.ondigitalocean.app','http://127.0.0.1']
-
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
