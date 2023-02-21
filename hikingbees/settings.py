@@ -42,13 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_multiple_model',
-    'corsheaders',
     'home',
     'about',
     'activity',
     'blog',
     'django_summernote',
     'solo',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -146,6 +146,11 @@ CKEDITOR_UPLOAD_PATH = 'uploads/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR, 'media')
 CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = (
+  'http://localhost:8888',
+  'https://hikingbees.com',
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
