@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import TeamMember,FeaturedTour,Testimonial,SiteConfiguration,Affiliations,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown,FAQ,FAQCategory
-from activity.serializers import ActivityCategorySerializer,ActivitySerializer,ActivitySmallSerializer,ActivityRegionSerializer,DestinationSerializer
+from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityRegionSerializer,DestinationSerializer
 
 
 class FAQCategorySerializer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class FAQSerializer(serializers.ModelSerializer):
         
 class InnerDropdownSerializer(serializers.ModelSerializer):
     activity_region = ActivityRegionSerializer()
-    activites = ActivitySerializer(many=True)
+    activites = ActivitySmallSerializer(many=True)
 
     class Meta:
         model = InnerDropdown
