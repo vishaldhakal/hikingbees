@@ -32,7 +32,7 @@ def navbar(request):
         
         acy = ActivityCategory.objects.get(title="Peak Climbing")
         climb_nav = Activity.objects.filter(activity_category=acy)
-        climb_nav_serializer = ActivitySmallSerializer(climb_nav)
+        climb_nav_serializer = ActivitySmallSerializer(climb_nav,many=True)
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
