@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,7 +8,32 @@ from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
+@api_view(["POST"])
+def ContactFormSubmission(request):
+    if request.method == "POST":
+        subject = "Inquiry Submission"
+        email = "Hiking Bees <info@hikingbees.com>"
+        headers = {'Reply-To': request.POST["email"]}
+        contex = {
+            "name": request.POST["name"],
+            "email": request.POST["email"],
+            "phone": request.POST["phone"],
+            "message": request.POST["message"]
+        }
+        html_content = render_to_string("contactForm.html", contex)
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return HttpResponse("Sucess")
+    else:
+        return HttpResponse("Not post req")
 
 @api_view(['GET'])
 def faq_list(request):
