@@ -15,7 +15,7 @@ from django.utils.html import strip_tags
 @api_view(["POST"])
 def ContactFormSubmission(request):
     if request.method == "POST":
-        subject = "Inquiry Submission"
+        subject = "Contact Form Submission"
         email = "Hiking Bees <info@hikingbees.com>"
         headers = {'Reply-To': request.POST["email"]}
         contex = {
@@ -25,6 +25,34 @@ def ContactFormSubmission(request):
             "message": request.POST["message"]
         }
         html_content = render_to_string("contactForm.html", contex)
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return HttpResponse("Sucess")
+    else:
+        return HttpResponse("Not post req")
+
+@api_view(["POST"])
+def InquirySubmission(request):
+    if request.method == "POST":
+        subject = "Enquiry About Activity"
+        email = "Hiking Bees <info@hikingbees.com>"
+        headers = {'Reply-To': request.POST["email"]}
+
+        actt = Activity.objects.get(slug=request.POST["slug"])
+
+        contex = {
+            "name": request.POST["name"],
+            "email": request.POST["email"],
+            "phone": request.POST["phone"],
+            "message": request.POST["message"],
+            "activity": actt.activity_title,
+            "slug": request.POST["slug"]
+        }
+        html_content = render_to_string("contactForm2.html", contex)
         text_content = strip_tags(html_content)
 
         msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)

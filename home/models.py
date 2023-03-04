@@ -118,3 +118,10 @@ class Partners(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+class Enquiry(models.Model):
+    name = models.CharField(max_length=500,blank=True)
+    phone = models.CharField(max_length=500,blank=True)
+    email = models.CharField(max_length=500,blank=True)
+    message = models.CharField(max_length=500,blank=True)
+    date = models.DateTimeField(auto_now_add=True)

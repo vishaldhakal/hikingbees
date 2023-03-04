@@ -9,5 +9,6 @@ urlpatterns = [
     path('navbar/', views.navbar),
     path('faqs/', views.faq_list),
     path('contact-form-submit/', views.ContactFormSubmission),
+    path('enquiry-submit/', views.InquirySubmission),
     path('team-single/<int:id>/', views.teams_single),
 ]

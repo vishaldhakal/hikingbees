@@ -74,6 +74,15 @@ class Activity(models.Model):
           strrr+="]"
           return self.activity_title + strrr
           
+class ActivityEnquiry(models.Model):
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='enquiries')
+    name = models.CharField(max_length=400)
+    email = models.CharField(max_length=400)
+    phone = models.CharField(max_length=400,blank=True,default=" ")
+    message = models.TextField()
+
+    def __str__(self):
+        return self.name
 
 class ActivityFAQ(models.Model):
     question = models.TextField()

@@ -1,6 +1,11 @@
-from .models import Activity,ActivityPricing,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
+from .models import Activity,ActivityPricing,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
 from rest_framework import serializers
 
+class ActivityEnquirySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityEnquiry
+        fields = ('name','email','phone','message')
+        depth = 1
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
