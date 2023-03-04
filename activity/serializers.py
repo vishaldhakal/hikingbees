@@ -4,7 +4,7 @@ from rest_framework import serializers
 class ActivityEnquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityEnquiry
-        fields = ('name','email','phone','message')
+        fields = ('id')
         depth = 1
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,6 +64,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     itinerary = ItineraryActivitySerializer(many=True, read_only=True)
     gallery = ActivityImageSerializer(many=True,read_only=True)
     faqs = ActivityFAQSerializer(many=True,read_only=True)
+    enquiries = ActivityEnquirySerializer(many=True,read_only=True)
     prices = ActivityPricingSerializer(many=True,read_only=True)
     
     class Meta:

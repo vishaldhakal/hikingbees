@@ -6,7 +6,7 @@ from .models import FAQ,FAQCategory,FeaturedTour,TeamMember,Testimonial,SiteConf
 from .serializers import FAQSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
-from activity.models import ActivityCategory,Activity
+from activity.models import ActivityCategory,Activity,ActivityEnquiry
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -43,6 +43,13 @@ def InquirySubmission(request):
         headers = {'Reply-To': request.POST["email"]}
 
         actt = Activity.objects.get(slug=request.POST["slug"])
+        if request.POST["phone"]:
+            chh = request.POST["phone"]
+        else:
+            chh = "No Number"
+
+        neww = ActivityEnquiry.objects.create(activity=actt,name=request.POST["name"],email=request.POST["email"],message=request.POST["message"],phone=chh)
+        neww.save()
 
         contex = {
             "name": request.POST["name"],
@@ -52,6 +59,7 @@ def InquirySubmission(request):
             "activity": actt.activity_title,
             "slug": request.POST["slug"]
         }
+
         html_content = render_to_string("contactForm2.html", contex)
         text_content = strip_tags(html_content)
 
