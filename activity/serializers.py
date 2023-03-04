@@ -4,7 +4,7 @@ from rest_framework import serializers
 class ActivityEnquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityEnquiry
-        fields = ('id')
+        fields = ('id',)
         depth = 1
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
