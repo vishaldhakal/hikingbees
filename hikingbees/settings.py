@@ -234,6 +234,7 @@ SUMMERNOTE_THEME = 'bs4'
 
 TINYMCE_DEFAULT_CONFIG = {
     "height" : "780",
+    "width" : "780",
     "entity_encoding": "raw",
     "menubar": "file edit view insert format tools table help",
     "plugins": 'print preview paste importcss searchreplace autolink autosave save code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons quickbars',
