@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django_summernote.fields import SummernoteTextField
 from ckeditor_uploader.fields import RichTextUploadingField
+from tinymce import models as tinymce_models
+
 
 class Author(models.Model):
     name = models.CharField(max_length=200) 
@@ -38,7 +40,7 @@ class Post(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     thumbnail_image = models.FileField()
     thumbnail_image_alt_description = models.CharField(max_length=300)
-    blog_content = RichTextUploadingField(blank=True)
+    blog_content = tinymce_models.HTMLField(blank=True)
     tags = models.ManyToManyField(Tag)
     author = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
     meta_title = models.CharField(max_length=200)
