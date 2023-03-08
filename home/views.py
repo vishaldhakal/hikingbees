@@ -6,7 +6,7 @@ from .models import FAQ,FAQCategory,FeaturedTour,TeamMember,Testimonial,SiteConf
 from .serializers import FAQSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
-from activity.models import ActivityCategory,Activity,ActivityEnquiry
+from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -61,6 +61,59 @@ def InquirySubmission(request):
         }
 
         html_content = render_to_string("contactForm2.html", contex)
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return HttpResponse("Sucess")
+    else:
+        return HttpResponse("Not post req")
+
+@api_view(["POST"])
+def BookingSubmission(request):
+    if request.method == "POST":
+        subject = "Booking of Activity"
+        email = "Hiking Bees <info@hikingbees.com>"
+        headers = {'Reply-To': request.POST["email"]}
+
+        name = request.POST["name"]
+        address = request.POST["address"]
+        emaill = request.POST["email"]
+        phone = request.POST["email"]
+        message = request.POST["email"]
+        no_of_guests = request.POST["email"]
+        total_price = request.POST["email"]
+        booking_date = request.POST["email"]
+        arrival_date = request.POST["email"]
+        departure_date = request.POST["email"]
+        created_at = request.POST["email"]
+        updated_at = request.POST["email"]
+        emergency_contact_name = request.POST["email"]
+        emergency_address = request.POST["email"]
+        emergency_phone = request.POST["email"]
+        emergency_email = request.POST["email"]
+        emergency_relationship = request.POST["email"]
+
+        actt = Activity.objects.get(slug=request.POST["slug"])
+
+        neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date,arrival_date=arrival_date,departure_date=departure_date,emergency_contact_name=emergency_contact_name,emergency_address=emergency_address,emergency_phone=emergency_phone)
+        neww.save()
+
+        contex = {
+            "name": request.POST["name"],
+            "email": request.POST["email"],
+            "phone": request.POST["phone"],
+            "message": request.POST["message"],
+            "total_price": request.POST["total_price"],
+            "no_of_guests": request.POST["no_of_guests"],
+            "booking_date": request.POST["booking_date"],
+            "activity": actt.activity_title,
+            "slug": request.POST["slug"]
+        }
+
+        html_content = render_to_string("contactForm3.html", contex)
         text_content = strip_tags(html_content)
 
         msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)

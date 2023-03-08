@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ActivityCategory,ActivityEnquiry,ActivityPricing,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
+from .models import ActivityCategory,ActivityBooking,ActivityEnquiry,ActivityPricing,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
 
 class ItineraryActivityInline(admin.StackedInline):
     model = ItineraryActivity
@@ -30,3 +30,4 @@ admin.site.register(ActivityFAQ)
 admin.site.register(ActivityPricing)
 admin.site.register(ActivityRegion)
 admin.site.register(ActivityEnquiry)
+admin.site.register(ActivityBooking)

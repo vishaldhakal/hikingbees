@@ -1,10 +1,11 @@
 from django.db import models
 from django_summernote.fields import SummernoteTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 class Destination(models.Model):
      name = models.CharField(max_length=200)
      destination_small_detail = models.TextField(blank=True)
-     destination_detail = SummernoteTextField(blank=True)
+     destination_detail = RichTextUploadingField(blank=True)
      thumnail_image = models.FileField(blank=True)
      thumnail_image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
@@ -51,10 +52,10 @@ class Activity(models.Model):
     popular = models.BooleanField()
     best_selling = models.BooleanField()
     featured = models.BooleanField(default=False)
-    tour_description = SummernoteTextField()
-    tour_highlights = SummernoteTextField()
-    tour_includes = SummernoteTextField()
-    tour_excludes = SummernoteTextField()
+    tour_description = RichTextUploadingField()
+    tour_highlights = RichTextUploadingField()
+    tour_includes = RichTextUploadingField()
+    tour_excludes = RichTextUploadingField()
     createdAt = models.DateTimeField(auto_created=True)
     availableStart = models.DateTimeField()
     availableEnd = models.DateTimeField()
@@ -80,6 +81,29 @@ class ActivityEnquiry(models.Model):
     email = models.CharField(max_length=400)
     phone = models.CharField(max_length=400,blank=True,default=" ")
     message = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class ActivityBooking(models.Model):
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='bookings')
+    name = models.CharField(max_length=400)
+    address = models.CharField(max_length=400)
+    email = models.CharField(max_length=400)
+    phone = models.CharField(max_length=400,blank=True)
+    message = models.TextField(blank=True)
+    no_of_guests = models.IntegerField()
+    total_price = models.FloatField()
+    booking_date = models.DateTimeField()
+    arrival_date = models.DateTimeField(blank=True)
+    departure_date = models.DateTimeField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    emergency_contact_name = models.CharField(max_length=400,blank=True)
+    emergency_address = models.CharField(max_length=400,blank=True)
+    emergency_phone = models.CharField(max_length=400,blank=True)
+    emergency_email = models.CharField(max_length=400,blank=True)
+    emergency_relationship = models.CharField(max_length=400,blank=True)
 
     def __str__(self):
         return self.name
