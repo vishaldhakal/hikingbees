@@ -83,10 +83,8 @@ def BookingSubmission(request):
         emaill = request.POST["email"]
         phone = request.POST["phone"]
         message = request.POST["message"]
-        ng = request.POST["no_of_guests"]
-        no_of_guests = int(ng)
-        tp = request.POST["total_price"]
-        total_price = float(tp)
+        no_of_guests = request.POST["no_of_guests"]
+        total_price = request.POST["total_price"]
         booking_date = request.POST["booking_date"]
         arrival_date = request.POST["arrival_date"]
         departure_date = request.POST["departure_date"]
@@ -96,10 +94,16 @@ def BookingSubmission(request):
         emergency_email = request.POST["emergency_email"]
         emergency_relationship = request.POST["emergency_relationship"]
 
-        actt = Activity.objects.get(slug=request.POST["slug"])
+        try:
+            actt = Activity.objects.get(slug=request.POST["slug"])
+        except:
+            return HttpResponse("Muji Activity vetiyena")
 
-        neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date)
-        neww.save()
+        try:
+            neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date,arrival_date=arrival_date,departure_date=departure_date,emergency_contact_name=emergency_contact_name,emergency_address=emergency_address,emergency_phone=emergency_phone,emergency_email=emergency_email,emergency_relationship=emergency_relationship)
+            neww.save()
+        except:
+            return HttpResponse("Muji Activity Book Bhayena")
 
         contex = {
             "name": request.POST["name"],
