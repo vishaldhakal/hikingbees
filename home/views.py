@@ -98,7 +98,7 @@ def BookingSubmission(request):
 
         actt = Activity.objects.get(slug=request.POST["slug"])
 
-        neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date,arrival_date=arrival_date,departure_date=departure_date,emergency_contact_name=emergency_contact_name,emergency_address=emergency_address,emergency_phone=emergency_phone)
+        neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date,arrival_date=arrival_date,departure_date=departure_date,emergency_contact_name=emergency_contact_name,emergency_address=emergency_address,emergency_phone=emergency_phone,emergency_email=emergency_email,emergency_relationship=emergency_relationship)
         neww.save()
 
         contex = {
