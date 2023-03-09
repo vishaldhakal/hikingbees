@@ -112,15 +112,24 @@ def BookingSubmission(request):
                 total_price=total_price,
                 booking_date=booking_date
             )
-            new_booking.phone = phone
-            new_booking.message = message
-            new_booking.arrival_date = arrival_date
-            new_booking.departure_date = departure_date
-            new_booking.emergency_contact_name = emergency_contact_name
-            new_booking.emergency_address = emergency_address
-            new_booking.emergency_phone = emergency_phone
-            new_booking.emergency_email = emergency_email
-            new_booking.emergency_relationship = emergency_relationship
+            if request.POST["phone"]:
+                new_booking.phone = phone
+            if request.POST["message"]:
+                new_booking.message = message
+            if request.POST["arrival_date"]:
+                new_booking.arrival_date = arrival_date
+            if request.POST["departure_date"]:
+                new_booking.departure_date = departure_date
+            if request.POST["emergency_contact_name"]:
+                new_booking.emergency_contact_name = emergency_contact_name
+            if request.POST["emergency_address"]:
+                new_booking.emergency_address = emergency_address
+            if request.POST["emergency_phone"]:
+                new_booking.emergency_phone = emergency_phone
+            if request.POST["emergency_email"]:
+                new_booking.emergency_email = emergency_email
+            if request.POST["emergency_relationship"]:
+                new_booking.emergency_relationship = emergency_relationship
             new_booking.save()
         except:
             return HttpResponse("Failed to book activity.")
