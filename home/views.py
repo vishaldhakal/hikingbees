@@ -81,18 +81,20 @@ def BookingSubmission(request):
         name = request.POST["name"]
         address = request.POST["address"]
         emaill = request.POST["email"]
-        phone = request.POST["phone"]| "No Number"
+        phone = request.POST["phone"]
         message = request.POST["message"]
-        no_of_guests = int(request.POST["no_of_guests"])
-        total_price = float(request.POST["total_price"])
+        ng = request.POST["no_of_guests"]
+        no_of_guests = int(ng)
+        tp = request.POST["total_price"]
+        total_price = float(tp)
         booking_date = request.POST["booking_date"]
         arrival_date = request.POST["arrival_date"]
         departure_date = request.POST["departure_date"]
-        emergency_contact_name = request.POST["emergency_contact_name"] |"NA"
-        emergency_address = request.POST["emergency_address"]|"NA"
-        emergency_phone = request.POST["emergency_phone"]|"NA"
-        emergency_email = request.POST["emergency_email"]|"NA"
-        emergency_relationship = request.POST["emergency_relationship"]|"NA"
+        emergency_contact_name = request.POST["emergency_contact_name"]
+        emergency_address = request.POST["emergency_address"]
+        emergency_phone = request.POST["emergency_phone"]
+        emergency_email = request.POST["emergency_email"]
+        emergency_relationship = request.POST["emergency_relationship"]
 
         actt = Activity.objects.get(slug=request.POST["slug"])
 
