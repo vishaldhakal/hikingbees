@@ -78,29 +78,46 @@ def BookingSubmission(request):
         email = "Hiking Bees <info@hikingbees.com>"
         headers = {'Reply-To': request.POST["email"]}
 
-        name = request.POST["name"]
-        address = request.POST["address"]
-        emaill = request.POST["email"]
-        phone = request.POST["phone"]
-        message = request.POST["message"]
-        no_of_guests = int(request.POST["no_of_guests"])
-        total_price = float(request.POST["total_price"])
-        booking_date = request.POST["booking_date"]
-        arrival_date = request.POST["arrival_date"]
-        departure_date = request.POST["departure_date"]
-        emergency_contact_name = request.POST["emergency_contact_name"]
-        emergency_address = request.POST["emergency_address"]
-        emergency_phone = request.POST["emergency_phone"]
-        emergency_email = request.POST["emergency_email"]
-        emergency_relationship = request.POST["emergency_relationship"]
+        name = request.POST.get("name", "")
+        address = request.POST.get("address", "")
+        emaill = request.POST.get("email", "")
+        phone = request.POST.get("phone", "")
+        message = request.POST.get("message", "")
+        no_of_guests = int(request.POST.get("no_of_guests", "0"))
+        total_price = float(request.POST.get("total_price", "0.0"))
+        booking_date = request.POST.get("booking_date", "")
+        arrival_date = request.POST.get("arrival_date", "")
+        departure_date = request.POST.get("departure_date", "")
+        emergency_contact_name = request.POST.get("emergency_contact_name", "")
+        emergency_address = request.POST.get("emergency_address", "")
+        emergency_phone = request.POST.get("emergency_phone", "")
+        emergency_email = request.POST.get("emergency_email", "")
+        emergency_relationship = request.POST.get("emergency_relationship", "")
 
-        actt = Activity.objects.get(slug=request.POST["slug"])
+        act = Activity.objects.get(slug=request.POST["slug"])
 
         try:
-            neww = ActivityBooking.objects.create(activity=actt,name=name,address=address,email=emaill,phone=phone,no_of_guests=no_of_guests,message=message,total_price=total_price,booking_date=booking_date,arrival_date=arrival_date,departure_date=departure_date,emergency_contact_name=emergency_contact_name,emergency_address=emergency_address,emergency_phone=emergency_phone,emergency_email=emergency_email,emergency_relationship=emergency_relationship)
-            neww.save()
+            new_booking = ActivityBooking.objects.create(
+                activity=act,
+                name=name,
+                address=address,
+                email=emaill,
+                no_of_guests=no_of_guests,
+                total_price=total_price,
+                booking_date=booking_date
+            )
+            new_booking.phone = phone
+            new_booking.message = message
+            new_booking.arrival_date = arrival_date
+            new_booking.departure_date = departure_date
+            new_booking.emergency_contact_name = emergency_contact_name
+            new_booking.emergency_address = emergency_address
+            new_booking.emergency_phone = emergency_phone
+            new_booking.emergency_email = emergency_email
+            new_booking.emergency_relationship = emergency_relationship
+            new_booking.save()
         except:
-            return HttpResponse("Muji Activity Book Bhayena")
+            return HttpResponse("Failed to book activity.")
 
         contex = {
             "name": request.POST["name"],
@@ -110,7 +127,7 @@ def BookingSubmission(request):
             "total_price": request.POST["total_price"],
             "no_of_guests": request.POST["no_of_guests"],
             "booking_date": request.POST["booking_date"],
-            "activity": actt.activity_title,
+            "activity": act.activity_title,
             "slug": request.POST["slug"]
         }
 
