@@ -11,6 +11,7 @@ from activity.serializers import ActivityCategorySerializer,ActivitySmallSeriali
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from datetime import datetime
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
@@ -85,9 +86,14 @@ def BookingSubmission(request):
         message = request.POST.get("message", "")
         no_of_guests = int(request.POST.get("no_of_guests", "0"))
         total_price = float(request.POST.get("total_price", "0.0"))
-        booking_date = request.POST.get("booking_date", "")
-        arrival_date = request.POST.get("arrival_date", "")
-        departure_date = request.POST.get("departure_date", "")
+        booking_date_str = request.POST.get("booking_date", "")
+        arrival_date_str = request.POST.get("arrival_date", "")
+        departure_date_str = request.POST.get("departure_date", "")
+
+        booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+        arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if arrival_date_str else None
+        departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if departure_date_str else None
+
         emergency_contact_name = request.POST.get("emergency_contact_name", "")
         emergency_address = request.POST.get("emergency_address", "")
         emergency_phone = request.POST.get("emergency_phone", "")
