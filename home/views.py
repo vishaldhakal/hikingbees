@@ -112,23 +112,23 @@ def BookingSubmission(request):
                 total_price=total_price,
                 booking_date=booking_date
             )
-            if request.POST["phone"]:
+            if "phone" in request.POST:
                 new_booking.phone = phone
-            if request.POST["message"]:
+            if "message" in request.POST:
                 new_booking.message = message
-            if request.POST["arrival_date"]:
+            if "arrival_date" in request.POST:
                 new_booking.arrival_date = arrival_date
-            if request.POST["departure_date"]:
+            if "departure_date" in request.POST:
                 new_booking.departure_date = departure_date
-            if request.POST["emergency_contact_name"]:
+            if "emergency_contact_name" in request.POST:
                 new_booking.emergency_contact_name = emergency_contact_name
-            if request.POST["emergency_address"]:
+            if "emergency_address" in request.POST:
                 new_booking.emergency_address = emergency_address
-            if request.POST["emergency_phone"]:
+            if "emergency_phone" in request.POST:
                 new_booking.emergency_phone = emergency_phone
-            if request.POST["emergency_email"]:
+            if "emergency_email" in request.POST:
                 new_booking.emergency_email = emergency_email
-            if request.POST["emergency_relationship"]:
+            if "emergency_relationship" in request.POST:
                 new_booking.emergency_relationship = emergency_relationship
             new_booking.save()
         except:
