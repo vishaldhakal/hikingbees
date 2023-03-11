@@ -102,6 +102,26 @@ def BookingSubmission(request):
 
         act = Activity.objects.get(slug=request.POST["slug"])
 
+        contex = {
+            "name": request.POST["name"],
+            "email": request.POST["email"],
+            "phone": request.POST["phone"],
+            "message": request.POST["message"],
+            "total_price": request.POST["total_price"],
+            "no_of_guests": request.POST["no_of_guests"],
+            "booking_date": request.POST["booking_date"],
+            "activity": act.activity_title,
+            "slug": request.POST["slug"]
+        }
+
+        html_content = render_to_string("contactForm3.html", contex)
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+
         try:
             new_booking = ActivityBooking.objects.create(
                 activity=act,
@@ -133,25 +153,6 @@ def BookingSubmission(request):
             new_booking.save()
         except:
             return HttpResponse("Failed to book activity.")
-
-        contex = {
-            "name": request.POST["name"],
-            "email": request.POST["email"],
-            "phone": request.POST["phone"],
-            "message": request.POST["message"],
-            "total_price": request.POST["total_price"],
-            "no_of_guests": request.POST["no_of_guests"],
-            "booking_date": request.POST["booking_date"],
-            "activity": act.activity_title,
-            "slug": request.POST["slug"]
-        }
-
-        html_content = render_to_string("contactForm3.html", contex)
-        text_content = strip_tags(html_content)
-
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
 
         return HttpResponse("Sucess")
     else:
