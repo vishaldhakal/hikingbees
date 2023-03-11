@@ -102,7 +102,7 @@ def BookingSubmission(request):
 
         act = Activity.objects.get(slug=request.POST["slug"])
 
-        """ try:
+        try:
             new_booking = ActivityBooking.objects.create(
                 activity=act,
                 name=name,
@@ -132,7 +132,7 @@ def BookingSubmission(request):
                 new_booking.emergency_relationship = emergency_relationship
             new_booking.save()
         except:
-            return HttpResponse("Failed to book activity.") """
+            return HttpResponse("Failed to book activity.")
 
         contex = {
             "name": request.POST["name"],
