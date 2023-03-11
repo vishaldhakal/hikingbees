@@ -14,7 +14,7 @@ class Destination(models.Model):
           return self.name
      
      class Meta:
-        ordering = ('-order','name',)
+        ordering = ('order','name',)
 
      
 
