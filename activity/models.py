@@ -3,6 +3,7 @@ from django_summernote.fields import SummernoteTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
 class Destination(models.Model):
+     order = models.IntegerField(blank=True)
      name = models.CharField(max_length=200)
      destination_small_detail = models.TextField(blank=True)
      destination_detail = RichTextUploadingField(blank=True)
@@ -11,6 +12,11 @@ class Destination(models.Model):
 
      def __str__(self) -> str:
           return self.name
+     
+     class Meta:
+        ordering = ('-order','name',)
+
+     
 
 class ActivityCategory(models.Model):
      title = models.CharField(max_length=200)
