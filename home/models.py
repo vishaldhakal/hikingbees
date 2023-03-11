@@ -77,6 +77,7 @@ class TeamMember(models.Model):
     ("Trekking Guides", "Trekking Guides"),
     ("Tour Guide", "Tour Guide"),
     )
+    order = models.IntegerField(blank=True)
     name = models.CharField(max_length=200,blank=True)
     role = models.CharField(max_length=200,blank=True)
     photo = models.FileField(blank=True)
@@ -92,6 +93,9 @@ class TeamMember(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        ordering = ('order','name',)
 
 class Testimonial(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
