@@ -226,6 +226,8 @@ def landing_page(request):
           "featured_activities":serializer_activities.data["featured_tours"],
           "popular_activities":serializer_activities.data["popular_tours"],
           "best_selling_activities":serializer_activities.data["best_selling_tours"],
+          "favourite_activities":serializer_activities.data["favourite_tours"],
+          "banner_activity":serializer_activities.data["banner_tour"],
           "activity_categories":serializer_activity_category.data,
           "team_members":teammembers_serializer.data,
           "testimonials":testimonial_serializer.data,
