@@ -3,6 +3,8 @@ from django_summernote.fields import SummernoteTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
 class Destination(models.Model):
+     meta_title = models.CharField(max_length=200,blank=True)
+     meta_description = models.TextField(blank=True)
      order = models.IntegerField(blank=True)
      name = models.CharField(max_length=200)
      destination_small_detail = models.TextField(blank=True)
@@ -19,6 +21,8 @@ class Destination(models.Model):
      
 
 class ActivityCategory(models.Model):
+     meta_title = models.CharField(max_length=200,blank=True)
+     meta_description = models.TextField(blank=True)
      title = models.CharField(max_length=200)
      destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
      subtitle = models.TextField()
@@ -31,6 +35,8 @@ class ActivityCategory(models.Model):
 
 class ActivityRegion(models.Model):
      title = models.CharField(max_length=200)
+     meta_title = models.CharField(max_length=200,blank=True)
+     meta_description = models.TextField(blank=True)
      activity_category = models.ManyToManyField(ActivityCategory)
      slug = models.SlugField(blank=True)
      image = models.FileField(blank=True)
@@ -40,6 +46,8 @@ class ActivityRegion(models.Model):
           return self.title
 
 class Activity(models.Model):
+    meta_title = models.CharField(max_length=200,blank=True)
+    meta_description = models.TextField(blank=True)
     activity_category = models.ManyToManyField(ActivityCategory)
     activity_region = models.ForeignKey(ActivityRegion,on_delete=models.DO_NOTHING)
     destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
