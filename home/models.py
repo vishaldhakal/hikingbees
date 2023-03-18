@@ -54,6 +54,8 @@ class FeaturedTour(SingletonModel):
     featured_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'featured': True},related_name="featured_tours")
     popular_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'popular': True},related_name="popular_tours")
     best_selling_tours = models.ManyToManyField(Activity,blank=True,limit_choices_to={'best_selling': True},related_name="best_selling_tours")
+    favourite_tours = models.ManyToManyField(Activity,blank=True,related_name="favourite_tours")
+    banner_tour = models.ManyToManyField(Activity,blank=True,related_name="banner_tour")
 
     def __str__(self) -> str:
         return "Featured, Popular and Best Selling Tours"
@@ -98,11 +100,20 @@ class TeamMember(models.Model):
         ordering = ('order','name',)
 
 class Testimonial(models.Model):
+
+    SOURCE_CHOICES = (
+    ("Trip Advisor", "Trip Advisor"),
+    ("Trust Pilot", "Trust Pilot"),
+    ("Google", "Google"),
+    ("Others", "Others"),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200,blank=True)
     avatar = models.FileField(blank=True)
     role = models.CharField(max_length=200,blank=True)
+    title = models.CharField(max_length=500,blank=True)
+    source = models.CharField(max_length=200,choices=SOURCE_CHOICES,default="Others")
     review = models.TextField(blank=True)
     rating = models.FloatField(default=5)
 

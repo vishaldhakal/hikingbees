@@ -73,6 +73,10 @@ class Activity(models.Model):
     createdAt = models.DateTimeField(auto_created=True)
     availableStart = models.DateTimeField()
     availableEnd = models.DateTimeField()
+    trek_map = models.FileField(blank=True)
+    altitude_chart = models.FileField(blank=True)
+    additional_info = RichTextUploadingField(blank=True)
+
 
     class Meta:
         ordering = ['createdAt']

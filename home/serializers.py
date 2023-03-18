@@ -12,6 +12,8 @@ class FeaturedTourSerializer(serializers.ModelSerializer):
     featured_tours = ActivitySmallSerializer(many=True)
     popular_tours = ActivitySmallSerializer(many=True)
     best_selling_tours = ActivitySmallSerializer(many=True)
+    favourite_tours = ActivitySmallSerializer(many=True)
+    banner_tour = ActivitySmallSerializer(many=True)
     class Meta:
         model = FeaturedTour
         fields = '__all__'
