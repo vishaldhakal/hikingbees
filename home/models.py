@@ -1,8 +1,7 @@
 from django.db import models
 from solo.models import SingletonModel
 from activity.models import Activity,ActivityCategory,Destination,ActivityRegion
-from django_summernote.fields import SummernoteTextField
-from ckeditor_uploader.fields import RichTextUploadingField
+from tinymce import models as tinymce_models
 
 class FAQCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -83,7 +82,7 @@ class TeamMember(models.Model):
     name = models.CharField(max_length=200,blank=True)
     role = models.CharField(max_length=200,blank=True)
     photo = models.FileField(blank=True)
-    about = RichTextUploadingField(blank=True)
+    about = tinymce_models.HTMLField(blank=True)
     type = models.CharField(max_length=300,choices=TEAM_CHOICES,default="Representative")
     email = models.CharField(max_length=200) 
     facebook = models.URLField(max_length=200,blank=True) 

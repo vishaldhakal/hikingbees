@@ -1,6 +1,5 @@
 from django.db import models
-from django_summernote.fields import SummernoteTextField
-from ckeditor_uploader.fields import RichTextUploadingField
+from tinymce import models as tinymce_models
 
 class Destination(models.Model):
      meta_title = models.CharField(max_length=200,blank=True)
@@ -8,7 +7,7 @@ class Destination(models.Model):
      order = models.IntegerField(blank=True)
      name = models.CharField(max_length=200)
      destination_small_detail = models.TextField(blank=True)
-     destination_detail = RichTextUploadingField(blank=True)
+     destination_detail = tinymce_models.HTMLField(blank=True)
      thumnail_image = models.FileField(blank=True)
      thumnail_image_alt_description = models.CharField(max_length=200,default="Alt Description")
 
@@ -66,16 +65,16 @@ class Activity(models.Model):
     popular = models.BooleanField()
     best_selling = models.BooleanField()
     featured = models.BooleanField(default=False)
-    tour_description = RichTextUploadingField()
-    tour_highlights = RichTextUploadingField()
-    tour_includes = RichTextUploadingField()
-    tour_excludes = RichTextUploadingField()
+    tour_description = tinymce_models.HTMLField()
+    tour_highlights = tinymce_models.HTMLField()
+    tour_includes = tinymce_models.HTMLField()
+    tour_excludes = tinymce_models.HTMLField()
     createdAt = models.DateTimeField(auto_created=True)
     availableStart = models.DateTimeField()
     availableEnd = models.DateTimeField()
     trek_map = models.FileField(blank=True)
     altitude_chart = models.FileField(blank=True)
-    additional_info = RichTextUploadingField(blank=True)
+    additional_info = tinymce_models.HTMLField(blank=True)
 
 
     class Meta:
