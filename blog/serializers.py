@@ -40,7 +40,7 @@ class TagSerializer(serializers.ModelSerializer):
 class BlogContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogContent
-        fields = '__all__'
+        fields = ('id','order','title','description')
         depth = 1
 
 class PostSerializer(serializers.ModelSerializer):
