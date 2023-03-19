@@ -122,37 +122,34 @@ def BookingSubmission(request):
         msg.send()
 
 
-        try:
-            new_booking = ActivityBooking.objects.create(
-                activity=act,
-                name=name,
-                address=address,
-                email=emaill,
-                no_of_guests=no_of_guests,
-                total_price=total_price,
-                booking_date=booking_date
-            )
-            if "phone" in request.POST:
-                new_booking.phone = phone
-            if "message" in request.POST:
-                new_booking.message = message
-            if "arrival_date" in request.POST:
-                new_booking.arrival_date = arrival_date
-            if "departure_date" in request.POST:
-                new_booking.departure_date = departure_date
-            if "emergency_contact_name" in request.POST:
-                new_booking.emergency_contact_name = emergency_contact_name
-            if "emergency_address" in request.POST:
-                new_booking.emergency_address = emergency_address
-            if "emergency_phone" in request.POST:
-                new_booking.emergency_phone = emergency_phone
-            if "emergency_email" in request.POST:
-                new_booking.emergency_email = emergency_email
-            if "emergency_relationship" in request.POST:
-                new_booking.emergency_relationship = emergency_relationship
-            new_booking.save()
-        except:
-            return HttpResponse("Failed to book activity.")
+        new_booking = ActivityBooking.objects.create(
+            activity=act,
+            name=name,
+            address=address,
+            email=emaill,
+            no_of_guests=no_of_guests,
+            total_price=total_price,
+            booking_date=booking_date
+        )
+        if "phone" in request.POST:
+            new_booking.phone = phone
+        if "message" in request.POST:
+            new_booking.message = message
+        if "arrival_date" in request.POST:
+            new_booking.arrival_date = arrival_date
+        if "departure_date" in request.POST:
+            new_booking.departure_date = departure_date
+        if "emergency_contact_name" in request.POST:
+            new_booking.emergency_contact_name = emergency_contact_name
+        if "emergency_address" in request.POST:
+            new_booking.emergency_address = emergency_address
+        if "emergency_phone" in request.POST:
+            new_booking.emergency_phone = emergency_phone
+        if "emergency_email" in request.POST:
+            new_booking.emergency_email = emergency_email
+        if "emergency_relationship" in request.POST:
+            new_booking.emergency_relationship = emergency_relationship
+        new_booking.save()
 
         return HttpResponse("Sucess")
     else:
