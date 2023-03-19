@@ -60,6 +60,8 @@ class FeaturedTour(SingletonModel):
         return "Featured, Popular and Best Selling Tours"
 
 class SiteConfiguration(SingletonModel):
+    meta_title = models.CharField(max_length=200,default="Meta Title Landing Page")
+    meta_description = models.TextField(default="Meta Description Landing Page")
     hero_title_line1 = models.CharField(max_length=328,default="Line 1")
     hero_title_line2 = models.CharField(max_length=328,default="Line 2")
     hero_title_line3 = models.CharField(max_length=328,default="Line 3")
