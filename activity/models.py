@@ -158,7 +158,7 @@ class ItineraryActivity(models.Model):
     trek_duration = models.CharField(max_length=100,blank=True)
     highest_altitude = models.CharField(max_length=100,blank=True)
     meals = models.CharField(max_length=100,blank=True)
-    description = models.TextField()
+    description = tinymce_models.HTMLField(blank=True)
     activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='itinerary')
 
     class Meta:

@@ -10,7 +10,7 @@ class ActivityEnquirySerializer(serializers.ModelSerializer):
 class ActivityBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityBooking
-        fields = '__all__'
+        fields = ('id','no_of_guests','booking_date',)
         depth = 1
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:

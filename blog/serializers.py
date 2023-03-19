@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Author, Category, Tag, Post,BlogContent
+from .models import Author, Category, Tag, Post
 from bs4 import BeautifulSoup
 
 class HTMLField(serializers.CharField):
@@ -37,14 +37,8 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
-class BlogContentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BlogContent
-        fields = ('id','order','title','description')
-        depth = 1
 
 class PostSerializer(serializers.ModelSerializer):
-    blogcontent = BlogContentSerializer(many=True, read_only=True)
     blog_content = HTMLField()
     class Meta:
         model = Post
