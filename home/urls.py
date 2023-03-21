@@ -12,4 +12,6 @@ urlpatterns = [
     path('enquiry-submit/', views.InquirySubmission),
     path('booking-submit/', views.BookingSubmission),
     path('team-single/<int:id>/', views.teams_single),
+    path('tinymce/', include('tinymce.urls')),
+    path('fb/', views.django_filebrowser, name='djangoFileBrowser'),
 ]

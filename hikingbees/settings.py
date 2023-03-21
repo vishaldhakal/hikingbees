@@ -233,6 +233,9 @@ SUMMERNOTE_CONFIG = {
 SUMMERNOTE_THEME = 'bs4'
 
 TINYMCE_DEFAULT_CONFIG = {
+    'file_browser_callback': 'djangoFileBrowser',
+    'relative_urls': False,
+    'remove_script_host': False,
     "height" : "780",
     "width" : "780",
     "entity_encoding": "raw",
@@ -243,31 +246,6 @@ TINYMCE_DEFAULT_CONFIG = {
     "emoticons | ",
     "custom_undo_redo_levels": 50,
     "quickbars_insert_toolbar": False,
-    "file_picker_callback": """function (cb, value, meta) {
-        var input = document.createElement("input");
-        input.setAttribute("type", "file");
-        if (meta.filetype == "image") {
-            input.setAttribute("accept", "image/*");
-        }
-        if (meta.filetype == "media") {
-            input.setAttribute("accept", "video/*");
-        }
-
-        input.onchange = function () {
-            var file = this.files[0];
-            var reader = new FileReader();
-            reader.onload = function () {
-                var id = "blobid" + (new Date()).getTime();
-                var blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                var base64 = reader.result.split(",")[1];
-                var blobInfo = blobCache.create(id, file, base64);
-                blobCache.add(blobInfo);
-                cb(blobInfo.blobUri(), { title: file.name });
-            };
-            reader.readAsDataURL(file);
-        };
-        input.click();
-    }""",
     "content_style": "body { font-family:Roboto,Helvetica,Arial,sans-serif; font-size:14px }",
 }
 
