@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Post,Tag,Category
 from .serializers import PostSerializer,PostSmallSerializer,TagSerializer,CategorySerializer,TagSmallSerializer,CategorySmallSerializer,PostSlugSerializer
+from bs4 import BeautifulSoup
+
 
 @api_view(['GET'])
 def post_list(request):
@@ -31,5 +33,14 @@ def post_list_slug(request):
 def post_single(request,slug):
     if request.method == 'GET':
         posts = Post.objects.get(slug=slug)
+        html_string = posts.blog_content
+        soup = BeautifulSoup(html_string, 'html.parser')
+        toc_div = soup.find('div', class_='mce-toc')
+        parent_div = toc_div.parent
+        toc_div.extract()
+        updated_html_string = str(soup)
         serializer = PostSerializer(posts)
-        return Response(serializer.data)
+        return Response({
+            "data":serializer.data,
+            "toc":updated_html_string
+        })
