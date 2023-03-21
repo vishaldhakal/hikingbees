@@ -233,8 +233,6 @@ SUMMERNOTE_CONFIG = {
 }
 SUMMERNOTE_THEME = 'bs4'
 
-TINYMCE_FILEBROWSER = True
-
 TINYMCE_DEFAULT_CONFIG = {
     "height" : "780",
     "width" : "780",
