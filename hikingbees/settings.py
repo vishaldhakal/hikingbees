@@ -233,7 +233,6 @@ SUMMERNOTE_CONFIG = {
 SUMMERNOTE_THEME = 'bs4'
 
 TINYMCE_DEFAULT_CONFIG = {
-    'file_browser_callback': 'djangoFileBrowser',
     "height" : "780",
     "width" : "780",
     "entity_encoding": "raw",
