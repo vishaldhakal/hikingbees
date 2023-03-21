@@ -12,14 +12,6 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
-from django.views.static import serve
-from django.urls import reverse
-from django.conf import settings
-
-def django_filebrowser(request):
-    url = request.GET.get('url', '')
-    url = url.replace(settings.MEDIA_URL, '')
-    return serve(request, url, document_root=settings.MEDIA_ROOT)
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
