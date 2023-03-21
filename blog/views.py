@@ -36,7 +36,8 @@ def post_single(request,slug):
         html_string = posts.blog_content
         soup = BeautifulSoup(html_string, 'html.parser')
         toc_div = soup.find('div', class_='mce-toc')
-        toc_div.extract()
+        if toc_div is not None:
+            toc_div.extract()
         updated_html_string = str(toc_div)
         serializer = PostSerializer(posts)
         return Response({
