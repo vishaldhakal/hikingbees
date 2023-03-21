@@ -36,11 +36,10 @@ def post_single(request,slug):
         html_string = posts.blog_content
         soup = BeautifulSoup(html_string, 'html.parser')
         toc_div = soup.find('div', class_='mce-toc')
-        parent_div = toc_div.parent
         toc_div.extract()
         updated_html_string = str(toc_div)
         serializer = PostSerializer(posts)
         return Response({
             "data":serializer.data,
-            "toc":updated_html_string
+            "toc":updated_html_string,
         })
