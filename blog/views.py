@@ -38,7 +38,7 @@ def post_single(request,slug):
         toc_div = soup.find('div', class_='mce-toc')
         parent_div = toc_div.parent
         toc_div.extract()
-        updated_html_string = str(soup)
+        updated_html_string = str(toc_div)
         serializer = PostSerializer(posts)
         return Response({
             "data":serializer.data,
