@@ -44,3 +44,13 @@ def post_single(request,slug):
             "data":serializer.data,
             "toc":updated_html_string,
         })
+    
+@api_view(['GET'])
+def recent_posts(request):
+    if request.method == 'GET':
+        posts = Post.objects.all()[:5]
+        posts_serializer = PostSerializer(posts,many=True)
+        return Response({
+          "recent_posts":posts_serializer.data,
+        })
+

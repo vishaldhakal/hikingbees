@@ -202,7 +202,7 @@ def landing_page(request):
         hero_content = SiteConfiguration.objects.get()
         hero_content_serializer = SiteConfigurationSerializer(hero_content)
 
-        posts = Post.objects.all()[:6]
+        posts = Post.objects.all()[:5]
         posts_serializer = PostSerializer(posts,many=True)
 
         activities = FeaturedTour.objects.get()

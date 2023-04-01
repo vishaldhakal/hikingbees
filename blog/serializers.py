@@ -46,6 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
         depth = 2
+        ordering = ['-created_at']
     
     def get_blog_content(self, obj):
         html_string = obj.blog_content
@@ -61,6 +62,7 @@ class PostSmallSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
         depth = 1
+        ordering = ['-created_at']
 
 class PostSlugSerializer(serializers.ModelSerializer):
     class Meta:

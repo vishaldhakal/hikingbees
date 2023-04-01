@@ -46,6 +46,10 @@ class Post(models.Model):
     meta_title = models.CharField(max_length=200)
     meta_description = models.TextField()
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return self.title
+    
 
