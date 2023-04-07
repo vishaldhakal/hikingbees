@@ -149,7 +149,7 @@ def activities_single(request,slug):
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
-        return Response({"data":serializer_activities.data,"bookings":grouped_bookings})
+        return Response({"data":serializer_activities.data,"bookings":grouped_bookings,"dates":unique_dates})
     
 
 
