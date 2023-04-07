@@ -12,28 +12,6 @@ class ActivityBookingSerializer(serializers.ModelSerializer):
         model = ActivityBooking
         fields = ('id','no_of_guests','booking_date',)
         depth = 1
-
-    def to_representation(self, instance):
-        # Retrieve the default representation of the instance
-        data = super().to_representation(instance)
-
-        # Group activity bookings with the same booking date
-        booking_date = data['booking_date']
-        if booking_date in self.context.get('booking_date', {}):
-            self.context['booking_date'][booking_date]['bookings'].append(data)
-        else:
-            self.context['booking_date'][booking_date] = {
-                'date': booking_date,
-                'bookings': [data]
-            }
-
-        return None  # Return None to exclude this instance from the response
-
-    def to_internal_value(self, data):
-        # Override to_internal_value to exclude the 'bookings' key from the request data
-        data.pop('bookings', None)
-        return super().to_internal_value(data)
-    
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination

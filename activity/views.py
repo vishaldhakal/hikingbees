@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Activity,ActivityCategory,Destination,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+from .models import Activity,ActivityCategory,ActivityBooking,Destination,ItineraryActivity,ActivityImage,ActivityRegion
+from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
 import json
+from django.core import serializers
+
 
 @api_view(['GET'])
 def activities_collection(request):
@@ -121,12 +123,28 @@ def activities_all_region(request,slug):
 
         return Response({"activities":acts.data,"activity_regions":serializer_activity_region.data})
 
+
+
+
 @api_view(['GET'])
 def activities_single(request,slug):
     if request.method == 'GET':
+        bookings = ActivityBooking.objects.filter(activity=activity)
+        bookings = bookings.order_by('booking_date')
+        grouped_bookings = {}
+        for booking in bookings:
+            date_key = booking.booking_date.date()
+            if date_key in grouped_bookings:
+                grouped_bookings[date_key].append(booking)
+            else:
+                grouped_bookings[date_key] = [booking]
+        serialized_bookings = serializers.serialize('json', grouped_bookings.values())
         activity = Activity.objects.get(slug=slug)
         serializer_activities = ActivitySerializer(activity)
-        return Response(serializer_activities.data)
+        return Response({"data":serializer_activities.data,"bookings":serialized_bookings})
+    
+
+
 
 @api_view(['GET'])
 def activity_categories_collection(request):
