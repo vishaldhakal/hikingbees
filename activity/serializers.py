@@ -71,7 +71,6 @@ class ActivitySerializer(serializers.ModelSerializer):
     gallery = ActivityImageSerializer(many=True,read_only=True)
     faqs = ActivityFAQSerializer(many=True,read_only=True)
     enquiries = ActivityEnquirySerializer(many=True,read_only=True)
-    bookings = ActivityBookingSerializer(many=True,read_only=True)
     prices = ActivityPricingSerializer(many=True,read_only=True)
     
     class Meta:

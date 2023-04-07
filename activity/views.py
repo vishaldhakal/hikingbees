@@ -5,7 +5,8 @@ from .models import Activity,ActivityCategory,ActivityBooking,Destination,Itiner
 from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
 import json
 from django.core import serializers
-
+from django.db.models import DateField
+from django.db.models.functions import Cast
 
 @api_view(['GET'])
 def activities_collection(request):
@@ -133,19 +134,18 @@ def activities_single(request,slug):
         bookings = ActivityBooking.objects.filter(activity=activity)
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
-        for booking in bookings:
-            date_key = booking.booking_date.date()
-            if not grouped_bookings or grouped_bookings[-1]['date'] != date_key:
-                grouped_bookings.append({
-                    'date': date_key,
-                    'bookings': [booking],
-                })
-            else:
-                grouped_bookings[-1]['bookings'].append(booking)
+        booking_dates = ActivityBooking.objects.annotate(
+            booking_date_date=Cast('booking_date', output_field=DateField())
+        ).values('booking_date_date').distinct()
 
-        serialized_bookings = serializers.serialize('json', grouped_bookings)
+        unique_dates = [booking['booking_date_date'] for booking in booking_dates]
+
+        for datee in unique_dates:
+            boki = ActivityBooking.objjects.filter(booking_date=datee)
+            grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
+
         serializer_activities = ActivitySerializer(activity)
-        return Response({"data":serializer_activities.data,"bookings":serialized_bookings})
+        return Response({"data":serializer_activities.data,"bookings":grouped_bookings})
     
 
 
