@@ -19,10 +19,10 @@ class ActivityBookingSerializer(serializers.ModelSerializer):
 
         # Group activity bookings with the same booking date
         booking_date = data['booking_date']
-        if booking_date in self.context.get('booking_dates', {}):
-            self.context['booking_dates'][booking_date]['bookings'].append(data)
+        if booking_date in self.context.get('booking_date', {}):
+            self.context['booking_date'][booking_date]['bookings'].append(data)
         else:
-            self.context['booking_dates'][booking_date] = {
+            self.context['booking_date'][booking_date] = {
                 'date': booking_date,
                 'bookings': [data]
             }
