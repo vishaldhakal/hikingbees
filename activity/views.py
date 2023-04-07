@@ -141,7 +141,7 @@ def activities_single(request,slug):
         unique_dates = [booking['booking_date_date'] for booking in booking_dates]
 
         for datee in unique_dates:
-            boki = ActivityBooking.objjects.filter(booking_date=datee)
+            boki = ActivityBooking.objects.filter(booking_date=datee)
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
