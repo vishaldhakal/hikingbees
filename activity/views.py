@@ -7,6 +7,8 @@ import json
 from django.core import serializers
 from django.db.models import DateField
 from django.db.models.functions import Cast
+from django.utils import timezone
+from datetime import datetime, time
 
 @api_view(['GET'])
 def activities_collection(request):
@@ -141,7 +143,9 @@ def activities_single(request,slug):
         unique_dates = [booking['booking_date_date'] for booking in booking_dates]
 
         for datee in unique_dates:
-            boki = ActivityBooking.objects.filter(booking_date=datee)
+            start_date = datetime.combine(datee, time.min)
+            end_date = datetime.combine(datee, time.max)
+            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date))
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
