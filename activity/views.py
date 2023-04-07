@@ -129,6 +129,7 @@ def activities_all_region(request,slug):
 @api_view(['GET'])
 def activities_single(request,slug):
     if request.method == 'GET':
+        activity = Activity.objects.get(slug=slug)
         bookings = ActivityBooking.objects.filter(activity=activity)
         bookings = bookings.order_by('booking_date')
         grouped_bookings = {}
@@ -139,7 +140,6 @@ def activities_single(request,slug):
             else:
                 grouped_bookings[date_key] = [booking]
         serialized_bookings = serializers.serialize('json', grouped_bookings.values())
-        activity = Activity.objects.get(slug=slug)
         serializer_activities = ActivitySerializer(activity)
         return Response({"data":serializer_activities.data,"bookings":serialized_bookings})
     
