@@ -73,6 +73,41 @@ def InquirySubmission(request):
         return HttpResponse("Not post req")
 
 @api_view(["POST"])
+def PlanTripSubmit(request):
+    if request.method == "POST":
+        subject = "Customized Trip Enquiry"
+        email = "Hiking Bees <info@hikingbees.com>"
+        headers = {'Reply-To': request.POST["email"]}
+
+        actt = Activity.objects.get(slug=request.POST["slug"])
+
+        contex = {
+            "name": request.POST["name"],
+            "email": request.POST["email"],
+            "phone": request.POST["phone"],
+            "message": request.POST["message"],
+            "noofpeople": request.POST["no_of_people"],
+            "noofdays": request.POST["no_of_days"],
+            "arrival": request.POST["arrival"],
+            "departure": request.POST["departure"],
+            "budget_from": request.POST["budget_from"],
+            "budget_to": request.POST["budget_to"],
+            "activity": actt.activity_title,
+            "slug": request.POST["slug"]
+        }
+
+        html_content = render_to_string("ContactForm4.html", contex)
+        text_content = strip_tags(html_content)
+
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return HttpResponse("Sucess")
+    else:
+        return HttpResponse("Not post req")
+
+@api_view(["POST"])
 def BookingSubmission(request):
     if request.method == "POST":
         subject = "Booking of Activity"
