@@ -132,14 +132,18 @@ def activities_single(request,slug):
         activity = Activity.objects.get(slug=slug)
         bookings = ActivityBooking.objects.filter(activity=activity)
         bookings = bookings.order_by('booking_date')
-        grouped_bookings = {}
+        grouped_bookings = []
         for booking in bookings:
             date_key = booking.booking_date.date()
-            if date_key in grouped_bookings:
-                grouped_bookings[date_key].append(booking)
+            if not grouped_bookings or grouped_bookings[-1]['date'] != date_key:
+                grouped_bookings.append({
+                    'date': date_key,
+                    'bookings': [booking],
+                })
             else:
-                grouped_bookings[date_key] = [booking]
-        serialized_bookings = serializers.serialize('json', grouped_bookings.values())
+                grouped_bookings[-1]['bookings'].append(booking)
+
+        serialized_bookings = serializers.serialize('json', grouped_bookings)
         serializer_activities = ActivitySerializer(activity)
         return Response({"data":serializer_activities.data,"bookings":serialized_bookings})
     
