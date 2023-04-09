@@ -145,7 +145,7 @@ def activities_single(request,slug):
         for datee in unique_dates:
             start_date = datetime.combine(datee, time.min)
             end_date = datetime.combine(datee, time.max)
-            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date))
+            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date),is_verified=True,is_private=False)
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
