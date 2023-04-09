@@ -123,6 +123,7 @@ def BookingSubmission(request):
         total_price = float(request.POST.get("total_price", "0.0"))
         booking_date_str = request.POST.get("booking_date", "")
         arrival_date_str = request.POST.get("arrival_date", "")
+        private_booking = request.POST.get("private_booking", "False")
         departure_date_str = request.POST.get("departure_date", "")
 
         booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -166,6 +167,11 @@ def BookingSubmission(request):
             total_price=total_price,
             booking_date=booking_date
         )
+        if "private_booking" in request.POST:
+            if private_booking == "True":
+                new_booking.is_private = True
+            else:
+                new_booking.is_private = False
         if "phone" in request.POST:
             new_booking.phone = phone
         if "message" in request.POST:

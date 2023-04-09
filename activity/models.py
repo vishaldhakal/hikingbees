@@ -111,6 +111,8 @@ class ActivityBooking(models.Model):
     message = models.TextField(blank=True)
     no_of_guests = models.IntegerField()
     total_price = models.FloatField()
+    is_private = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
     booking_date = models.DateTimeField()
     arrival_date = models.DateTimeField(null=True)
     departure_date = models.DateTimeField(null=True)
