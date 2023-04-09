@@ -137,7 +137,7 @@ def activities_single(request,slug):
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
         booking_dates = ActivityBooking.objects.annotate(
-            booking_date_date=Cast('booking_date', output_field=DateField(),is_verified=True,is_private=False)
+            booking_date_date=Cast('booking_date', output_field=DateField()),is_verified=True,is_private=False
         ).values('booking_date_date').distinct()
 
         unique_dates = [booking['booking_date_date'] for booking in booking_dates]
