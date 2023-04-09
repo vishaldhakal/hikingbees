@@ -137,7 +137,7 @@ def activities_single(request,slug):
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
         booking_dates = ActivityBooking.objects.annotate(
-            booking_date_date=Cast('booking_date', output_field=DateField())
+            booking_date_date=Cast('booking_date', output_field=DateField(),is_verified=True,is_private=False)
         ).values('booking_date_date').distinct()
 
         unique_dates = [booking['booking_date_date'] for booking in booking_dates]
@@ -145,7 +145,7 @@ def activities_single(request,slug):
         for datee in unique_dates:
             start_date = datetime.combine(datee, time.min)
             end_date = datetime.combine(datee, time.max)
-            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date),is_verified=True,is_private=False)
+            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date))
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
