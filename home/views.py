@@ -12,7 +12,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
-from activity.serializers import ActivityBookingSerializer
+from activity.serializers import ActivityBooking2Serializer
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
@@ -248,7 +248,7 @@ def landing_page(request):
         posts_serializer = PostSerializer(posts,many=True)
         
         bookings = ActivityBooking.objects.all().order_by('-booking_date')[:10]
-        bookings_serializer = ActivityBookingSerializer(bookings,many=True)
+        bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
 
         activities = FeaturedTour.objects.get()
         serializer_activities = FeaturedTourSerializer(activities)

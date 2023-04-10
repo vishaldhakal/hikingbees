@@ -7,6 +7,17 @@ class ActivityEnquirySerializer(serializers.ModelSerializer):
         fields = ('id',)
         depth = 1
 
+class ActivitySmallestSer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ('activity_title','priceSale','slug',)
+        depth = 1
+class ActivityBooking2Serializer(serializers.ModelSerializer):
+    activity = ActivitySmallestSer(read_only=True)
+    class Meta:
+        model = ActivityBooking
+        fields = ('id','no_of_guests','booking_date','activity')
+        depth = 1
 class ActivityBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityBooking
