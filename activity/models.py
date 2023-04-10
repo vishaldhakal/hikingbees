@@ -125,7 +125,7 @@ class ActivityBooking(models.Model):
     emergency_relationship = models.CharField(max_length=400,blank=True)
 
     def __str__(self):
-        return self.name
+        return "Booking for " + self.activity.activity_title
 
 class ActivityFAQ(models.Model):
     question = models.TextField()

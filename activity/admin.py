@@ -30,4 +30,16 @@ admin.site.register(ActivityFAQ)
 admin.site.register(ActivityPricing)
 admin.site.register(ActivityRegion)
 admin.site.register(ActivityEnquiry)
-admin.site.register(ActivityBooking)
+
+class ActivityBookingAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__",
+        "name",
+        "booking_date",
+        "is_private",
+        "is_verified",
+    )
+    list_filter = ("is_private", "is_verified", "booking_date","activity")
+
+
+admin.site.register(ActivityBooking, ActivityBookingAdmin)
