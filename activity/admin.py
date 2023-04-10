@@ -20,6 +20,16 @@ class ActivityAdmin(admin.ModelAdmin):
         ActivityFAQInline,
         ActivityPricingInline,
     ]
+
+    list_display = (
+        "__str__",
+        "price",
+        "createdAt",
+        "featured",
+        "best_selling",
+        "popular",
+    )
+    list_filter = ("featured","best_selling","popular","destination")
     
 admin.site.register(Destination)
 admin.site.register(ActivityCategory)
