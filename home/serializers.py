@@ -1,7 +1,12 @@
 from rest_framework import serializers
-from .models import TeamMember,FeaturedTour,Testimonial,SiteConfiguration,Affiliations,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown,FAQ,FAQCategory
+from .models import TeamMember,FeaturedTour,Testimonial,SiteConfiguration,Affiliations,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown,FAQ,FAQCategory,LegalDocument
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityRegionSerializer,DestinationSerializer
 
+
+class LegalDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LegalDocument
+        fields = '__all__'
 
 class FAQCategorySerializer(serializers.ModelSerializer):
     class Meta:

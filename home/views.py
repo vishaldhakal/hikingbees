@@ -2,8 +2,8 @@ from django.shortcuts import render,HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ,FAQCategory,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
-from .serializers import FAQSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
+from .serializers import FAQSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
@@ -196,6 +196,12 @@ def BookingSubmission(request):
         return HttpResponse("Sucess")
     else:
         return HttpResponse("Not post req")
+
+@api_view(['GET'])
+def legaldocuments(request):
+    legal_documents = LegalDocument.objects.all()
+    legal_documents_serializer = LegalDocumentSerializer(legal_documents, many=True)
+    return Response({'legal_documents': legal_documents_serializer.data})
 
 @api_view(['GET'])
 def faq_list(request):
