@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown
+from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown,NewsletterSubscription
 from .serializers import FAQSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import PostSerializer
@@ -196,6 +196,18 @@ def BookingSubmission(request):
         return HttpResponse("Sucess")
     else:
         return HttpResponse("Not post req")
+
+@api_view(['POST'])
+def Newsletter(request):
+    emaill = request.POST.get("email")
+    nsss = NewsletterSubscription.objects.create(email=emaill)
+    nsss.save()
+    subject = "Newsletter Subscribed"
+
+    body = f"Newsletter Subscribed by {emaill}\n"
+
+    send_mail(subject, body, emaill,  ["info@hikingbees.com"], fail_silently=False)
+    return Response({'success': "Subscribed Sucessfully"},status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def legaldocuments(request):

@@ -3,6 +3,12 @@ from solo.models import SingletonModel
 from activity.models import Activity,ActivityCategory,Destination,ActivityRegion
 from tinymce import models as tinymce_models
 
+class NewsletterSubscription(models.Model):
+    email = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.email
+    
 class LegalDocument(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
