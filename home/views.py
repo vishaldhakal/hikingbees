@@ -206,7 +206,7 @@ def Newsletter(request):
 
     body = f"Newsletter Subscribed by {emaill}\n"
 
-    send_mail(subject, body, emaill,  ["info@hikingbees.com"], fail_silently=False)
+    send_mail(subject, body, "info@hikingbees.com",  [emaill,"info@hikingbees.com"], fail_silently=False)
     return Response({'success': "Subscribed Sucessfully"},status=status.HTTP_200_OK)
 
 @api_view(['GET'])
