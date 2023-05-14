@@ -13,6 +13,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
+from django.utils import timezone
+
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
@@ -253,6 +255,8 @@ def navbar(request):
 @api_view(['GET'])
 def landing_page(request):
     if request.method == 'GET':
+        today = timezone.now().date()
+
         teammembers = TeamMember.objects.all()
         teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
 
@@ -265,7 +269,7 @@ def landing_page(request):
         posts = Post.objects.all()[:5]
         posts_serializer = PostSerializer(posts,many=True)
         
-        bookings = ActivityBooking.objects.all().order_by('-booking_date')[:10]
+        bookings = ActivityBooking.objects.filter(departure_date__date__gte=today).order_by('-booking_date')[:10]
         bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
 
         activities = FeaturedTour.objects.get()
@@ -293,6 +297,16 @@ def landing_page(request):
           "testimonials":testimonial_serializer.data,
           "affiliations":serializer_affiliations.data,
           "partners":serializer_partners.data,
+          "bookings":bookings_serializer.data,
+        })
+
+@api_view(['GET'])
+def all_bookings(request):
+    if request.method == 'GET':
+        bookings = ActivityBooking.objects.all().order_by('-booking_date')
+        bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
+        
+        return Response({
           "bookings":bookings_serializer.data,
         })
 
