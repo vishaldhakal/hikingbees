@@ -13,7 +13,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
-from django.utils import timezone
+from datetime import date
+
 
 
 @api_view(["POST"])
@@ -255,7 +256,7 @@ def navbar(request):
 @api_view(['GET'])
 def landing_page(request):
     if request.method == 'GET':
-        today = timezone.now().date()
+        today = date.today()
 
         teammembers = TeamMember.objects.all()
         teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
