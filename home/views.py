@@ -269,7 +269,7 @@ def landing_page(request):
         posts = Post.objects.all()[:5]
         posts_serializer = PostSerializer(posts,many=True)
         
-        bookings = ActivityBooking.objects.all().order_by('-booking_date')[:10]
+        bookings = ActivityBooking.objects.filter(booking_date__gte=today).order_by('-booking_date')[:10]
         bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
 
         activities = FeaturedTour.objects.get()
