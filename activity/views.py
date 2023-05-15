@@ -134,7 +134,7 @@ def activities_single(request,slug):
     if request.method == 'GET':
         today = timezone.now().date()
         activity = Activity.objects.get(slug=slug)
-        bookings = ActivityBooking.objects.filter(activity=activity)
+        bookings = ActivityBooking.objects.filter(activity=activity,booking_date__gte=today)
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
         booking_dates = ActivityBooking.objects.filter(is_verified=True,is_private=False).annotate(
