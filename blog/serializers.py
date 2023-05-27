@@ -57,17 +57,10 @@ class PostSerializer(serializers.ModelSerializer):
         updated_html_string = str(soup)
         return mark_safe(updated_html_string)
 
-class PostSmall2Serializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ('id','slug','title','blog_duration_to_read','created_at','thumbnail_image','thumbnail_image_alt_description','author')
-        depth = 1
-        ordering = ['-created_at']
-
 class PostSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('id','slug','title','blog_duration_to_read','created_at','thumbnail_image','thumbnail_image_alt_description')
+        fields = '__all__'
         depth = 1
         ordering = ['-created_at']
 
