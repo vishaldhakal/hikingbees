@@ -50,7 +50,7 @@ class DestinationSerializerSmall(serializers.ModelSerializer):
 class ActivityCategory2Serializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('title','image','image_alt_description','subtitle')
+        fields = ('title','image','image_alt_description','subtitle','slug')
         depth = 2
 
 class ActivityCategorySerializer(serializers.ModelSerializer):
