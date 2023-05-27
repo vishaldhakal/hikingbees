@@ -12,6 +12,7 @@ class ActivitySmallestSer(serializers.ModelSerializer):
         model = Activity
         fields = ('activity_title','priceSale','slug',)
         depth = 1
+        
 class ActivityBooking2Serializer(serializers.ModelSerializer):
     activity = ActivitySmallestSer(read_only=True)
     class Meta:
@@ -45,6 +46,12 @@ class DestinationSerializerSmall(serializers.ModelSerializer):
     class Meta:
         model = Destination
         fields = ('name',)
+
+class ActivityCategory2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields = ('title','image','image_alt_description','subtitle')
+        depth = 2
 
 class ActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:

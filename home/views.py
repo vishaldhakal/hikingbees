@@ -7,7 +7,7 @@ from .serializers import FAQSerializer,LegalDocumentSerializer,FeaturedTourSeria
 from blog.models import Post
 from blog.serializers import PostSmallSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
-from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
+from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -277,7 +277,7 @@ def landing_page(request):
         serializer_activities = FeaturedTourSerializer(activities)
 
         activity_category = ActivityCategory.objects.all()
-        serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
+        serializer_activity_category = ActivityCategory2Serializer(activity_category, many=True)
         
         affiliations = Affiliations.objects.all()
         serializer_affiliations = AffiliationsSerializer(affiliations, many=True)
