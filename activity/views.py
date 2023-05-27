@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivitySmallest2Serializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -19,7 +19,7 @@ def activities_collection(request):
         act_des = request.GET.get("destination","All")
 
         activities = Activity.objects.all()
-        serializer_activities = ActivitySmallSerializer(activities, many=True)
+        serializer_activities = ActivitySmallest2Serializer(activities, many=True)
         
         activities_cat = ActivityCategory.objects.all()
         serializer_activities_cat = ActivityCategorySerializer(activities_cat, many=True)
@@ -93,7 +93,7 @@ def activities_all(request,slug):
             act_category = ActivityCategory.objects.get(slug=act_cat)
             activities = Activity.objects.filter(activity_category=act_category,destination=deatt)
 
-        serializer_activities = ActivitySmallSerializer(activities, many=True)
+        serializer_activities = ActivitySmallest2Serializer(activities, many=True)
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)

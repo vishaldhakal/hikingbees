@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown,NewsletterSubscription
 from .serializers import FAQSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
-from blog.serializers import PostSerializer
+from blog.serializers import PostSmallSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer
 from django.core.mail import send_mail, EmailMultiAlternatives
@@ -268,7 +268,7 @@ def landing_page(request):
         hero_content_serializer = SiteConfigurationSerializer(hero_content)
 
         posts = Post.objects.all()[:5]
-        posts_serializer = PostSerializer(posts,many=True)
+        posts_serializer = PostSmallSerializer(posts,many=True)
         
         bookings = ActivityBooking.objects.filter(booking_date__gte=today).order_by('-booking_date')[:10]
         bookings_serializer = ActivityBooking2Serializer(bookings,many=True)

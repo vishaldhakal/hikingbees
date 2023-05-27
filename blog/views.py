@@ -49,7 +49,7 @@ def post_single(request,slug):
 def recent_posts(request):
     if request.method == 'GET':
         posts = Post.objects.all()[:5]
-        posts_serializer = PostSerializer(posts,many=True)
+        posts_serializer = PostSmallSerializer(posts,many=True)
         return Response({
           "recent_posts":posts_serializer.data,
         })
