@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivitySmallestSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -19,7 +19,7 @@ def activities_collection(request):
         act_des = request.GET.get("destination","All")
 
         activities = Activity.objects.all()
-        serializer_activities = ActivitySmallestSerializer(activities, many=True)
+        serializer_activities = ActivitySmallSerializer(activities, many=True)
         
         activities_cat = ActivityCategory.objects.all()
         serializer_activities_cat = ActivityCategorySerializer(activities_cat, many=True)
@@ -48,7 +48,7 @@ def activities_slug(request):
 def activities_search(request):
     if request.method == 'GET':
         activities = Activity.objects.all()
-        serializer_activities = ActivitySmallestSerializer(activities, many=True)
+        serializer_activities = ActivitySmallSerializer(activities, many=True)
         return Response(serializer_activities.data)
 
 @api_view(['GET'])

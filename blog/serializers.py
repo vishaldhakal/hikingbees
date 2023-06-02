@@ -60,7 +60,7 @@ class PostSerializer(serializers.ModelSerializer):
 class PostSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
+        exclude = ['blog_content']
         depth = 1
         ordering = ['-created_at']
 
