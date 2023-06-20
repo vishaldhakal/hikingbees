@@ -91,7 +91,29 @@ class Activity(models.Model):
           
           strrr+="]"
           return self.activity_title + strrr
-          
+
+class ActivityTestimonial(models.Model):
+
+    SOURCE_CHOICES = (
+    ("Trip Advisor", "Trip Advisor"),
+    ("Trust Pilot", "Trust Pilot"),
+    ("Google", "Google"),
+    ("Others", "Others"),
+    )
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='testimonials')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=200,blank=True)
+    avatar = models.FileField(blank=True)
+    role = models.CharField(max_length=200,blank=True)
+    title = models.CharField(max_length=500,blank=True)
+    source = models.CharField(max_length=200,choices=SOURCE_CHOICES,default="Others")
+    review = models.TextField(blank=True)
+    rating = models.FloatField(default=5)
+
+    def __str__(self) -> str:
+        return self.name
+            
 class ActivityEnquiry(models.Model):
     activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='enquiries')
     name = models.CharField(max_length=400)

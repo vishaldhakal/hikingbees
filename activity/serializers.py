@@ -1,9 +1,15 @@
-from .models import Activity,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
+from .models import Activity,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial
 from rest_framework import serializers
 
 class ActivityEnquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityEnquiry
+        fields = ('id',)
+        depth = 1
+
+class ActivityTestimonialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityTestimonial
         fields = ('id',)
         depth = 1
 

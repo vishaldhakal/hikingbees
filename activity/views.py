@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Activity,ActivityCategory,ActivityBooking,Destination,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
+from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
+from .serializers import ActivityCategorySlugSerializer,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -135,6 +135,8 @@ def activities_single(request,slug):
         today = timezone.now().date()
         activity = Activity.objects.get(slug=slug)
         bookings = ActivityBooking.objects.filter(activity=activity,booking_date__gte=today)
+        testimonials = ActivityTestimonial.objects.filter(activity=activity)
+        testimonials_ser = ActivityTestimonialSerializer(testimonials,many=True)
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
         booking_dates = ActivityBooking.objects.filter(is_verified=True,is_private=False).annotate(
@@ -150,7 +152,7 @@ def activities_single(request,slug):
             grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
-        return Response({"data":serializer_activities.data,"bookings":grouped_bookings,"dates":unique_dates})
+        return Response({"data":serializer_activities.data,"bookings":grouped_bookings,"dates":unique_dates,"testimonials":testimonials_ser.data})
     
 
 
