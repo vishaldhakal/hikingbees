@@ -150,8 +150,8 @@ class ActivityBooking(models.Model):
         return "Booking for " + self.activity.activity_title
 
 class ActivityFAQ(models.Model):
-    question = models.TextField()
-    answer = models.TextField()
+    question = tinymce_models.HTMLField(blank=True)
+    answer = tinymce_models.HTMLField(blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
