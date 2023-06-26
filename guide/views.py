@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import TravelGuide,GuideAuthour
-from .serializers import TravelGuideSerializer,TravelGuideSlugSerializer,TravelGuideSmallSerializer,GuideAuthourSerializer
+from .models import TravelGuide,GuideAuthour,TravelGuideRegion,TravelGuideCategory
+from .serializers import TravelGuideSerializer,TravelGuideSlugSerializer,TravelGuideSmallSerializer,GuideAuthourSerializer,TravelGuideCategorySerializer,TravelGuideRegionSerializer
 from bs4 import BeautifulSoup
 
 
@@ -12,8 +12,14 @@ def guide_list(request):
     if request.method == 'GET':
         posts = TravelGuide.objects.all()
         serializer = TravelGuideSmallSerializer(posts, many=True)
+        regions = TravelGuideRegion.objects.all()
+        categories = TravelGuideCategory.objects.all()
+        categories_serializer = TravelGuideCategorySerializer(categories, many=True)
+        regions_serializer = TravelGuideRegionSerializer(regions, many=True)
         return Response({
             "guides":serializer.data,
+            "regions":regions_serializer.data,
+            "categories":categories_serializer.data,
         })
 
 @api_view(['GET'])

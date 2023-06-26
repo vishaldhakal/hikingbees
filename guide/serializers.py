@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import GuideAuthour,TravelGuide
+from .models import GuideAuthour,TravelGuide,TravelGuideCategory,TravelGuideRegion
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
@@ -17,8 +17,22 @@ class GuideAuthourSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+class TravelGuideCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelGuideCategory
+        fields = '__all__'
+        depth = 2
+
+class TravelGuideRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelGuideRegion
+        fields = '__all__'
+        depth = 2
+
 class TravelGuideSerializer(serializers.ModelSerializer):
     blog_content = serializers.SerializerMethodField()
+    guide_regions = TravelGuideRegionSerializer(many=True)
+    guide_categories = TravelGuideCategorySerializer(many=True)
     class Meta:
         model = TravelGuide
         fields = '__all__'
