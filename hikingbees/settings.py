@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'about',
     'activity',
     'blog',
+    'guide',
     'django_summernote',
     'solo',
     'corsheaders',
