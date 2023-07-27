@@ -98,7 +98,7 @@ class ActivityTestimonial(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200,blank=True)
     title = models.CharField(max_length=500,blank=True)
-    review = models.TextField(blank=True)
+    review = tinymce_models.HTMLField(blank=True)
     rating = models.FloatField(default=5)
 
     def __str__(self) -> str:
