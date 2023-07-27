@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ActivityTestimonial,ActivityCategory,ActivityBooking,ActivityEnquiry,ActivityPricing,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
+from .models import ActivityTestimonial,ActivityTestimonialImage,ActivityCategory,ActivityBooking,ActivityEnquiry,ActivityPricing,Activity,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ
 
 class ItineraryActivityInline(admin.StackedInline):
     model = ItineraryActivity
@@ -9,6 +9,9 @@ class ActivityFAQInline(admin.StackedInline):
 
 class ActivityImageInline(admin.StackedInline):
     model = ActivityImage
+
+class ActivityTestimonialImageInline(admin.StackedInline):
+    model = ActivityTestimonialImage
 
 class ActivityPricingInline(admin.StackedInline):
     model = ActivityPricing
@@ -31,6 +34,11 @@ class ActivityAdmin(admin.ModelAdmin):
     )
     list_filter = ("featured","best_selling","popular","destination")
     
+class ActivityTestimonialAdmin(admin.ModelAdmin):
+    inlines = [
+        ActivityTestimonialImageInline,
+    ]
+
 admin.site.register(Destination)
 admin.site.register(ActivityCategory)
 admin.site.register(Activity,ActivityAdmin)
@@ -40,7 +48,8 @@ admin.site.register(ActivityFAQ)
 admin.site.register(ActivityPricing)
 admin.site.register(ActivityRegion)
 admin.site.register(ActivityEnquiry)
-admin.site.register(ActivityTestimonial)
+admin.site.register(ActivityTestimonial,ActivityTestimonialAdmin)
+
 
 class ActivityBookingAdmin(admin.ModelAdmin):
     list_display = (

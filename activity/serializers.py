@@ -1,4 +1,4 @@
-from .models import Activity,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial
+from .models import Activity,ActivityTestimonialImage,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial
 from rest_framework import serializers
 
 class ActivityEnquirySerializer(serializers.ModelSerializer):
@@ -7,10 +7,17 @@ class ActivityEnquirySerializer(serializers.ModelSerializer):
         fields = ('id',)
         depth = 1
 
+class ActivityTestimonialImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityTestimonialImage
+        fields = ('image',)
+        depth = 1
+
 class ActivityTestimonialSerializer(serializers.ModelSerializer):
+    images = ActivityTestimonialImageSerializer(many=True)
     class Meta:
         model = ActivityTestimonial
-        fields = ('id',)
+        fields = '__all__'
         depth = 1
 
 class ActivitySmallestSer(serializers.ModelSerializer):
@@ -95,6 +102,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     gallery = ActivityImageSerializer(many=True,read_only=True)
     faqs = ActivityFAQSerializer(many=True,read_only=True)
     enquiries = ActivityEnquirySerializer(many=True,read_only=True)
+    testimonials = ActivityTestimonialSerializer(many=True,read_only=True)
     prices = ActivityPricingSerializer(many=True,read_only=True)
     
     class Meta:
