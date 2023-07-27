@@ -17,7 +17,7 @@ class ActivityTestimonialSerializer(serializers.ModelSerializer):
     images = ActivityTestimonialImageSerializer(many=True)
     class Meta:
         model = ActivityTestimonial
-        fields = '__all__'
+        exclude = ('activity',)
         depth = 1
 
 class ActivitySmallestSer(serializers.ModelSerializer):
