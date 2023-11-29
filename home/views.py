@@ -21,7 +21,7 @@ from datetime import date
 def ContactFormSubmission(request):
     if request.method == "POST":
         subject = "Contact Form Submission"
-        email = "Hiking Bees <info@hikingbees.com>"
+        email = "Hiking Bees <infohikingbees@gmail.com>"
         headers = {'Reply-To': request.POST["email"]}
         contex = {
             "name": request.POST["name"],
@@ -44,7 +44,7 @@ def ContactFormSubmission(request):
 def InquirySubmission(request):
     if request.method == "POST":
         subject = "Enquiry About Activity"
-        email = "Hiking Bees <info@hikingbees.com>"
+        email = "Hiking Bees <infohikingbees@gmail.com>"
         headers = {'Reply-To': request.POST["email"]}
 
         actt = Activity.objects.get(slug=request.POST["slug"])
@@ -80,7 +80,7 @@ def InquirySubmission(request):
 def PlanTripSubmit(request):
     if request.method == "POST":
         subject = "Customized Trip Enquiry"
-        email = "Hiking Bees <info@hikingbees.com>"
+        email = "Hiking Bees <infohikingbees@gmail.com>"
         headers = {'Reply-To': request.POST["email"]}
 
         actt = Activity.objects.get(slug=request.POST["slug"])
@@ -115,7 +115,7 @@ def PlanTripSubmit(request):
 def BookingSubmission(request):
     if request.method == "POST":
         subject = "Booking of Activity"
-        email = "Hiking Bees <info@hikingbees.com>"
+        email = "Hiking Bees <infohikingbees@gmail.com>"
         headers = {'Reply-To': request.POST["email"]}
 
         name = request.POST.get("name", "")
