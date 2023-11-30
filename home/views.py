@@ -32,7 +32,7 @@ def ContactFormSubmission(request):
         html_content = render_to_string("contactForm.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["beeshiking@gmail.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
@@ -68,7 +68,7 @@ def InquirySubmission(request):
         html_content = render_to_string("contactForm2.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["beeshiking@gmail.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
@@ -103,7 +103,7 @@ def PlanTripSubmit(request):
         html_content = render_to_string("ContactForm4.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["beeshiking@gmail.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
@@ -157,7 +157,7 @@ def BookingSubmission(request):
         html_content = render_to_string("contactForm3.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["beeshiking@gmail.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
@@ -209,7 +209,7 @@ def Newsletter(request):
 
     """ body = f"Newsletter Subscribed by {emaill}\n" """
 
-    """ send_mail(subject, body, "info@hikingbees.com",  [emaill,"info@hikingbees.com"], fail_silently=False) """
+    """ send_mail(subject, body, "beeshiking@gmail.com",  [emaill,"beeshiking@gmail.com"], fail_silently=False) """
     return Response({'success': "Subscribed Sucessfully"},status=status.HTTP_200_OK)
 
 @api_view(['GET'])
