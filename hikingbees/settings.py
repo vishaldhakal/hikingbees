@@ -162,7 +162,7 @@ EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'infohikingbees@gmail.com'
-EMAIL_HOST_PASSWORD = 's5wcEXM8AIqW2nJT'
+EMAIL_HOST_PASSWORD = 'H65bTQXvawFrx7fz'
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
