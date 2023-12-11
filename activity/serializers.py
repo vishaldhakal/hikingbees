@@ -49,6 +49,12 @@ class ActivityRegionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+class ActivityRegionSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityRegion
+        fields = ['id','title','slug','image']
+        depth = 1
+
 class ActivityRegionSlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
