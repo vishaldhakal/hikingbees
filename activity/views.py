@@ -13,7 +13,7 @@ import hashlib
 import hmac
 from django.utils.encoding import force_bytes
 
-SECRET_KEY = 'your_secret_key'
+SECRET_KEY = 'wXuq97YlFNPM2OU2i/Y1bGukJuY0LUl6u9nAg1Y91uQ='
 
 @api_view(['POST'])
 def sign_view(request):
