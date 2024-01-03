@@ -12,6 +12,7 @@ from datetime import datetime, time
 import hashlib
 import hmac
 from django.utils.encoding import force_bytes
+import base64
 
 SECRET_KEY = 'wXuq97YlFNPM2OU2i/Y1bGukJuY0LUl6u9nAg1Y91uQ='
 
@@ -29,7 +30,7 @@ def sign_view(request):
 
         # Create a SHA-256 HMAC hash using the secret key
         hash_obj = hmac.new(force_bytes(SECRET_KEY), msg=force_bytes(field_values_joined), digestmod=hashlib.sha256)
-        hash_value = hash_obj.digest().encode('base64').strip()
+        hash_value = base64.b64encode(hash_obj.digest()).decode('utf-8').strip()
 
         # Log the details (you may want to replace this with your actual logging mechanism)
         print({
