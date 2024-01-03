@@ -9,6 +9,42 @@ from django.db.models import DateField
 from django.db.models.functions import Cast
 from django.utils import timezone
 from datetime import datetime, time
+import hashlib
+import hmac
+from django.utils.encoding import force_bytes
+
+SECRET_KEY = 'your_secret_key'
+
+@api_view(['POST'])
+def sign_view(request):
+    try:
+        # Get the signed field names from the request
+        signed_field_names = request.data.get('signed_field_names', '').split(',')
+
+        # Create a list of field values
+        field_values = [f"{item}={request.data.get(item, '')}" for item in signed_field_names]
+
+        # Join the field values with a comma
+        field_values_joined = ",".join(field_values)
+
+        # Create a SHA-256 HMAC hash using the secret key
+        hash_obj = hmac.new(force_bytes(SECRET_KEY), msg=force_bytes(field_values_joined), digestmod=hashlib.sha256)
+        hash_value = hash_obj.digest().encode('base64').strip()
+
+        # Log the details (you may want to replace this with your actual logging mechanism)
+        print({
+            'request_body': request.data,
+            'fieldValues': field_values,
+            'fieldValuesJoined': field_values_joined,
+            'hash': hash_value,
+        })
+
+        # Return the hash in the response
+        return Response({'hash': hash_value})
+
+    except Exception as e:
+        # Handle exceptions appropriately
+        return Response({'error': str(e)})
 
 @api_view(['GET'])
 def activities_collection(request):

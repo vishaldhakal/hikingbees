@@ -14,4 +14,5 @@ urlpatterns = [
     path('activities-all/<str:slug>/', views.activities_all),
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
     path('activities-featured/', views.activities_featured),
+    path('api/sign/', views.sign_view, name='sign_view'),
 ]
