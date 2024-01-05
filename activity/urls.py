@@ -15,5 +15,4 @@ urlpatterns = [
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
     path('activities-featured/', views.activities_featured),
     path('sign/', views.sign_view, name='sign_view'),
-    path('check_similarity/', views.check_similarity, name='check_similarity'),
 ]

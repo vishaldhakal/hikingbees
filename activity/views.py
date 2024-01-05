@@ -13,12 +13,6 @@ import hashlib
 import hmac
 from django.utils.encoding import force_bytes
 import base64
-from transformers import AutoModel, AutoTokenizer
-import torch
-
-model_name = "l3cube-pune/indic-sentence-similarity-sbert"
-model = AutoModel.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 sentence_array = [
     "घर/जग्गा नामसारीको सिफारिस गरी पाऊँ",
@@ -107,47 +101,6 @@ def sign_view(request):
 
     except Exception as e:
         # Handle exceptions appropriately
-        return Response({'error': str(e)})
-
-@api_view(["POST"])
-def check_similarity(request):
-    try:
-        #get data from form data
-        voice_text = request.POST['voice_text']
-
-        # Sample voice input (replace this with your actual voice-to-text conversion)
-        """ voice_text = "कस्तो सिफारिस गर्नुपर्छ अस्थायी बसोबासको?" """
-
-        # Tokenize the voice_text
-        voice_inputs = tokenizer(voice_text, return_tensors="pt")
-
-        # Get the model output (embedding)
-        model_output = model(**voice_inputs).pooler_output
-
-        # Calculate similarity scores
-        similarity_scores = []
-        for sentence in sentence_array:
-            sentence_inputs = tokenizer(sentence, return_tensors="pt")
-            sentence_output = model(**sentence_inputs).pooler_output
-
-            # You might want to use a different score if the model provides one
-            similarity_score = torch.nn.functional.cosine_similarity(model_output, sentence_output).item()
-            similarity_scores.append(similarity_score)
-
-        # Find the most similar sentence
-        max_similarity_index = similarity_scores.index(max(similarity_scores))
-        most_similar_sentence = sentence_array[max_similarity_index]
-
-        result = {
-            "voice_text": voice_text,
-            "most_similar_sentence": most_similar_sentence,
-            "max_similarity_index" : max_similarity_index,
-            "similarity_score": max(similarity_scores)
-        }
-
-        return Response(result)
-
-    except Exception as e:
         return Response({'error': str(e)})
     
 @api_view(['GET'])
