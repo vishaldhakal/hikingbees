@@ -22,6 +22,7 @@ class Destination(models.Model):
 class ActivityCategory(models.Model):
      meta_title = models.CharField(max_length=200,blank=True)
      meta_description = models.TextField(blank=True)
+     content = tinymce_models.HTMLField(blank=True)
      title = models.CharField(max_length=200)
      destination = models.ForeignKey(Destination,on_delete=models.DO_NOTHING)
      subtitle = models.TextField()
@@ -37,6 +38,7 @@ class ActivityRegion(models.Model):
      meta_title = models.CharField(max_length=200,blank=True)
      meta_description = models.TextField(blank=True)
      activity_category = models.ManyToManyField(ActivityCategory)
+     content = tinymce_models.HTMLField(blank=True)
      slug = models.SlugField(blank=True)
      image = models.FileField(blank=True)
      image_alt_description = models.CharField(max_length=200,default="Alt Description")
