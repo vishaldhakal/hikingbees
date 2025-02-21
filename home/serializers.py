@@ -42,15 +42,15 @@ class FAQSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class InnerDropdownSerializer(serializers.ModelSerializer):
-    activity_region = ActivityRegionSmallSerializer()
-    activites = NavbarActivitySmallSerializer(many=True)
+    activity_region = ActivityRegionSerializer()
+    activites = ActivitySmallSerializer(many=True)
 
     class Meta:
         model = InnerDropdown
         fields = '__all__'
 
 class DestinationNavDropdownSerializer(serializers.ModelSerializer):
-    destinations = DestinationSmallSerializer(many=True)
+    destinations = DestinationSerializer(many=True)
 
     class Meta:
         model = DestinationNavDropdown
