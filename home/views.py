@@ -3,11 +3,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown,NewsletterSubscription
-from .serializers import FAQSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer,NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
-from blog.serializers import PostSmallSerializer
+from blog.serializers import LandingPagePostSerializer, PostSmallSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
-from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer
+from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -236,20 +236,20 @@ def navbar(request):
         destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav)
 
         other_nav = OtherActivitiesNavDropdown.objects.get()
-        other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav)
+        other_nav_serializer = NavbarOtherActivitiesSerializer(other_nav)
         
         acy = ActivityCategory.objects.get(title="Peak Climbing")
         climb_nav = Activity.objects.filter(activity_category=acy)
-        climb_nav_serializer = ActivitySmallSerializer(climb_nav,many=True)
+        climb_nav_serializer = NavbarActivitySerializer(climb_nav,many=True)
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
         
         return Response({
-          "destination_nav":destination_nav_serializer.data,
-          "other_activities_nav":other_nav_serializer.data,
-          "climbing_nav":climb_nav_serializer.data,
-          "trekking_nav":trek_nav_serializer.data,
+            "destination_nav":destination_nav_serializer.data,
+            "other_activities_nav":other_nav_serializer.data,
+            "climbing_nav":climb_nav_serializer.data,
+            "trekking_nav":trek_nav_serializer.data,
         })
 
 
@@ -259,7 +259,7 @@ def landing_page(request):
         today = date.today()
 
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
+        teammembers_serializer = LandingTeamMemberSerializer(teammembers,many=True)
 
         testimonial = Testimonial.objects.all()
         testimonial_serializer = TestimonialSerializer(testimonial,many=True)
@@ -268,13 +268,13 @@ def landing_page(request):
         hero_content_serializer = SiteConfigurationSerializer(hero_content)
 
         posts = Post.objects.all()[:5]
-        posts_serializer = PostSmallSerializer(posts,many=True)
+        posts_serializer = LandingPagePostSerializer(posts,many=True)
         
         bookings = ActivityBooking.objects.filter(booking_date__gte=today).order_by('-booking_date')[:10]
         bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
 
         activities = FeaturedTour.objects.get()
-        serializer_activities = FeaturedTourSerializer(activities)
+        serializer_activities = LandingFeaturedTourSerializer(activities)
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategory2Serializer(activity_category, many=True)

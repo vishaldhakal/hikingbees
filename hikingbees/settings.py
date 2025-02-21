@@ -31,7 +31,8 @@ ALLOWED_HOSTS = ['68.183.89.163','.hikingbees.com','king-prawn-app-t9tni.ondigit
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    'unfold',
+
     'ckeditor',
     'ckeditor_uploader',
     'django.contrib.admin',
@@ -164,59 +165,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@hikingbees.com'
 EMAIL_HOST_PASSWORD = '20@Hikingbees20.'
 
-JAZZMIN_SETTINGS = {
-    # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Hikingbees Admin",
-    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Hikingbees",
-    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Hikingbees",
-    # Welcome text on the login screen
-    "welcome_sign": "Welcome to the Hikingbees Admin",
-    # Copyright on the footer
-    "copyright": "Baliyo Software",
-    "search_model": ["blog.post","activity.activity"],
-    # Field name on user model that contains avatar FileField/URLField/Charfield or a callable that receives the user
-    "user_avatar": None,
-    ############
-    # Top Menu #
-    ############
-    # Links to put along the top menu
-    "show_sidebar": True,
-    # Whether to aut expand the menu
-    "navigation_expanded": True,
-    # Hide these apps when generating side menu e.g (auth)
-    "hide_apps": ["auth"],
-    # Hide these models when generating side menu (e.g auth.user)
-    "hide_models": [],
-    # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["home", "activity", "blog"],
-    #################
-    # Related Modal #
-    #################
-    # Use modals instead of popups
-    "related_modal_active": False,
-    #############
-    # UI Tweaks #
-    #############
-    # Relative paths to custom CSS/JS scripts (must be present in static files)
-    "custom_css": None,
-    "custom_js": None,
-    # Whether to link font from fonts.googleapis.com (use custom_css to supply font otherwise)
-    "use_google_fonts_cdn": True,
-    # Whether to show the UI customizer on the sidebar
-    "show_ui_builder": False,
-    ###############
-    # Change view #
-    ###############
-    # Render out the change view as a single form, or in tabs, current options are
-    # - single
-    # - horizontal_tabs (default)
-    # - vertical_tabs
-    # - collapsible
-    # - carousel
-    "changeform_format": "horizontal_tabs",
-}
 
 SUMMERNOTE_CONFIG = {
     'summernote': {
@@ -274,3 +222,24 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 CSRF_TRUSTED_ORIGINS = ['https://4963-110-44-120-22.ngrok.io',]
+
+from django.utils.translation import gettext_lazy as _
+
+
+UNFOLD = {
+    "SITE_HEADER": _("Hikingbees Admin"),
+    "SITE_TITLE": _("Hikingbees Admin"),
+    "SITE_BRAND": _("Hikingbees"),
+    "THEME": "",
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation_expanded": True,
+    },
+    "WELCOME_MESSAGE": _("Welcome to the Hikingbees Admin"),
+    "COPYRIGHT": _("Baliyo Software"),
+    "SEARCH_MODELS": ["blog.post", "activity.activity"],
+    "SHOW_UI_BUILDER": False,
+    "HIDE_APPS": ["auth"],
+    "ORDER_WITH_RESPECT_TO": ["home", "activity", "blog"],
+}

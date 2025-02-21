@@ -43,6 +43,12 @@ class DestinationSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+class DestinationSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Destination
+        fields = ('id','order','name','thumnail_image','thumnail_image_alt_description')
+        depth = 1
+
 class ActivityRegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
@@ -52,13 +58,19 @@ class ActivityRegionSerializer(serializers.ModelSerializer):
 class ActivityRegionSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
-        fields = ['id','title','slug','image']
+        fields = ['id','title','slug','image','image_alt_description']
         depth = 1
 
 class ActivityRegionSlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
         fields = ('id','slug')
+        depth = 1
+
+class LandingActivityRegionSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityRegion
+        fields = ['id','title','slug']
         depth = 1
 
 class DestinationSerializerSmall(serializers.ModelSerializer):
@@ -77,6 +89,18 @@ class ActivityCategorySerializer(serializers.ModelSerializer):
         model = ActivityCategory
         fields = '__all__'
         depth = 2
+
+class NavbarActivityCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields = ('id','title','image','image_alt_description','slug')
+        depth = 2
+
+class LandingActivityCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields=('id','title','slug')
+
 
 class ActivityCategorySlugSerializer(serializers.ModelSerializer):
     class Meta:
@@ -124,6 +148,25 @@ class ActivitySmallSerializer(serializers.ModelSerializer):
         fields = ('id','slug', 'activity_title', 'activity_category','enquiries','location','duration','price','coverImg','ratings','popular','best_selling','destination','activity_region','priceSale')
         depth = 1
 
+class LandingActivitySmallSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Activity
+        fields=('id','slug','activity_title','duration','price','heroImg','coverImg','priceSale','ratings')
+
+class LandingFavouriteActivitySmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields=('id','slug','activity_title','heroImg','coverImg',"location")
+
+class LandingBannerActivitySmallSerializer(serializers.ModelSerializer):
+        activity_category=LandingActivityCategorySerializer(many=True)
+        activity_region=LandingActivityRegionSmallSerializer()
+        class Meta:
+            model = Activity
+            fields=('id','slug','activity_title','activity_category','location','duration','price','heroImg','coverImg','priceSale','ratings','activity_region')
+            depth = 1    
+
 class ActivitySmallestSerializer(serializers.ModelSerializer):
     destination = DestinationSerializerSmall()
     class Meta:
@@ -135,3 +178,15 @@ class ActivitySlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = ('id','slug')
+
+class NavbarActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ('id','slug','activity_title','coverImg')
+
+class NavbarActivitySmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ('id','slug','activity_title')
+
+

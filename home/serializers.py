@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import TeamMember,FeaturedTour,Testimonial,SiteConfiguration,Affiliations,Partners,TreekingNavDropdown,DestinationNavDropdown,OtherActivitiesNavDropdown,ClimbingNavDropdown,InnerDropdown,FAQ,FAQCategory,LegalDocument
-from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityRegionSerializer,DestinationSerializer
+from activity.serializers import ActivityCategory2Serializer, ActivityCategorySerializer, ActivityRegionSmallSerializer,ActivitySmallSerializer,ActivityRegionSerializer,DestinationSerializer, DestinationSmallSerializer, LandingActivitySmallSerializer, LandingBannerActivitySmallSerializer, LandingFavouriteActivitySmallSerializer, NavbarActivityCategorySerializer, NavbarActivitySerializer, NavbarActivitySmallSerializer
 
 
 class LegalDocumentSerializer(serializers.ModelSerializer):
@@ -22,6 +22,16 @@ class FeaturedTourSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeaturedTour
         fields = '__all__'
+        
+class LandingFeaturedTourSerializer(serializers.ModelSerializer):
+    featured_tours = LandingActivitySmallSerializer(many=True)
+    popular_tours = LandingActivitySmallSerializer(many=True)
+    best_selling_tours = LandingActivitySmallSerializer(many=True)
+    favourite_tours = LandingFavouriteActivitySmallSerializer(many=True)
+    banner_tour = LandingBannerActivitySmallSerializer(many=True)
+    class Meta:
+        model = FeaturedTour
+        fields = '__all__'
 
 
 class FAQSerializer(serializers.ModelSerializer):
@@ -32,15 +42,15 @@ class FAQSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class InnerDropdownSerializer(serializers.ModelSerializer):
-    activity_region = ActivityRegionSerializer()
-    activites = ActivitySmallSerializer(many=True)
+    activity_region = ActivityRegionSmallSerializer()
+    activites = NavbarActivitySmallSerializer(many=True)
 
     class Meta:
         model = InnerDropdown
         fields = '__all__'
 
 class DestinationNavDropdownSerializer(serializers.ModelSerializer):
-    destinations = DestinationSerializer(many=True)
+    destinations = DestinationSmallSerializer(many=True)
 
     class Meta:
         model = DestinationNavDropdown
@@ -49,6 +59,12 @@ class DestinationNavDropdownSerializer(serializers.ModelSerializer):
 class OtherActivitiesNavDropdownSerializer(serializers.ModelSerializer):
     activity_categories = ActivityCategorySerializer(many=True)
 
+    class Meta:
+        model = OtherActivitiesNavDropdown
+        fields = '__all__'
+
+class NavbarOtherActivitiesSerializer(serializers.ModelSerializer):
+    activity_categories = NavbarActivityCategorySerializer(many=True)
     class Meta:
         model = OtherActivitiesNavDropdown
         fields = '__all__'
@@ -92,6 +108,12 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         model = TeamMember
         fields = '__all__'
         depth = 2
+
+class LandingTeamMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeamMember
+        fields = ('id','order','name','photo','role','facebook','twitter','instagram','linkedin')
+        depth = 1
 
 class TeamMemberSlugSerializer(serializers.ModelSerializer):
     class Meta:
