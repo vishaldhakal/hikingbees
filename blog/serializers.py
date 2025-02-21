@@ -64,10 +64,18 @@ class PostSmallSerializer(serializers.ModelSerializer):
         depth = 1
         ordering = ['-created_at']
 
+class AuthorSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('id','name','picture')
+
 class LandingPagePostSerializer(serializers.ModelSerializer):
+    author = AuthorSmallSerializer()
     class Meta:
         model = Post
-        fields=('id','thumbnail_image','updated_at','created_at','blog_duration_to_read','slug','title','thumbnail_image_alt_description')
+        fields=('id','thumbnail_image','updated_at','created_at','blog_duration_to_read','slug','title','thumbnail_image_alt_description','author')
+
+
 
 
 class PostSlugSerializer(serializers.ModelSerializer):

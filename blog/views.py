@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Post,Tag,Category
-from .serializers import PostSerializer,PostSmallSerializer,TagSerializer,CategorySerializer,TagSmallSerializer,CategorySmallSerializer,PostSlugSerializer
+from .serializers import LandingPagePostSerializer, PostSerializer,PostSmallSerializer,TagSerializer,CategorySerializer,TagSmallSerializer,CategorySmallSerializer,PostSlugSerializer
 from bs4 import BeautifulSoup
 
 
@@ -49,7 +49,7 @@ def post_single(request,slug):
 def recent_posts(request):
     if request.method == 'GET':
         posts = Post.objects.all()[:5]
-        posts_serializer = PostSerializer(posts,many=True)
+        posts_serializer = LandingPagePostSerializer(posts,many=True)
         return Response({
           "recent_posts":posts_serializer.data,
         })
