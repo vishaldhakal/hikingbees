@@ -50,7 +50,7 @@ class InnerDropdownSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DestinationNavDropdownSerializer(serializers.ModelSerializer):
-    destinations = DestinationSmallSerializer(many=True)
+    destinations = DestinationSerializer(many=True)
 
     class Meta:
         model = DestinationNavDropdown
