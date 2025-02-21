@@ -236,20 +236,20 @@ def navbar(request):
         destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav)
 
         other_nav = OtherActivitiesNavDropdown.objects.get()
-        other_nav_serializer = NavbarOtherActivitiesSerializer(other_nav)
+        other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav)
         
         acy = ActivityCategory.objects.get(title="Peak Climbing")
         climb_nav = Activity.objects.filter(activity_category=acy)
-        climb_nav_serializer = NavbarActivitySerializer(climb_nav,many=True)
+        climb_nav_serializer = ActivitySmallSerializer(climb_nav,many=True)
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
         
         return Response({
-            "destination_nav":destination_nav_serializer.data,
-            "other_activities_nav":other_nav_serializer.data,
-            "climbing_nav":climb_nav_serializer.data,
-            "trekking_nav":trek_nav_serializer.data,
+          "destination_nav":destination_nav_serializer.data,
+          "other_activities_nav":other_nav_serializer.data,
+          "climbing_nav":climb_nav_serializer.data,
+          "trekking_nav":trek_nav_serializer.data,
         })
 
 
