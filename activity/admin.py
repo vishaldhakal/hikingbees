@@ -3,6 +3,7 @@ from unfold.admin import ModelAdmin, StackedInline
 from .models import *
 from tinymce.widgets import TinyMCE
 from django import forms
+from django.utils import timezone
 
 class DestinationAdminForm(forms.ModelForm):
     class Meta:
@@ -39,6 +40,11 @@ class ActivityAdminForm(forms.ModelForm):
             'tour_excludes': TinyMCE(),
             'additional_info': TinyMCE(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not self.instance.pk:  # If this is a new instance
+            self.instance.createdAt = timezone.now()
 
 class ActivityTestimonialForm(forms.ModelForm):
     class Meta:
