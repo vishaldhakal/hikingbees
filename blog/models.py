@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django_summernote.fields import SummernoteTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from tinymce import models as tinymce_models
-
+from activity.models import Activity
 
 class Author(models.Model):
     name = models.CharField(max_length=200) 
@@ -43,6 +43,7 @@ class Post(models.Model):
     blog_content = tinymce_models.HTMLField(blank=True)
     tags = models.ManyToManyField(Tag)
     author = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
+    related_activities = models.ManyToManyField('activity.Activity', blank=True, related_name='posts')
     meta_title = models.CharField(max_length=200)
     meta_description = models.TextField()
 

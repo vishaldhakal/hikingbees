@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown,NewsletterSubscription
 from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer,NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
-from blog.serializers import LandingPagePostSerializer, PostSmallSerializer
+from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives
@@ -244,12 +244,17 @@ def navbar(request):
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
+
+        # Add latest 4 posts
+        latest_posts = Post.objects.all().order_by('-created_at')[:4]
+        latest_posts_serializer = NavbarPostSerializer(latest_posts, many=True)
         
         return Response({
           "destination_nav":destination_nav_serializer.data,
           "other_activities_nav":other_nav_serializer.data,
           "climbing_nav":climb_nav_serializer.data,
           "trekking_nav":trek_nav_serializer.data,
+          "latest_posts": latest_posts_serializer.data,
         })
 
 

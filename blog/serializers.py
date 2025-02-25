@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from activity.serializers import LandingActivitySmallSerializer
 from .models import Author, Category, Tag, Post
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
@@ -42,6 +44,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     blog_content = serializers.SerializerMethodField()
+    related_activities = LandingActivitySmallSerializer(many=True)
+
     class Meta:
         model = Post
         fields = '__all__'
@@ -60,9 +64,14 @@ class PostSerializer(serializers.ModelSerializer):
 class PostSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        exclude = ['blog_content']
+        exclude = ['blog_content','related_activities']
         depth = 1
         ordering = ['-created_at']
+
+class NavbarPostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields=('id','title','slug')
 
 class AuthorSmallSerializer(serializers.ModelSerializer):
     class Meta:

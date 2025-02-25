@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Post,Tag,Category
-from .serializers import LandingPagePostSerializer, PostSerializer,PostSmallSerializer,TagSerializer,CategorySerializer,TagSmallSerializer,CategorySmallSerializer,PostSlugSerializer
+from .serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSerializer,PostSmallSerializer,TagSerializer,CategorySerializer,TagSmallSerializer,CategorySmallSerializer,PostSlugSerializer
 from bs4 import BeautifulSoup
 
 
@@ -30,19 +30,18 @@ def post_list_slug(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
-def post_single(request,slug):
+def post_single(request, slug):
     if request.method == 'GET':
-        posts = Post.objects.get(slug=slug)
-        html_string = posts.blog_content
-        soup = BeautifulSoup(html_string, 'html.parser')
-        toc_div = soup.find('div', class_='mce-toc')
-        if toc_div is not None:
-            toc_div.extract()
-        updated_html_string = str(toc_div)
-        serializer = PostSerializer(posts)
+        post = Post.objects.get(slug=slug)
+        # Get latest 5 similar posts that share tags with the current post, excluding the current post
+        similar_posts = Post.objects.filter(tags__in=post.tags.all()).exclude(id=post.id).distinct().order_by('-created_at')[:5]
+        
+        post_serializer = PostSerializer(post)
+        similar_posts_serializer = NavbarPostSerializer(similar_posts, many=True)
+        
         return Response({
-            "data":serializer.data,
-            "toc":updated_html_string,
+            "data": post_serializer.data,
+            "similar_posts": similar_posts_serializer.data,
         })
     
 @api_view(['GET'])
