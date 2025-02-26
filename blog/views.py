@@ -31,26 +31,23 @@ def post_list_slug(request):
         return Response(serializer.data)
 
 @api_view(['GET'])
-def post_single(request, slug):
+def post_single(request,slug):
     if request.method == 'GET':
-        post = Post.objects.get(slug=slug)
-        # Get similar posts ranked by number of shared tags
-        similar_posts = (
-            Post.objects
-            .filter(tags__in=post.tags.all())
-            .exclude(id=post.id)
-            .annotate(
-                shared_tags=models.Count('tags', filter=models.Q(tags__in=post.tags.all()))
-            )
-            .order_by('-shared_tags', '-created_at')
-        )[:5]
-        
-        post_serializer = PostSerializer(post)
+        posts = Post.objects.get(slug=slug)
+        html_string = posts.blog_content
+        soup = BeautifulSoup(html_string, 'html.parser')
+        toc_div = soup.find('div', class_='mce-toc')
+        if toc_div is not None:
+            toc_div.extract()
+        updated_html_string = str(toc_div)
+        similar_posts = ( Post.objects .filter(tags__in=posts.tags.all()) .exclude(id=posts.id) .annotate( shared_tags=models.Count('tags', filter=models.Q(tags__in=posts.tags.all())) ) .order_by('-shared_tags', '-created_at') )[:5]
+        serializer = PostSerializer(posts)
         similar_posts_serializer = NavbarPostSerializer(similar_posts, many=True)
-        
+
         return Response({
-            "data": post_serializer.data,
-            "similar_posts": similar_posts_serializer.data,
+            "data":serializer.data,
+            "toc":updated_html_string,
+            "similar_posts":similar_posts_serializer.data,
         })
     
 @api_view(['GET'])
