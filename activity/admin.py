@@ -74,19 +74,24 @@ class ItineraryActivityForm(forms.ModelForm):
 class ItineraryActivityInline(StackedInline):
     model = ItineraryActivity
     form = ItineraryActivityForm
+    tab = True
 
 class ActivityFAQInline(StackedInline):
     model = ActivityFAQ
     form = ActivityFAQForm
+    tab = True
 
 class ActivityImageInline(StackedInline):
     model = ActivityImage
+    tab = True
 
 class ActivityTestimonialImageInline(StackedInline):
     model = ActivityTestimonialImage
+    tab = True
 
 class ActivityPricingInline(StackedInline):
     model = ActivityPricing
+    tab = True
 
 class DestinationAdmin(ModelAdmin):
     form = DestinationAdminForm
@@ -99,12 +104,6 @@ class ActivityRegionAdmin(ModelAdmin):
 
 class ActivityAdmin(ModelAdmin):
     form = ActivityAdminForm
-    inlines = [
-        ItineraryActivityInline,
-        ActivityImageInline,
-        ActivityFAQInline,
-        ActivityPricingInline,
-    ]
     list_display = (
         "__str__",
         "price",
@@ -113,48 +112,77 @@ class ActivityAdmin(ModelAdmin):
         "best_selling",
         "popular",
     )
-    list_filter = ("featured","best_selling","popular","destination")
+    list_filter = ("featured", "best_selling", "popular", "destination")
+
+    inlines = [
+        ItineraryActivityInline,
+        ActivityImageInline,
+        ActivityFAQInline,
+        ActivityPricingInline,
+    ]
 
     fieldsets = (
-        ("Basic Information", {
-            "fields": (
-                ("activity_title", "slug"),
-                ("destination", "activity_category", "activity_region"),
-                ("price", "priceSale"),
-                ("popular", "best_selling", "featured"),
-            )
-        }),
-        ("Meta Information", {
-            "fields": (
-                "meta_title",
-                "meta_description"
-            )
-        }),
-        ("Tour Details", {
-            "fields": (
-                "heroImg",
-                "coverImg",
-                "location",
-                "duration",
-                "trip_grade",
-                "max_group_size",
-                "best_time",
-                "ratings",
-                "availableStart",
-                "availableEnd",
-                "trek_map",
-                "altitude_chart",
-            )
-        }),
-        ("Tour Description", {
-            "fields": (
-                "tour_description",
-                "tour_highlights",
-                "tour_includes",
-                "tour_excludes",
-                "additional_info",
-            )
-        }),
+        (
+            "Basic Information",
+            {
+                "classes": ["tab"],
+                "fields": [
+                    ("activity_title", "slug"),
+                    ("destination", "activity_category", "activity_region"),
+                    ("price", "priceSale"),
+                    ("popular", "best_selling", "featured"),
+                ],
+            },
+        ),
+        (
+            "Meta Information",
+            {
+                "classes": ["tab"],
+                "fields": [
+                    "meta_title",
+                    "meta_description"
+                ],
+            },
+        ),
+        (
+            "Tour Details",
+            {
+                "classes": ["tab"],
+                "fields": [
+
+                    ("heroImg","coverImg",),
+                    ("location","duration",),
+                    ("trip_grade","max_group_size",),
+                    ("best_time","ratings",),
+                    ("availableStart","availableEnd",)
+
+                ],
+            },
+        ),
+        (
+            "Map & Chart",
+            {
+                "classes": ["tab"],
+                "fields": [
+                    "trek_map",
+                    "altitude_chart",
+                ]
+            }
+        ),
+        (
+            "Tour Description",
+            {
+                "classes": ["tab"],
+                "fields": [
+                    "tour_description",
+                    "tour_highlights",
+                    "tour_includes",
+                    "tour_excludes",
+                    "additional_info",
+                ],
+            },
+        ),
+        
     )
 
 class ActivityTestimonialAdmin(ModelAdmin):
