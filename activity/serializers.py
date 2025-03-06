@@ -90,6 +90,11 @@ class ActivityCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+class ActivityCategorySmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityCategory
+        fields = ('id','title','slug')
+
 class NavbarActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory

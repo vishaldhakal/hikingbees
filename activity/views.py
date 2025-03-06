@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer
+from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -173,10 +173,9 @@ def activities_featured(request):
         return Response(serializer_activities.data)
 
 @api_view(['GET'])
-def activities_all(request,slug):
+def activities_all(request, slug):
     if request.method == 'GET':
-
-        act_cat = request.GET.get("category","All")
+        act_cat = request.GET.get("category", "All")
         capp = slug.capitalize()
         deatt = Destination.objects.get(name=capp)
 
@@ -184,16 +183,22 @@ def activities_all(request,slug):
             activities = Activity.objects.filter(destination=deatt)
         else:
             act_category = ActivityCategory.objects.get(slug=act_cat)
-            activities = Activity.objects.filter(activity_category=act_category,destination=deatt)
+            activities = Activity.objects.filter(activity_category=act_category, destination=deatt)
+
+        # Get only activity categories that have activities in this destination
+        activity_category = ActivityCategory.objects.filter(
+            activity__destination=deatt
+        ).distinct()
 
         serializer_activities = ActivitySmallSerializer(activities, many=True)
-
-        activity_category = ActivityCategory.objects.all()
-        serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
-        
+        serializer_activity_category = ActivityCategorySmallSerializer(activity_category, many=True)
         serializer_destination = DestinationSerializer(deatt)
 
-        return Response({"activities":serializer_activities.data,"activity_categories":serializer_activity_category.data,"destination_details":serializer_destination.data})
+        return Response({
+            "activities": serializer_activities.data,
+            "activity_categories": serializer_activity_category.data,
+            "destination_details": serializer_destination.data
+        })
 
 @api_view(['GET'])
 def activities_all_region(request,slug):
