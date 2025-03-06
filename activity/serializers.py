@@ -167,9 +167,10 @@ class LandingFavouriteActivitySmallSerializer(serializers.ModelSerializer):
 class LandingBannerActivitySmallSerializer(serializers.ModelSerializer):
         activity_category=LandingActivityCategorySerializer(many=True)
         activity_region=LandingActivityRegionSmallSerializer()
+        destination=DestinationSerializerSmall()
         class Meta:
             model = Activity
-            fields=('id','slug','activity_title','activity_category','location','duration','price','heroImg','coverImg','priceSale','ratings','activity_region')
+            fields=('id','slug','activity_title','activity_category','location','duration','heroImg','coverImg','price','priceSale','ratings','activity_region','destination')
             depth = 1    
 
 class ActivitySmallestSerializer(serializers.ModelSerializer):

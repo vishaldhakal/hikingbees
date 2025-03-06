@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer
+from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -190,7 +190,7 @@ def activities_all(request, slug):
             activity__destination=deatt
         ).distinct()
 
-        serializer_activities = ActivitySmallSerializer(activities, many=True)
+        serializer_activities = LandingBannerActivitySmallSerializer(activities, many=True)
         serializer_activity_category = ActivityCategorySmallSerializer(activity_category, many=True)
         serializer_destination = DestinationSerializer(deatt)
 
