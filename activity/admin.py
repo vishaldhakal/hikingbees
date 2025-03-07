@@ -129,7 +129,7 @@ class ActivityAdmin(ModelAdmin):
                 "fields": [
                     ("activity_title", "slug"),
                     ("destination", "activity_category", "activity_region"),
-                    ("price", "priceSale"),
+                    ("price", "priceSale","banner_text"),
                     ("popular", "best_selling", "featured"),
                 ],
             },
