@@ -80,10 +80,16 @@ class AuthorSmallSerializer(serializers.ModelSerializer):
 
 class LandingPagePostSerializer(serializers.ModelSerializer):
     author = AuthorSmallSerializer()
+    thumbnail_image = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
         fields=('id','thumbnail_image','updated_at','created_at','blog_duration_to_read','slug','title','thumbnail_image_alt_description','author','meta_description')
 
+    def get_thumbnail_image(self, obj):
+        if obj.thumbnail_image:
+            return f'/media/{obj.thumbnail_image.name}'  # Returns /media/path/to/image
+        return None
 class PostSlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
