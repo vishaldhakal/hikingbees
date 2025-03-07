@@ -189,6 +189,7 @@ def activities_all(request, slug):
         activity_category = ActivityCategory.objects.filter(
             activity__destination=deatt
         ).distinct()
+        
 
         serializer_activities = LandingBannerActivitySmallSerializer(activities, many=True)
         serializer_activity_category = ActivityCategorySmallSerializer(activity_category, many=True)

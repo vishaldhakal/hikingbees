@@ -150,19 +150,19 @@ class ActivitySmallSerializer(serializers.ModelSerializer):
     enquiries = ActivityEnquirySerializer(many=True,read_only=True)
     class Meta:
         model = Activity
-        fields = ('id','slug', 'activity_title', 'activity_category','enquiries','location','duration','price','coverImg','ratings','popular','best_selling','destination','activity_region','priceSale')
+        fields = ('id','slug', 'activity_title', 'activity_category','enquiries','location','duration','price','coverImg','ratings','popular','best_selling','destination','activity_region','priceSale','banner_text')
         depth = 1
 
 class LandingActivitySmallSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields=('id','slug','activity_title','duration','price','heroImg','coverImg','priceSale','ratings')
+        fields=('id','slug','activity_title','duration','price','heroImg','coverImg','priceSale','ratings','banner_text')
 
 class LandingFavouriteActivitySmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields=('id','slug','activity_title','heroImg','coverImg',"location")
+        fields=('id','slug','activity_title','heroImg','coverImg','location','banner_text')
 
 class LandingBannerActivitySmallSerializer(serializers.ModelSerializer):
         activity_category=LandingActivityCategorySerializer(many=True)
@@ -177,7 +177,7 @@ class ActivitySmallestSerializer(serializers.ModelSerializer):
     destination = DestinationSerializerSmall()
     class Meta:
         model = Activity
-        fields = ('id','slug', 'activity_title','destination','duration','price','priceSale','trip_grade','max_group_size','best_time')
+        fields = ('id','slug', 'activity_title','destination','duration','price','priceSale','trip_grade','max_group_size','best_time','banner_text')
         depth = 1
 
 class ActivitySlugSerializer(serializers.ModelSerializer):

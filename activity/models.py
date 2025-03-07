@@ -77,7 +77,7 @@ class Activity(models.Model):
     trek_map = models.FileField(blank=True)
     altitude_chart = models.FileField(blank=True)
     additional_info = tinymce_models.HTMLField(blank=True)
-
+    banner_text = models.CharField(max_length=120,blank=True,null=True)
 
     class Meta:
         ordering = ['createdAt']
