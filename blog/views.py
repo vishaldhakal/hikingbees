@@ -7,7 +7,6 @@ from .serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSe
 from bs4 import BeautifulSoup
 from django.db import models
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import generics
 
 
 class CustomPagination(PageNumberPagination):
@@ -16,17 +15,20 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class PostListView(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = LandingPagePostSerializer
-    pagination_class = CustomPagination
+@api_view(['GET'])
+def post_list(request):
+    if request.method == 'GET':
+        # Initialize paginator
+        paginator = CustomPagination()
+        
+        # Get all posts and paginate them
+        posts = Post.objects.all()
+        paginated_posts = paginator.paginate_queryset(posts, request)
+        
+        # Serialize paginated posts
+        posts_serializer = LandingPagePostSerializer(paginated_posts, many=True)
 
-    def list(self, request, *args, **kwargs):
-        # Get paginated posts
-        posts_page = self.paginate_queryset(self.get_queryset())
-        posts_serializer = self.get_serializer(posts_page, many=True)
-
-        # Get tags and categories
+        # Get and serialize tags and categories
         tags = Tag.objects.all()
         categories = Category.objects.all()
         
@@ -37,9 +39,9 @@ class PostListView(generics.ListAPIView):
             "posts": posts_serializer.data,
             "tags": tag_serializer.data,
             "categories": categories_serializer.data,
-            "total_pages": self.paginator.page.paginator.num_pages,
-            "current_page": self.paginator.page.number,
-            "total_items": self.paginator.page.paginator.count,
+            "total_pages": paginator.page.paginator.num_pages,
+            "current_page": paginator.page.number,
+            "total_items": paginator.page.paginator.count,
         })
 
 @api_view(['GET'])
