@@ -7,8 +7,6 @@ from .serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSe
 from bs4 import BeautifulSoup
 from django.db import models
 from rest_framework.pagination import PageNumberPagination
-
-
 class CustomPagination(PageNumberPagination):
     page_size = 15
     page_size_query_param = 'page_size'
