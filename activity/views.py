@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer
+from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -217,11 +217,10 @@ def activities_all_region(request,slug):
             act_regionn = ActivityRegion.objects.get(slug=act_region)
             activities = Activity.objects.filter(activity_category=act_category,activity_region=act_regionn)
         
-        acts = ActivitySmallSerializer(activities,many=True)
+        acts = LandingBannerActivitySmallSerializer(activities,many=True)
 
-        print(activities)
         activity_region = ActivityRegion.objects.filter(activity_category=act_category)
-        serializer_activity_region = ActivityRegionSerializer(activity_region, many=True)
+        serializer_activity_region = LandingActivityRegionSmallSerializer(activity_region, many=True)
 
         return Response({"activities":acts.data,"activity_regions":serializer_activity_region.data})
 
