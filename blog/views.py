@@ -17,14 +17,14 @@ class CustomPagination(PageNumberPagination):
 def post_list(request):
     if request.method == 'GET':
         # Initialize paginator
-        paginator = CustomPagination()
+        # paginator = CustomPagination()
         
         # Get all posts and paginate them
         posts = Post.objects.all()
-        paginated_posts = paginator.paginate_queryset(posts, request)
+        # paginated_posts = paginator.paginate_queryset(posts, request)
         
         # Serialize paginated posts
-        posts_serializer = LandingPagePostSerializer(paginated_posts, many=True)
+        posts_serializer = LandingPagePostSerializer(posts, many=True)
 
         # Get and serialize tags and categories
         tags = Tag.objects.all()
@@ -37,9 +37,9 @@ def post_list(request):
             "posts": posts_serializer.data,
             "tags": tag_serializer.data,
             "categories": categories_serializer.data,
-            "total_pages": paginator.page.paginator.num_pages,
-            "current_page": paginator.page.number,
-            "total_items": paginator.page.paginator.count,
+            # "total_pages": paginator.page.paginator.num_pages,
+            # "current_page": paginator.page.number,
+            # "total_items": paginator.page.paginator.count,
         })
 
 @api_view(['GET'])

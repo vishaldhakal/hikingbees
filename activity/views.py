@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer
+from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -219,10 +219,17 @@ def activities_all_region(request,slug):
         
         acts = LandingBannerActivitySmallSerializer(activities,many=True)
 
+
         activity_region = ActivityRegion.objects.filter(activity_category=act_category)
         serializer_activity_region = LandingActivityRegionSmallSerializer(activity_region, many=True)
-
-        return Response({"activities":acts.data,"activity_regions":serializer_activity_region.data})
+        serializer_activity_category = ActivityCategorySerializerSmall(act_category)
+        return Response(
+            {
+                "activities":acts.data,
+                "activity_regions":serializer_activity_region.data,
+                "activity_category_details":serializer_activity_category.data
+                }
+                )
 
 
 
