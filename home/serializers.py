@@ -112,7 +112,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 class LandingTeamMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeamMember
-        fields = ('id','name','slug','photo','role','facebook','twitter','instagram','linkedin')
+        fields = ('id','name','slug','photo','role','type','facebook','twitter','instagram','linkedin')
         depth = 1
 
 class TeamMemberSlugSerializer(serializers.ModelSerializer):
