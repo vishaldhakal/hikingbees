@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer
+from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer, DestinationSmallSerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -163,6 +163,13 @@ def destination_slug(request):
     if request.method == 'GET':
         activities = Destination.objects.all()
         serializer_activities = DestinationSerializerSmall(activities, many=True)
+        return Response(serializer_activities.data)
+
+@api_view(['GET'])
+def destination_view(request):
+    if request.method == 'GET':
+        activities = Destination.objects.all().order_by('order')
+        serializer_activities = DestinationSmallSerializer(activities, many=True)
         return Response(serializer_activities.data)
 
 @api_view(['GET'])

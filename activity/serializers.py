@@ -46,8 +46,8 @@ class DestinationSerializer(serializers.ModelSerializer):
 class DestinationSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
-        fields = ('id','order','name','thumnail_image','thumnail_image_alt_description')
-        depth = 1
+        fields = ('id','name','thumnail_image','thumnail_image_alt_description')
+
 
 class ActivityRegionSerializer(serializers.ModelSerializer):
     class Meta:

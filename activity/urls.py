@@ -10,6 +10,7 @@ urlpatterns = [
     path('activities-regions/', views.activities_regions),
     path('activities-region-slug/', views.activities_reg_slug),
     path('destinations-slug/', views.destination_slug),
+    path('destinations/', views.destination_view),
     path('activitiy-categories/', views.activity_categories_collection),
     path('activities-all/<str:slug>/', views.activities_all),
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
