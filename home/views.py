@@ -341,7 +341,7 @@ def teams_id(request):
 def teams(request):
     if request.method == 'GET':
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = TeamMemberSerializer(teammembers,many=True)
+        teammembers_serializer = LandingTeamMemberSerializer(teammembers,many=True)
         
         return Response({
           "team_members":teammembers_serializer.data,

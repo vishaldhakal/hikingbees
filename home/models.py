@@ -97,6 +97,7 @@ class TeamMember(models.Model):
     )
     order = models.IntegerField(blank=True)
     name = models.CharField(max_length=200,blank=True)
+    slug=models.SlugField(max_length=200,blank=True)
     role = models.CharField(max_length=200,blank=True)
     photo = models.FileField(blank=True)
     about = tinymce_models.HTMLField(blank=True)
