@@ -16,5 +16,5 @@ urlpatterns = [
     path('booking-submit/', views.BookingSubmission),
     path('newsletter-submit/', views.Newsletter),
     path('team-single/<int:id>/', views.teams_single),
-    path('team-single/<slug:slug>/', views.teams_single_slug, name='team-single'),
+    path('team-members/<slug:slug>/', views.teams_single_slug, name='team-single'),
 ]
