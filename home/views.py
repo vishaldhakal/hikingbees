@@ -356,3 +356,13 @@ def teams_single(request,id):
         return Response({
           "team_member":teammembers_serializer.data,
         })
+
+@api_view(['GET'])
+def teams_single_slug(request,slug):
+    if request.method == 'GET':
+        teammembers = TeamMember.objects.get(slug=slug)
+        teammembers_serializer = LandingTeamMemberSerializer(teammembers)
+        
+        return Response({
+          "team_member":teammembers_serializer.data,
+        })
