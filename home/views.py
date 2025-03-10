@@ -361,7 +361,7 @@ def teams_single(request,id):
 def teams_single_slug(request,slug):
     if request.method == 'GET':
         teammembers = TeamMember.objects.get(slug=slug)
-        teammembers_serializer = LandingTeamMemberSerializer(teammembers)
+        teammembers_serializer = TeamMemberSerializer(teammembers)
         
         return Response({
           "team_member":teammembers_serializer.data,
