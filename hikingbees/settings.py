@@ -163,7 +163,8 @@ EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@hikingbees.com'
-EMAIL_HOST_PASSWORD = '20@Hikingbees20.'
+# EMAIL_HOST_PASSWORD = '20@Hikingbees20.'
+EMAIL_HOST_PASSWORD="FJgpLaAfQCf3"
 
 
 SUMMERNOTE_CONFIG = {
