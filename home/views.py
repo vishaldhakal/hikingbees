@@ -20,25 +20,58 @@ from datetime import date
 @api_view(["POST"])
 def ContactFormSubmission(request):
     if request.method == "POST":
-        subject = "Contact Form Submission"
-        email = "Hiking Bees <info@hikingbees.com>"
-        headers = {'Reply-To': request.POST["email"]}
-        contex = {
-            "name": request.POST["name"],
-            "email": request.POST["email"],
-            "phone": request.POST["phone"],
-            "message": request.POST["message"]
-        }
-        html_content = render_to_string("contactForm.html", contex)
-        text_content = strip_tags(html_content)
+        try:
+            # Get data from either POST or request.data (for JSON)
+            data = request.POST or request.data
+            
+            # Get required fields with validation
+            name = data.get("name")
+            email = data.get("email")
+            phone = data.get("phone")
+            message = data.get("message")
+            
+            # Validate required fields
+            if not all([name, email, message]):
+                return Response({
+                    "error": "Missing required fields. Please provide name, email, and message."
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            subject = "Contact Form Submission"
+            email_from = "Hiking Bees <info@hikingbees.com>"
+            headers = {'Reply-To': email}
+            
+            context = {
+                "name": name,
+                "email": email,
+                "phone": phone or "Not provided",
+                "message": message
+            }
+            
+            html_content = render_to_string("contactForm.html", context)
+            text_content = strip_tags(html_content)
 
-        return HttpResponse("Sucess")
-    else:
-        return HttpResponse("Not post req")
+            msg = EmailMultiAlternatives(
+                subject, 
+                "You have been sent a Contact Form Submission. Unable to Receive !",
+                email_from, 
+                ["info@hikingbees.com"],
+                headers=headers
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            return Response({
+                "message": "Contact form submitted successfully"
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                "error": f"An error occurred: {str(e)}"
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response({
+        "error": "Method not allowed"
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(["POST"])
 def InquirySubmission(request):
@@ -202,13 +235,8 @@ def BookingSubmission(request):
                     html_content = render_to_string("contactForm3.html", contex)
                     text_content = strip_tags(html_content)
 
-                    msg = EmailMultiAlternatives(
-                        subject,
-                        "You have been sent a Contact Form Submission. Unable to Receive !",
-                        "info@hikingbees.com",
-                        [emaill],
-                        headers=headers
-                    )
+                    msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
                 except Exception as e:
