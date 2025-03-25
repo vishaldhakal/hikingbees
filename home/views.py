@@ -114,98 +114,128 @@ def PlanTripSubmit(request):
 @api_view(["POST"])
 def BookingSubmission(request):
     if request.method == "POST":
-        subject = "Booking of Activity"
-        email = "Hiking Bees <info@hikingbees.com>"
-        
-        # Get email safely first
-        emaill = request.POST.get("email", "")
-        headers = {'Reply-To': emaill}  # Use the safely retrieved email
-
-        name = request.POST.get("name", "")
-        address = request.POST.get("address", "")
-        phone = request.POST.get("phone", "")
-        message = request.POST.get("message", "")
-        no_of_guests = int(request.POST.get("no_of_guests", "0"))
-        total_price = float(request.POST.get("total_price", "0.0"))
-        booking_date_str = request.POST.get("booking_date", "")
-        arrival_date_str = request.POST.get("arrival_date", "")
-        private_booking = request.POST.get("private_booking", "False")
-        departure_date_str = request.POST.get("departure_date", "")
-
-        # Add validation for booking_date
-        if not booking_date_str:
-            return Response({"error": "Booking date is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
         try:
-            booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-            arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if arrival_date_str else None
-            departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if departure_date_str else None
-        except ValueError:
-            return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+            subject = "Booking of Activity"
+            email = "Hiking Bees <info@hikingbees.com>"
+            # Handle both multipart and form-urlencoded data
+            data = request.POST or request.data
 
-        emergency_contact_name = request.POST.get("emergency_contact_name", "")
-        emergency_address = request.POST.get("emergency_address", "")
-        emergency_phone = request.POST.get("emergency_phone", "")
-        emergency_email = request.POST.get("emergency_email", "")
-        emergency_relationship = request.POST.get("emergency_relationship", "")
+            # Get email safely first
+            emaill = data.get("email", "")
+            headers = {'Reply-To': emaill}
 
-        act = Activity.objects.get(slug=request.POST["slug"])
+            name = data.get("name", "")
+            address = data.get("address", "")
+            phone = data.get("phone", "")
+            message = data.get("message", "")
+            no_of_guests = int(data.get("no_of_guests", "0"))
+            total_price = float(data.get("total_price", "0.0"))
+            booking_date_str = data.get("booking_date", "")
+            arrival_date_str = data.get("arrival_date", "")
+            private_booking = data.get("private_booking", "False")
+            departure_date_str = data.get("departure_date", "")
+            slug = data.get("slug", "")
 
-        contex = {
-            "name": name,
-            "email": emaill,
-            "phone": phone,
-            "message": message,
-            "total_price": total_price,
-            "no_of_guests": no_of_guests,
-            "booking_date": booking_date,
-            "activity": act.activity_title,
-            "slug": request.POST.get("slug", "")
-        }
+            # Validate required fields
+            if not all([name, emaill, booking_date_str, slug]):
+                return Response({
+                    "error": "Missing required fields. Please provide name, email, booking_date, and slug"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        html_content = render_to_string("contactForm3.html", contex)
-        text_content = strip_tags(html_content)
+            # Parse dates
+            try:
+                booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+            except ValueError:
+                try:
+                    # Try alternate format
+                    booking_date = datetime.strptime(booking_date_str, '%Y-%m-%d')
+                except ValueError:
+                    return Response({
+                        "error": "Invalid booking_date format. Use YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS.000Z"
+                    }, status=status.HTTP_400_BAD_REQUEST)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            # Parse optional dates
+            try:
+                arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if arrival_date_str else None
+            except ValueError:
+                try:
+                    arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%d') if arrival_date_str else None
+                except ValueError:
+                    arrival_date = None
+
+            try:
+                departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if departure_date_str else None
+            except ValueError:
+                try:
+                    departure_date = datetime.strptime(departure_date_str, '%Y-%m-%d') if departure_date_str else None
+                except ValueError:
+                    departure_date = None
+
+            emergency_contact_name = data.get("emergency_contact_name", "")
+            emergency_address = data.get("emergency_address", "")
+            emergency_phone = data.get("emergency_phone", "")
+            emergency_email = data.get("emergency_email", "")
+            emergency_relationship = data.get("emergency_relationship", "")
+
+            act = Activity.objects.get(slug=slug)
+
+            contex = {
+                "name": name,
+                "email": emaill,
+                "phone": phone,
+                "message": message,
+                "total_price": total_price,
+                "no_of_guests": no_of_guests,
+                "booking_date": booking_date,
+                "activity": act.activity_title,
+                "slug": slug
+            }
+
+            html_content = render_to_string("contactForm3.html", contex)
+            text_content = strip_tags(html_content)
+
+            msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", "info@hikingbees.com", [emaill], headers=headers)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
 
 
-        new_booking = ActivityBooking.objects.create(
-            activity=act,
-            name=name,
-            address=address,
-            email=emaill,
-            no_of_guests=no_of_guests,
-            total_price=total_price,
-            booking_date=booking_date
-        )
-        if "private_booking" in request.POST:
-            if private_booking == "True":
-                new_booking.is_private = True
-            else:
-                new_booking.is_private = False
-        if "phone" in request.POST:
-            new_booking.phone = phone
-        if "message" in request.POST:
-            new_booking.message = message
-        if "arrival_date" in request.POST:
-            new_booking.arrival_date = arrival_date
-        if "departure_date" in request.POST:
-            new_booking.departure_date = departure_date
-        if "emergency_contact_name" in request.POST:
-            new_booking.emergency_contact_name = emergency_contact_name
-        if "emergency_address" in request.POST:
-            new_booking.emergency_address = emergency_address
-        if "emergency_phone" in request.POST:
-            new_booking.emergency_phone = emergency_phone
-        if "emergency_email" in request.POST:
-            new_booking.emergency_email = emergency_email
-        if "emergency_relationship" in request.POST:
-            new_booking.emergency_relationship = emergency_relationship
-        new_booking.save()
+            new_booking = ActivityBooking.objects.create(
+                activity=act,
+                name=name,
+                address=address,
+                email=emaill,
+                no_of_guests=no_of_guests,
+                total_price=total_price,
+                booking_date=booking_date
+            )
+            if "private_booking" in data:
+                if private_booking == "True":
+                    new_booking.is_private = True
+                else:
+                    new_booking.is_private = False
+            if "phone" in data:
+                new_booking.phone = phone
+            if "message" in data:
+                new_booking.message = message
+            if "arrival_date" in data:
+                new_booking.arrival_date = arrival_date
+            if "departure_date" in data:
+                new_booking.departure_date = departure_date
+            if "emergency_contact_name" in data:
+                new_booking.emergency_contact_name = emergency_contact_name
+            if "emergency_address" in data:
+                new_booking.emergency_address = emergency_address
+            if "emergency_phone" in data:
+                new_booking.emergency_phone = emergency_phone
+            if "emergency_email" in data:
+                new_booking.emergency_email = emergency_email
+            if "emergency_relationship" in data:
+                new_booking.emergency_relationship = emergency_relationship
+            new_booking.save()
 
-        return HttpResponse("Sucess")
+            return HttpResponse("Sucess")
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return HttpResponse("Not post req")
 
