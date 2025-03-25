@@ -116,11 +116,13 @@ def BookingSubmission(request):
     if request.method == "POST":
         subject = "Booking of Activity"
         email = "Hiking Bees <info@hikingbees.com>"
-        headers = {'Reply-To': request.POST["email"]}
+        
+        # Get email safely first
+        emaill = request.POST.get("email", "")
+        headers = {'Reply-To': emaill}  # Use the safely retrieved email
 
         name = request.POST.get("name", "")
         address = request.POST.get("address", "")
-        emaill = request.POST.get("email", "")
         phone = request.POST.get("phone", "")
         message = request.POST.get("message", "")
         no_of_guests = int(request.POST.get("no_of_guests", "0"))
@@ -130,9 +132,16 @@ def BookingSubmission(request):
         private_booking = request.POST.get("private_booking", "False")
         departure_date_str = request.POST.get("departure_date", "")
 
-        booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
-        arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if arrival_date_str else None
-        departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if departure_date_str else None
+        # Add validation for booking_date
+        if not booking_date_str:
+            return Response({"error": "Booking date is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            booking_date = datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+            arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if arrival_date_str else None
+            departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ') if departure_date_str else None
+        except ValueError:
+            return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
 
         emergency_contact_name = request.POST.get("emergency_contact_name", "")
         emergency_address = request.POST.get("emergency_address", "")
@@ -143,15 +152,15 @@ def BookingSubmission(request):
         act = Activity.objects.get(slug=request.POST["slug"])
 
         contex = {
-            "name": request.POST["name"],
-            "email": request.POST["email"],
-            "phone": request.POST["phone"],
-            "message": request.POST["message"],
-            "total_price": request.POST["total_price"],
-            "no_of_guests": request.POST["no_of_guests"],
-            "booking_date": request.POST["booking_date"],
+            "name": name,
+            "email": emaill,
+            "phone": phone,
+            "message": message,
+            "total_price": total_price,
+            "no_of_guests": no_of_guests,
+            "booking_date": booking_date,
             "activity": act.activity_title,
-            "slug": request.POST["slug"]
+            "slug": request.POST.get("slug", "")
         }
 
         html_content = render_to_string("contactForm3.html", contex)
