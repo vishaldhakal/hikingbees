@@ -54,16 +54,6 @@ def validate_phone(phone):
         return False
     return True
 
-def validate_message(message):
-    """
-    Validates the message field.
-    Returns True if message is valid, False otherwise.
-    """
-    if not message or not isinstance(message, str):
-        return False
-    if len(message.strip()) < 10:
-        return False
-    return True
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
@@ -79,7 +69,7 @@ def ContactFormSubmission(request):
             message = data.get("message", "").strip()
             
             # Validate all fields
-            if not validate_name(name) or not validate_email(email) or not validate_phone(phone) or not validate_message(message):
+            if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
                 return Response({
                     "error": "Validation failed",
                     "message": "Please check your input fields"
