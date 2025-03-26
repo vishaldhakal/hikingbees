@@ -159,7 +159,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.resend.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = "re_aExwtxXd_8RGEoHABY6PraXxUM3KoAijx"
+EMAIL_HOST_PASSWORD = "re_3Sb2tExA_CKjeCJQ5BiTLNYJqZLpegerR"
 
 
 SUMMERNOTE_CONFIG = {
