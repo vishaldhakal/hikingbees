@@ -14,64 +14,140 @@ from django.utils.html import strip_tags
 from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.core.cache import cache
+from django.conf import settings
+import logging
+import time
+from smtplib import SMTPException, SMTPServerDisconnected
+import re
 
+logger = logging.getLogger(__name__)
 
+def sanitize_input(text):
+    """Sanitize input to prevent XSS and injection attacks"""
+    if not text:
+        return ""
+    # Remove any HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    # Remove any script tags
+    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.DOTALL)
+    return text.strip()
+
+def validate_email_format(email):
+    """Validate email format"""
+    try:
+        validate_email(email)
+        return True
+    except ValidationError:
+        return False
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
-    if request.method == "POST":
-        try:
-            # Get data from either POST or request.data (for JSON)
-            data = request.POST or request.data
-            
-            # Get required fields with validation
-            name = data.get("name")
-            email = data.get("email")
-            phone = data.get("phone")
-            message = data.get("message")
-            
-            # Validate required fields
-            if not all([name, email, message]):
+    if request.method != "POST":
+        return Response({
+            "error": "Method not allowed"
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    try:
+        # Get data from either POST or request.data (for JSON)
+        data = request.POST or request.data
+        
+        # Rate limiting check
+        client_ip = request.META.get('REMOTE_ADDR')
+        cache_key = f'contact_form_{client_ip}'
+        if cache.get(cache_key):
+            return Response({
+                "error": "Please wait a few minutes before submitting another form."
+            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        
+        # Set rate limit (5 minutes)
+        cache.set(cache_key, True, 300)
+        
+        # Get and sanitize required fields
+        name = sanitize_input(data.get("name", ""))
+        email = sanitize_input(data.get("email", ""))
+        phone = sanitize_input(data.get("phone", ""))
+        message = sanitize_input(data.get("message", ""))
+        
+        # Validate required fields
+        if not all([name, email, message]):
+            return Response({
+                "error": "Missing required fields. Please provide name, email, and message."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate email format
+        if not validate_email_format(email):
+            return Response({
+                "error": "Invalid email format."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        subject = "Contact Form Submission"
+        email_from = "Hiking Bees <info@hikingbees.com>"
+        headers = {'Reply-To': email}
+        
+        context = {
+            "name": name,
+            "email": email,
+            "phone": phone or "Not provided",
+            "message": message
+        }
+        
+        html_content = render_to_string("contactForm.html", context)
+        text_content = strip_tags(html_content)
+
+        # Email sending with retry logic
+        max_retries = 3
+        retry_delay = 2  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                msg = EmailMultiAlternatives(
+                    subject, 
+                    "You have been sent a Contact Form Submission. Unable to Receive !",
+                    email_from, 
+                    ["info@hikingbees.com"],
+                    headers=headers
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+                
+                logger.info(f"Contact form submitted successfully from {email}")
                 return Response({
-                    "error": "Missing required fields. Please provide name, email, and message."
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            subject = "Contact Form Submission"
-            email_from = "Hiking Bees <info@hikingbees.com>"
-            headers = {'Reply-To': email}
+                    "message": "Contact form submitted successfully"
+                }, status=status.HTTP_200_OK)
+                
+            except SMTPServerDisconnected as e:
+                logger.error(f"SMTP connection error (attempt {attempt + 1}/{max_retries}): {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                return Response({
+                    "error": "Email service temporarily unavailable. Please try again later."
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+                
+            except SMTPException as e:
+                logger.error(f"SMTP error: {str(e)}")
+                return Response({
+                    "error": "Failed to send email. Please try again later."
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            except Exception as e:
+                logger.error(f"Unexpected error in contact form submission: {str(e)}")
+                return Response({
+                    "error": "An unexpected error occurred. Please try again later."
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response({
+            "error": "Failed to send email after multiple attempts. Please try again later."
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
             
-            context = {
-                "name": name,
-                "email": email,
-                "phone": phone or "Not provided",
-                "message": message
-            }
-            
-            html_content = render_to_string("contactForm.html", context)
-            text_content = strip_tags(html_content)
-
-            msg = EmailMultiAlternatives(
-                subject, 
-                "You have been sent a Contact Form Submission. Unable to Receive !",
-                email_from, 
-                ["info@hikingbees.com"],
-                headers=headers
-            )
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-
-            return Response({
-                "message": "Contact form submitted successfully"
-            }, status=status.HTTP_200_OK)
-            
-        except Exception as e:
-            return Response({
-                "error": f"An error occurred: {str(e)}"
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    return Response({
-        "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    except Exception as e:
+        logger.error(f"Critical error in contact form submission: {str(e)}")
+        return Response({
+            "error": "A critical error occurred. Please try again later."
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(["POST"])
 def InquirySubmission(request):
