@@ -82,7 +82,7 @@ def ContactFormSubmission(request):
             body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
             
             try:
-                send_mail(subject, body, email_from, ["info@hikingbees.com"], fail_silently=False)
+                send_mail(subject, body, email_from, ["info@hikingbees.com"], fail_silently=True)
             except Exception as e:
                 return Response({
                     "error": "An error occurred while sending the email",
