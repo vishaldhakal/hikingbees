@@ -8,14 +8,62 @@ from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
 from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer, NavbarActivitySerializer
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
 
+def validate_name(name):
+    """
+    Validates the name field.
+    Returns True if name is valid, False otherwise.
+    """
+    if not name or not isinstance(name, str):
+        return False
+    if len(name.strip()) < 2:
+        return False
+    return True
 
+def validate_email(email):
+    """
+    Validates the email field.
+    Returns True if email is valid, False otherwise.
+    """
+    if not email or not isinstance(email, str):
+        return False
+    if '@' not in email or '.' not in email:
+        return False
+    if len(email.split('@')[0]) < 1 or len(email.split('@')[1].split('.')[0]) < 1:
+        return False
+    return True
+
+def validate_phone(phone):
+    """
+    Validates the phone field.
+    Returns True if phone is valid, False otherwise.
+    """
+    if not phone:
+        return True  # Phone is optional
+    if not isinstance(phone, str):
+        return False
+    # Remove any non-digit characters
+    phone_digits = ''.join(filter(str.isdigit, phone))
+    if len(phone_digits) < 10:
+        return False
+    return True
+
+def validate_message(message):
+    """
+    Validates the message field.
+    Returns True if message is valid, False otherwise.
+    """
+    if not message or not isinstance(message, str):
+        return False
+    if len(message.strip()) < 10:
+        return False
+    return True
 
 @api_view(["POST"])
 def ContactFormSubmission(request):
@@ -24,49 +72,48 @@ def ContactFormSubmission(request):
             # Get data from either POST or request.data (for JSON)
             data = request.POST or request.data
             
-            # Get required fields with validation
-            name = data.get("name")
-            email = data.get("email")
-            phone = data.get("phone")
-            message = data.get("message")
+            # Get required fields
+            name = data.get("name", "").strip()
+            email = data.get("email", "").strip()
+            phone = data.get("phone", "").strip()
+            message = data.get("message", "").strip()
             
-            # Validate required fields
-            if not all([name, email, message]):
+            # Validate all fields
+            if not validate_name(name) or not validate_email(email) or not validate_phone(phone) or not validate_message(message):
                 return Response({
-                    "error": "Missing required fields. Please provide name, email, and message."
+                    "error": "Validation failed",
+                    "message": "Please check your input fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             subject = "Contact Form Submission"
             email_from = "Hiking Bees <info@hikingbees.com>"
-            headers = {'Reply-To': email}
             
-            context = {
-                "name": name,
-                "email": email,
-                "phone": phone or "Not provided",
-                "message": message
-            }
+            # Create email body
+            body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
             
-            html_content = render_to_string("contactForm.html", context)
-            text_content = strip_tags(html_content)
-
-            msg = EmailMultiAlternatives(
-                subject, 
-                "You have been sent a Contact Form Submission. Unable to Receive !",
-                email_from, 
-                ["info@hikingbees.com"],
-                headers=headers
+            # Send email
+            msg = EmailMessage(
+                subject=subject,
+                body=body,
+                from_email=email_from,
+                to=["info@hikingbees.com"],
+                reply_to=[email],
             )
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
+            msg.send(fail_silently=False)
 
             return Response({
-                "message": "Contact form submitted successfully"
+                "message": "Contact form submitted successfully",
+                "data": {
+                    "name": name,
+                    "email": email,
+                    "phone": phone or "Not provided"
+                }
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
             return Response({
-                "error": f"An error occurred: {str(e)}"
+                "error": "An error occurred while processing your request",
+                "details": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
