@@ -154,12 +154,6 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@hikingbees.com'
 EMAIL_HOST_PASSWORD="20@Hikingbees20."
 
-""" EMAIL_USE_TLS = True
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.resend.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = "re_3Sb2tExA_CKjeCJQ5BiTLNYJqZLpegerR" """
 
 
 SUMMERNOTE_CONFIG = {
