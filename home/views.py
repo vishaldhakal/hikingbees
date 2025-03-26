@@ -86,7 +86,7 @@ def ContactFormSubmission(request):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             subject = "Contact Form Submission"
-            email_from = "Hiking Bees <info@hikingbees.com>"
+            email_from = "Hiking Bees <info@yetihikes.com>"
             
             # Create email body
             body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
