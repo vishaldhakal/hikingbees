@@ -76,20 +76,18 @@ def ContactFormSubmission(request):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             subject = "Contact Form Submission"
-            email_from = "Hiking Bees <info@yetihikes.com>"
+            email_from = "Hiking Bees <info@hikingbees.com>"
             
             # Create email body
             body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
             
-            # Send email
-            msg = EmailMessage(
-                subject=subject,
-                body=body,
-                from_email=email_from,
-                to=["info@hikingbees.com"],
-                reply_to=[email],
-            )
-            msg.send(fail_silently=False)
+            try:
+                send_mail(subject, body, email_from, ["info@hikingbees.com"], fail_silently=False)
+            except Exception as e:
+                return Response({
+                    "error": "An error occurred while sending the email",
+                    "details": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
                 "message": "Contact form submitted successfully",
