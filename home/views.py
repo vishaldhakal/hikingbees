@@ -55,7 +55,7 @@ def validate_phone(phone):
     return True
 
 
-@api_view(["POST"])
+""" @api_view(["POST"])
 def ContactFormSubmission(request):
     if request.method == "POST":
         try:
@@ -106,7 +106,13 @@ def ContactFormSubmission(request):
     
     return Response({
         "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED) """
+
+@api_view(["POST"])
+def ContactFormSubmission(request):
+    data = request.data
+    send_mail(data['subject'], data['message'], "info@hikingbees.com", ['vishaldhakal96@gmail.com'])
+    return Response({'message': 'Email sent successfully'})
 
 @api_view(["POST"])
 def InquirySubmission(request):
