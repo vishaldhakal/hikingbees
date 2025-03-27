@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ activity.activity_title }} - Details</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 1.5cm;
+            margin-bottom: 2.5cm;
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 2px solid #F0B90B;
+            page-break-after: avoid;
+        }
+        .title {
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .section {
+            margin-bottom: 20px;
+            padding-top: 10px;
+            page-break-before: always;
+        }
+        .first-section {
+            page-break-before: avoid;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #F0B90B;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+        .section-content {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+            padding: 0 5px;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .overview-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .overview-label {
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .overview-value {
+            color: #666;
+            font-size: 16px;
+        }
+        .itinerary-item {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        .itinerary-day {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .itinerary-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+        .itinerary-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .itinerary-detail-item {
+            display: inline-block;
+            margin-right: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+        .itinerary-description {
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+        }
+        .map-chart-section {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .map-chart-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .activity-image {
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .footer {
+            position: running(footer);
+            height: 60px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            text-align: center;
+            background: white;
+        }
+        .footer-url {
+            font-size: 13px;
+            color: #F0B90B;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .footer-emails {
+            font-size: 12px;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="title">{{ activity.activity_title }}</div>
+    </div>
+
+    <div class="section first-section">
+        <div class="section-title">Tour Overview</div>
+        <div class="overview-grid">
+            <div class="overview-item">
+                <div class="overview-label">Location</div>
+                <div class="overview-value">{{ activity.location }}</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Durations</div>
+                <div class="overview-value">{{ activity.duration }}</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Trip Grade</div>
+                <div class="overview-value">{{ activity.trip_grade }}</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Max group size</div>
+                <div class="overview-value">{{ activity.max_group_size }}</div>
+            </div>
+            <div class="overview-item">
+                <div class="overview-label">Best Time</div>
+                <div class="overview-value">{{ activity.best_time }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Tour Description</div>
+        <div class="section-content">{{ activity.tour_description|safe }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Tour Highlights</div>
+        <div class="section-content">{{ activity.tour_highlights|safe }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Tour Includes</div>
+        <div class="section-content">{{ activity.tour_includes|safe }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Tour Excludes</div>
+        <div class="section-content">{{ activity.tour_excludes|safe }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Itinerary</div>
+        {% for itinerary in itineraries %}
+        <div class="itinerary-item">
+            <div class="itinerary-title">Day {{ itinerary.day }} : {{ itinerary.title }}</div>
+            {% if itinerary.trek_distance or itinerary.trek_duration or itinerary.highest_altitude or itinerary.meals %}
+            <div class="itinerary-details">
+                {% if itinerary.trek_distance %}
+                <div class="itinerary-detail-item">Distance: {{ itinerary.trek_distance }}</div>
+                {% endif %}
+                {% if itinerary.trek_duration %}
+                <div class="itinerary-detail-item">Duration: {{ itinerary.trek_duration }}</div>
+                {% endif %}
+                {% if itinerary.highest_altitude %}
+                <div class="itinerary-detail-item">Altitude: {{ itinerary.highest_altitude }}</div>
+                {% endif %}
+                {% if itinerary.meals %}
+                <div class="itinerary-detail-item">Meals: {{ itinerary.meals }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="itinerary-description">{{ itinerary.description|safe }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if activity.additional_info %}
+    <div class="section">
+        <div class="section-title">Additional Information</div>
+        <div class="section-content">{{ activity.additional_info|safe }}</div>
+    </div>
+    {% endif %}
+    {% if trek_map_url %}
+    <div class="map-chart-section">
+        <img class="activity-image" src="http://admin.hikingbees.com{{ trek_map_url }}" alt="Trek Map">
+    </div>
+    {% endif %}
+
+    {% if altitude_chart_url %}
+    <div class="map-chart-section">
+        <img class="activity-image" src="http://admin.hikingbees.com{{ altitude_chart_url }}" alt="Altitude Chart">
+    </div>
+    {% endif %}
+    
+    <div class="footer" style="display: flex; flex-direction: column; align-items: center;">
+        <img src="http://admin.hikingbees.com/static/logo_dark.svg" alt="Logo" style="max-height: 60px;">
+        <a href="https://www.hikingbees.com" class="footer-url">www.hikingbees.com</a>
+        <div class="footer-emails">
+            info@hikingbees.com | beeshiking@gmail.com
+        </div>
+    </div>
+</body>
+</html>

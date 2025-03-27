@@ -131,6 +131,7 @@ class ActivityAdmin(ModelAdmin):
                     ("destination", "activity_category", "activity_region"),
                     ("price", "priceSale","banner_text"),
                     ("popular", "best_selling", "featured"),
+                    ("pdf_url",),
                 ],
             },
         ),

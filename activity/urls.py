@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from .views import activity_pdf_detail
 
 urlpatterns = [
     path('activity-detail/<str:slug>/', views.activities_single),
@@ -16,4 +17,5 @@ urlpatterns = [
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
     path('activities-featured/', views.activities_featured),
     path('sign/', views.sign_view, name='sign_view'),
+    path('activity-pdf/<str:slug>/', activity_pdf_detail, name='activity_pdf_detail'),
 ]

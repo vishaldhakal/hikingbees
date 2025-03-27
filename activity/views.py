@@ -13,6 +13,23 @@ import hashlib
 import hmac
 from django.utils.encoding import force_bytes
 import base64
+from django.http import HttpResponse
+from django.template.loader import get_template
+# from xhtml2pdf import pisa
+from io import BytesIO
+from django.template.loader import render_to_string
+from playwright.sync_api import sync_playwright
+import tempfile
+import os
+from django.conf import settings
+import atexit
+from django.shortcuts import get_object_or_404
+from asgiref.sync import sync_to_async
+from django.views.decorators.http import require_http_methods
+from functools import wraps
+import asyncio
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 sentence_array = [
     "घर/जग्गा नामसारीको सिफारिस गरी पाऊँ",
@@ -295,3 +312,73 @@ def activity_images_collection(request):
         activity_images = ActivityImage.objects.all()
         serializer_activity_images = ActivityImageSerializer(activity_images, many=True)
         return Response(serializer_activity_images.data)
+
+def generate_pdf(temp_html_path):
+    """Synchronous function to generate PDF using Playwright"""
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page()
+        page.goto(f'file://{temp_html_path}')
+        
+        # Generate PDF
+        pdf_bytes = page.pdf(
+            format='A4',
+            margin={
+                'top': '1.5cm',
+                'bottom': '2cm',
+                'left': '1.5cm',
+                'right': '1.5cm'
+            },
+            print_background=True,
+            prefer_css_page_size=True
+        )
+        
+        page.close()
+        browser.close()
+        return pdf_bytes
+
+@require_http_methods(["GET"])
+@api_view(['GET'])
+def activity_pdf_detail(request, slug):
+    activity = get_object_or_404(Activity, slug=slug)
+    
+    # If PDF URL exists, return it directly
+    if activity.pdf_url:
+        return Response({'pdf_url': activity.pdf_url})
+
+    # Otherwise generate new PDF
+    itineraries = ItineraryActivity.objects.filter(activity=activity)
+    trek_map_url = activity.trek_map.url if activity.trek_map else None
+    altitude_chart_url = activity.altitude_chart.url if activity.altitude_chart else None
+    
+    html_content = render_to_string(
+        'activity_pdf_template.html',
+        {
+            'activity': activity,
+            'itineraries': itineraries,
+            'trek_map_url': trek_map_url,
+            'altitude_chart_url': altitude_chart_url,
+        }
+    )
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.html', mode='w', encoding='utf-8') as f:
+        f.write(html_content)
+        temp_html_path = f.name
+
+    try:
+        # Generate PDF
+        pdf_bytes = generate_pdf(temp_html_path)
+        
+        # Save PDF file and store URL
+        pdf_filename = f"activity_pdfs/{slug}.pdf"
+        pdf_path = default_storage.save(pdf_filename, ContentFile(pdf_bytes))
+        
+        # Update activity with PDF URL
+        activity.pdf_url = default_storage.url(pdf_path)
+        activity.save()
+        
+        return Response({'pdf_url': activity.pdf_url})
+        
+    finally:
+        if os.path.exists(temp_html_path):
+            os.unlink(temp_html_path)

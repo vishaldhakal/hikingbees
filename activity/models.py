@@ -78,6 +78,7 @@ class Activity(models.Model):
     altitude_chart = models.FileField(blank=True)
     additional_info = tinymce_models.HTMLField(blank=True)
     banner_text = models.CharField(max_length=120,blank=True,null=True)
+    pdf_url = models.CharField(max_length=120,blank=True,null=True)
 
     class Meta:
         ordering = ['createdAt']
@@ -144,6 +145,7 @@ class ActivityBooking(models.Model):
     emergency_phone = models.CharField(max_length=400,blank=True)
     emergency_email = models.CharField(max_length=400,blank=True)
     emergency_relationship = models.CharField(max_length=400,blank=True)
+    
 
     def __str__(self):
         return "Booking for " + self.activity.activity_title
