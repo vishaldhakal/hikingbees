@@ -93,6 +93,10 @@ class ActivityPricingInline(StackedInline):
     model = ActivityPricing
     tab = True
 
+class AddOnsInline(StackedInline):
+    model = AddOns
+    tab = True
+
 class DestinationAdmin(ModelAdmin):
     form = DestinationAdminForm
 
@@ -119,6 +123,7 @@ class ActivityAdmin(ModelAdmin):
         ActivityImageInline,
         ActivityFAQInline,
         ActivityPricingInline,
+        AddOnsInline,
     ]
 
     fieldsets = (
@@ -207,6 +212,12 @@ admin.site.register(ActivityFAQ, ActivityFAQAdmin)
 admin.site.register(ActivityPricing, ModelAdmin)
 admin.site.register(ActivityEnquiry, ModelAdmin)
 admin.site.register(ActivityTestimonial, ActivityTestimonialAdmin)
+admin.site.register(AddOns, ModelAdmin)
+admin.site.register(ActivityBookingAddOn, ModelAdmin)
+admin.site.register(VideoReview, ModelAdmin)
+class ActivityBookingAddOnInline(StackedInline):
+    model = ActivityBookingAddOn
+    tab = True
 
 class ActivityBookingAdmin(ModelAdmin):
     list_display = (
@@ -216,6 +227,7 @@ class ActivityBookingAdmin(ModelAdmin):
         "is_private",
         "is_verified",
     )
-    list_filter = ("is_private", "is_verified", "booking_date","activity")
+    list_filter = ("is_private", "is_verified", "booking_date", "activity")
+    inlines = [ActivityBookingAddOnInline]
 
 admin.site.register(ActivityBooking, ActivityBookingAdmin)

@@ -1,4 +1,4 @@
-from .models import Activity,ActivityTestimonialImage,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial
+from .models import Activity,ActivityTestimonialImage,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial,AddOns,ActivityBookingAddOn, VideoReview
 from rest_framework import serializers
 
 class ActivityEnquirySerializer(serializers.ModelSerializer):
@@ -137,6 +137,11 @@ class ItineraryActivitySerializer(serializers.ModelSerializer):
         model = ItineraryActivity
         fields = '__all__'
 
+class AddOnsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AddOns
+        fields = ('id', 'name', 'subtitle', 'price', 'unit')
+
 class ActivitySerializer(serializers.ModelSerializer):
     itinerary = ItineraryActivitySerializer(many=True, read_only=True)
     gallery = ActivityImageSerializer(many=True,read_only=True)
@@ -144,6 +149,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     enquiries = ActivityEnquirySerializer(many=True,read_only=True)
     testimonials = ActivityTestimonialSerializer(many=True,read_only=True)
     prices = ActivityPricingSerializer(many=True,read_only=True)
+    add_ons_bookings = AddOnsSerializer(many=True, read_only=True)
     
     class Meta:
         model = Activity
@@ -206,4 +212,9 @@ class NavbarActivitySmallSerializer(serializers.ModelSerializer):
         model = Activity
         fields = ('id','slug','activity_title')
 
+
+class VideoReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VideoReview
+        fields = '__all__'
 

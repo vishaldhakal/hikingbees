@@ -124,6 +124,16 @@ class ActivityEnquiry(models.Model):
     def __str__(self):
         return self.name
 
+class AddOns(models.Model):
+    activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='add_ons_bookings')
+    name = models.CharField(max_length=400)
+    subtitle = models.CharField(max_length=400,null=True,blank=True)
+    price = models.FloatField()
+    unit = models.CharField(max_length=400)
+
+    def __str__(self):
+        return f"{self.name} - {self.price}"
+
 class ActivityBooking(models.Model):
     activity = models.ForeignKey(Activity,on_delete=models.CASCADE,related_name='bookings')
     name = models.CharField(max_length=400)
@@ -145,10 +155,18 @@ class ActivityBooking(models.Model):
     emergency_phone = models.CharField(max_length=400,blank=True)
     emergency_email = models.CharField(max_length=400,blank=True)
     emergency_relationship = models.CharField(max_length=400,blank=True)
-    
+    add_ons = models.ManyToManyField(AddOns, through='ActivityBookingAddOn', blank=True)
 
     def __str__(self):
         return "Booking for " + self.activity.activity_title
+
+class ActivityBookingAddOn(models.Model):
+    booking = models.ForeignKey(ActivityBooking, on_delete=models.CASCADE, related_name='booking_addons')
+    addon = models.ForeignKey(AddOns, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.booking.name} - {self.addon.name} x{self.quantity}"
 
 class ActivityFAQ(models.Model):
     question = tinymce_models.HTMLField(blank=True)
@@ -191,3 +209,15 @@ class ItineraryActivity(models.Model):
 
     def __str__(self) -> str:
           return self.title
+
+class VideoReview(models.Model):
+    title = models.CharField(max_length=500)
+    subtitle = models.CharField(max_length=500,null=True,blank=True)
+    thumbnail_image = models.FileField(null=True,blank=True)
+    thumbnail_image_alt_description = models.CharField(max_length=428,default="Image Description",null=True,blank=True)
+    video_url = models.CharField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return self.title

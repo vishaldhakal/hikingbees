@@ -6,7 +6,7 @@ from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testim
 from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer,NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
-from activity.models import ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
+from activity.models import ActivityBookingAddOn, ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
 from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
@@ -14,6 +14,7 @@ from django.utils.html import strip_tags
 from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
+import json
 
 def validate_name(name):
     """
@@ -253,6 +254,29 @@ def BookingSubmission(request):
                 if emergency_relationship:
                     new_booking.emergency_relationship = emergency_relationship
                 
+                # Handle add-ons
+                addons_data = data.get('booking_addons', [])
+                if isinstance(addons_data, str):
+                    # If it's a string (from form data), try to parse it as JSON
+                    try:
+                        addons_data = json.loads(addons_data)
+                    except json.JSONDecodeError:
+                        addons_data = []
+
+                for addon in addons_data:
+                    try:
+                        addon_id = addon.get('id')
+                        quantity = addon.get('quantity', 0)
+                        if addon_id and quantity > 0:
+                            ActivityBookingAddOn.objects.create(
+                                booking=new_booking,
+                                addon_id=addon_id,
+                                quantity=quantity
+                            )
+                    except Exception as e:
+                        print(f"Failed to add addon: {str(e)}")
+                        # Continue with other addons even if one fails
+
                 new_booking.save()
 
                 # Try to send email, but don't fail if it doesn't work

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion
-from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer, DestinationSmallSerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer
+from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion, VideoReview
+from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer, DestinationSmallSerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer, VideoReviewSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -382,3 +382,10 @@ def activity_pdf_detail(request, slug):
     finally:
         if os.path.exists(temp_html_path):
             os.unlink(temp_html_path)
+
+@api_view(['GET'])
+def video_review_list(request):
+    if request.method == 'GET':
+        video_reviews = VideoReview.objects.all().order_by('-created_at')
+        serializer = VideoReviewSerializer(video_reviews, many=True)
+        return Response(serializer.data)

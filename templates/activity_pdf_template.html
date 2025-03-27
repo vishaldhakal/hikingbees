@@ -19,7 +19,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            padding-bottom: 80px;
+            padding-bottom: 5cm;
         }
         .header {
             text-align: center;
@@ -125,23 +125,32 @@
             object-fit: contain;
         }
         .footer {
-            position: running(footer);
-            height: 60px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
             border-top: 1px solid #eee;
             padding-top: 10px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: white;
+            width: 100%;
+        }
+        .footer img {
+            max-height: 30px;
+        }
+        .footer-emails {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
         }
         .footer-url {
             font-size: 13px;
             color: #F0B90B;
             text-decoration: none;
             font-weight: bold;
-        }
-        .footer-emails {
-            font-size: 12px;
-            color: #555;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -241,12 +250,12 @@
     </div>
     {% endif %}
     
-    <div class="footer" style="display: flex; flex-direction: column; align-items: center;">
-        <img src="http://admin.hikingbees.com/static/logo_dark.svg" alt="Logo" style="max-height: 60px;">
-        <a href="https://www.hikingbees.com" class="footer-url">www.hikingbees.com</a>
+    <div class="footer">
+        <img src="http://admin.hikingbees.com/static/logo_dark.svg" alt="Logo">
         <div class="footer-emails">
             info@hikingbees.com | beeshiking@gmail.com
         </div>
+        <a href="https://www.hikingbees.com" class="footer-url">www.hikingbees.com</a>
     </div>
 </body>
 </html>
