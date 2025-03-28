@@ -147,20 +147,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.zoho.com'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'info@hikingbees.com'
-# EMAIL_HOST_PASSWORD="20@Hikingbees20."
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'ratish.shakya149@gmail.com'
-EMAIL_HOST_PASSWORD="pxza isui tivj hhke"
+EMAIL_HOST_USER = 'info@hikingbees.com'
+EMAIL_HOST_PASSWORD="20@Hikingbees20."
+
+
 
 SUMMERNOTE_CONFIG = {
     'summernote': {
