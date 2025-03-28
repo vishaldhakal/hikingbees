@@ -87,6 +87,7 @@ class Activity(models.Model):
     pdf_url = models.CharField(max_length=120, blank=True, null=True)
     related_activities = models.ManyToManyField(
         'self', blank=True, symmetrical=True)
+    per_day_walk = models.CharField(max_length=120, blank=True, null=True)
 
     class Meta:
         ordering = ['createdAt']
