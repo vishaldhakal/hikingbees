@@ -175,7 +175,7 @@ class ActivityAdmin(ModelAdmin):
                 "fields": [
 
                     ("heroImg", "coverImg",),
-                    ("location", "duration",),
+                    ("location", "duration", "per_day_walk"),
                     ("trip_grade", "max_group_size",),
                     ("best_time", "ratings",),
                     ("availableStart", "availableEnd",)
