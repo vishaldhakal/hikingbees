@@ -112,7 +112,13 @@ def ContactFormSubmission(request):
 @api_view(["POST"])
 def ContactFormSubmission(request):
     data = request.data
-    send_mail(data['subject'], data['message'], "info@hikingbees.com", ['vishaldhakal96@gmail.com'])
+    from django.conf import settings
+    send_mail(
+        data['subject'], 
+        data['message'], 
+        settings.EMAIL_HOST_USER,  # Use email from settings instead of hardcoded value
+        [data['email']] 
+    )
     return Response({'message': 'Email sent successfully'})
 
 @api_view(["POST"])
