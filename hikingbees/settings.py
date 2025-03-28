@@ -152,8 +152,7 @@ EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'info@hikingbees.com'
-EMAIL_HOST_PASSWORD="20@Hikingbees20."
-
+EMAIL_HOST_PASSWORD = "20@Hikingbees20."
 
 
 SUMMERNOTE_CONFIG = {
@@ -161,7 +160,8 @@ SUMMERNOTE_CONFIG = {
         'width': '100%',
         'toolbar': [
             ['style', ['style',]],
-            ['font', ['fontname', 'fontsize', 'bold', 'italic', 'strikethrough', 'clear',]],
+            ['font', ['fontname', 'fontsize', 'bold',
+                      'italic', 'strikethrough', 'clear',]],
             ['color', ['forecolor', 'backcolor', ]],
             ['para', ['ul', 'ol', 'height']],
             ['insert', ['link']],
@@ -173,8 +173,8 @@ SUMMERNOTE_CONFIG = {
 SUMMERNOTE_THEME = 'bs4'
 
 TINYMCE_DEFAULT_CONFIG = {
-    "height" : "780",
-    "width" : "780",
+    "height": "780",
+    "width": "780",
     "entity_encoding": "raw",
     "menubar": "file edit view insert format tools table help",
     "plugins": 'print preview paste importcss searchreplace autolink autosave save code visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount imagetools textpattern noneditable help charmap emoticons quickbars',

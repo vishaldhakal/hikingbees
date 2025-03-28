@@ -5,6 +5,7 @@ from tinymce.widgets import TinyMCE
 from django import forms
 from django.utils import timezone
 
+
 class DestinationAdminForm(forms.ModelForm):
     class Meta:
         model = Destination
@@ -12,6 +13,7 @@ class DestinationAdminForm(forms.ModelForm):
         widgets = {
             'destination_detail': TinyMCE(),
         }
+
 
 class ActivityCategoryAdminForm(forms.ModelForm):
     class Meta:
@@ -21,6 +23,7 @@ class ActivityCategoryAdminForm(forms.ModelForm):
             'content': TinyMCE(),
         }
 
+
 class ActivityRegionAdminForm(forms.ModelForm):
     class Meta:
         model = ActivityRegion
@@ -28,6 +31,7 @@ class ActivityRegionAdminForm(forms.ModelForm):
         widgets = {
             'content': TinyMCE(),
         }
+
 
 class ActivityAdminForm(forms.ModelForm):
     class Meta:
@@ -46,6 +50,7 @@ class ActivityAdminForm(forms.ModelForm):
         if not self.instance.pk:  # If this is a new instance
             self.instance.createdAt = timezone.now()
 
+
 class ActivityTestimonialForm(forms.ModelForm):
     class Meta:
         model = ActivityTestimonial
@@ -53,6 +58,7 @@ class ActivityTestimonialForm(forms.ModelForm):
         widgets = {
             'review': TinyMCE(),
         }
+
 
 class ActivityFAQForm(forms.ModelForm):
     class Meta:
@@ -63,6 +69,7 @@ class ActivityFAQForm(forms.ModelForm):
             'answer': TinyMCE(),
         }
 
+
 class ItineraryActivityForm(forms.ModelForm):
     class Meta:
         model = ItineraryActivity
@@ -71,40 +78,50 @@ class ItineraryActivityForm(forms.ModelForm):
             'description': TinyMCE(),
         }
 
+
 class ItineraryActivityInline(StackedInline):
     model = ItineraryActivity
     form = ItineraryActivityForm
     tab = True
+
 
 class ActivityFAQInline(StackedInline):
     model = ActivityFAQ
     form = ActivityFAQForm
     tab = True
 
+
 class ActivityImageInline(StackedInline):
     model = ActivityImage
     tab = True
+
 
 class ActivityTestimonialImageInline(StackedInline):
     model = ActivityTestimonialImage
     tab = True
 
+
 class ActivityPricingInline(StackedInline):
     model = ActivityPricing
     tab = True
+
 
 class AddOnsInline(StackedInline):
     model = AddOns
     tab = True
 
+
 class DestinationAdmin(ModelAdmin):
     form = DestinationAdminForm
+
 
 class ActivityCategoryAdmin(ModelAdmin):
     form = ActivityCategoryAdminForm
 
+
 class ActivityRegionAdmin(ModelAdmin):
     form = ActivityRegionAdminForm
+
 
 class ActivityAdmin(ModelAdmin):
     form = ActivityAdminForm
@@ -134,8 +151,9 @@ class ActivityAdmin(ModelAdmin):
                 "fields": [
                     ("activity_title", "slug"),
                     ("destination", "activity_category", "activity_region"),
-                    ("price", "priceSale","banner_text"),
+                    ("price", "priceSale", "banner_text"),
                     ("popular", "best_selling", "featured"),
+                    ("related_activities"),
                     ("pdf_url",),
                 ],
             },
@@ -156,11 +174,11 @@ class ActivityAdmin(ModelAdmin):
                 "classes": ["tab"],
                 "fields": [
 
-                    ("heroImg","coverImg",),
-                    ("location","duration",),
-                    ("trip_grade","max_group_size",),
-                    ("best_time","ratings",),
-                    ("availableStart","availableEnd",)
+                    ("heroImg", "coverImg",),
+                    ("location", "duration",),
+                    ("trip_grade", "max_group_size",),
+                    ("best_time", "ratings",),
+                    ("availableStart", "availableEnd",)
 
                 ],
             },
@@ -188,18 +206,22 @@ class ActivityAdmin(ModelAdmin):
                 ],
             },
         ),
-        
+
     )
+
 
 class ActivityTestimonialAdmin(ModelAdmin):
     form = ActivityTestimonialForm
     inlines = [ActivityTestimonialImageInline]
 
+
 class ActivityFAQAdmin(ModelAdmin):
     form = ActivityFAQForm
 
+
 class ItineraryActivityAdmin(ModelAdmin):
     form = ItineraryActivityForm
+
 
 # Register all models with their respective admin classes
 admin.site.register(Destination, DestinationAdmin)
@@ -215,9 +237,12 @@ admin.site.register(ActivityTestimonial, ActivityTestimonialAdmin)
 admin.site.register(AddOns, ModelAdmin)
 admin.site.register(ActivityBookingAddOn, ModelAdmin)
 admin.site.register(VideoReview, ModelAdmin)
+
+
 class ActivityBookingAddOnInline(StackedInline):
     model = ActivityBookingAddOn
     tab = True
+
 
 class ActivityBookingAdmin(ModelAdmin):
     list_display = (
@@ -229,5 +254,6 @@ class ActivityBookingAdmin(ModelAdmin):
     )
     list_filter = ("is_private", "is_verified", "booking_date", "activity")
     inlines = [ActivityBookingAddOnInline]
+
 
 admin.site.register(ActivityBooking, ActivityBookingAdmin)

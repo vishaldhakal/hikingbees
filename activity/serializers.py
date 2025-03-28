@@ -1,5 +1,6 @@
-from .models import Activity,ActivityTestimonialImage,ActivityPricing,ActivityBooking,ActivityEnquiry,ActivityCategory,ItineraryActivity,ActivityImage,Destination,ActivityRegion,ActivityFAQ,ActivityTestimonial,AddOns,ActivityBookingAddOn, VideoReview
+from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, VideoReview
 from rest_framework import serializers
+
 
 class ActivityEnquirySerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,46 +8,58 @@ class ActivityEnquirySerializer(serializers.ModelSerializer):
         fields = ('id',)
         depth = 1
 
+
 class ActivityTestimonialImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityTestimonialImage
         fields = ('image',)
         depth = 1
 
+
 class ActivityTestimonialSerializer(serializers.ModelSerializer):
     images = ActivityTestimonialImageSerializer(many=True)
+
     class Meta:
         model = ActivityTestimonial
         exclude = ('activity',)
         depth = 1
 
+
 class ActivitySmallestSer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('activity_title','priceSale','slug',)
+        fields = ('activity_title', 'priceSale', 'slug',)
         depth = 1
-        
+
+
 class ActivityBooking2Serializer(serializers.ModelSerializer):
     activity = ActivitySmallestSer(read_only=True)
+
     class Meta:
         model = ActivityBooking
-        fields = ('id','no_of_guests','booking_date','activity')
+        fields = ('id', 'no_of_guests', 'booking_date', 'activity')
         depth = 1
+
+
 class ActivityBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityBooking
-        fields = ('id','no_of_guests','booking_date',)
+        fields = ('id', 'no_of_guests', 'booking_date',)
         depth = 1
+
+
 class DestinationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
         fields = '__all__'
         depth = 2
 
+
 class DestinationSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Destination
-        fields = ('id','name','thumnail_image','thumnail_image_alt_description')
+        fields = ('id', 'name', 'thumnail_image',
+                  'thumnail_image_alt_description')
 
 
 class ActivityRegionSerializer(serializers.ModelSerializer):
@@ -55,34 +68,41 @@ class ActivityRegionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
 class ActivityRegionSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
-        fields = ['id','title','slug','image','image_alt_description']
+        fields = ['id', 'title', 'slug', 'image', 'image_alt_description']
         depth = 1
+
 
 class ActivityRegionSlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
-        fields = ('id','slug')
+        fields = ('id', 'slug')
         depth = 1
+
 
 class LandingActivityRegionSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityRegion
-        fields = ['id','title','slug']
+        fields = ['id', 'title', 'slug']
         depth = 1
+
 
 class DestinationSerializerSmall(serializers.ModelSerializer):
     class Meta:
         model = Destination
         fields = ('name',)
 
+
 class ActivityCategory2Serializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('title','image','image_alt_description','subtitle','slug')
+        fields = ('title', 'image', 'image_alt_description',
+                  'subtitle', 'slug')
         depth = 2
+
 
 class ActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -90,131 +110,160 @@ class ActivityCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+
 class ActivityCategorySerializerSmall(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
         fields = '__all__'
 
+
 class ActivityCategorySmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('id','title','slug')
+        fields = ('id', 'title', 'slug')
+
 
 class NavbarActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('id','title','image','image_alt_description','slug')
+        fields = ('id', 'title', 'image', 'image_alt_description', 'slug')
         depth = 2
+
 
 class LandingActivityCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields=('id','title','slug')
+        fields = ('id', 'title', 'slug')
 
 
 class ActivityCategorySlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('id','slug')
+        fields = ('id', 'slug')
+
 
 class ActivityImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityImage
         fields = '__all__'
 
+
 class ActivityPricingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityPricing
         fields = '__all__'
+
 
 class ActivityFAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityFAQ
         fields = '__all__'
 
+
 class ItineraryActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = ItineraryActivity
         fields = '__all__'
+
 
 class AddOnsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AddOns
         fields = ('id', 'name', 'subtitle', 'price', 'unit')
 
-class ActivitySerializer(serializers.ModelSerializer):
-    itinerary = ItineraryActivitySerializer(many=True, read_only=True)
-    gallery = ActivityImageSerializer(many=True,read_only=True)
-    faqs = ActivityFAQSerializer(many=True,read_only=True)
-    enquiries = ActivityEnquirySerializer(many=True,read_only=True)
-    testimonials = ActivityTestimonialSerializer(many=True,read_only=True)
-    prices = ActivityPricingSerializer(many=True,read_only=True)
-    add_ons_bookings = AddOnsSerializer(many=True, read_only=True)
-    
-    class Meta:
-        model = Activity
-        fields = '__all__'
-        depth = 2
-
-class ActivitySmallSerializer(serializers.ModelSerializer):
-    destination = DestinationSerializerSmall()
-    enquiries = ActivityEnquirySerializer(many=True,read_only=True)
-    class Meta:
-        model = Activity
-        fields = ('id','slug', 'activity_title', 'activity_category','enquiries','location','duration','price','coverImg','ratings','popular','best_selling','destination','activity_region','priceSale','banner_text')
-        depth = 1
-
-class ActivitySearchSerializers(serializers.ModelSerializer):
-
-    class Meta:
-        model=Activity
-        fields=('id','slug','activity_title','duration','best_time','max_group_size','trip_grade','price','priceSale')
 
 class LandingActivitySmallSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Activity
-        fields=('id','slug','activity_title','duration','price','heroImg','coverImg','priceSale','ratings','banner_text')
+        fields = ('id', 'slug', 'activity_title', 'duration', 'price',
+                  'heroImg', 'coverImg', 'priceSale', 'ratings', 'banner_text')
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    itinerary = ItineraryActivitySerializer(many=True, read_only=True)
+    gallery = ActivityImageSerializer(many=True, read_only=True)
+    faqs = ActivityFAQSerializer(many=True, read_only=True)
+    enquiries = ActivityEnquirySerializer(many=True, read_only=True)
+    testimonials = ActivityTestimonialSerializer(many=True, read_only=True)
+    prices = ActivityPricingSerializer(many=True, read_only=True)
+    add_ons_bookings = AddOnsSerializer(many=True, read_only=True)
+    related_activities = LandingActivitySmallSerializer(
+        many=True, read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = '__all__'
+        depth = 2
+
+
+class ActivitySmallSerializer(serializers.ModelSerializer):
+    destination = DestinationSerializerSmall()
+    enquiries = ActivityEnquirySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = ('id', 'slug', 'activity_title', 'activity_category', 'enquiries', 'location', 'duration', 'price',
+                  'coverImg', 'ratings', 'popular', 'best_selling', 'destination', 'activity_region', 'priceSale', 'banner_text')
+        depth = 1
+
+
+class ActivitySearchSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Activity
+        fields = ('id', 'slug', 'activity_title', 'duration', 'best_time',
+                  'max_group_size', 'trip_grade', 'price', 'priceSale')
+
 
 class LandingFavouriteActivitySmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields=('id','slug','activity_title','heroImg','coverImg','location','banner_text')
+        fields = ('id', 'slug', 'activity_title', 'heroImg',
+                  'coverImg', 'location', 'banner_text')
+
 
 class LandingBannerActivitySmallSerializer(serializers.ModelSerializer):
-        activity_category=LandingActivityCategorySerializer(many=True)
-        activity_region=LandingActivityRegionSmallSerializer()
-        destination=DestinationSerializerSmall()
-        class Meta:
-            model = Activity
-            fields=('id','slug','activity_title','activity_category','location','duration','heroImg','coverImg','price','priceSale','ratings','activity_region','destination')
-            depth = 1    
+    activity_category = LandingActivityCategorySerializer(many=True)
+    activity_region = LandingActivityRegionSmallSerializer()
+    destination = DestinationSerializerSmall()
+
+    class Meta:
+        model = Activity
+        fields = ('id', 'slug', 'activity_title', 'activity_category', 'location', 'duration',
+                  'heroImg', 'coverImg', 'price', 'priceSale', 'ratings', 'activity_region', 'destination')
+        depth = 1
+
 
 class ActivitySmallestSerializer(serializers.ModelSerializer):
     destination = DestinationSerializerSmall()
+
     class Meta:
         model = Activity
-        fields = ('id','slug', 'activity_title','destination','duration','price','priceSale','trip_grade','max_group_size','best_time','banner_text')
+        fields = ('id', 'slug', 'activity_title', 'destination', 'duration', 'price',
+                  'priceSale', 'trip_grade', 'max_group_size', 'best_time', 'banner_text')
         depth = 1
+
 
 class ActivitySlugSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('id','slug')
+        fields = ('id', 'slug')
+
 
 class NavbarActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('id','slug','activity_title','coverImg')
+        fields = ('id', 'slug', 'activity_title', 'coverImg')
+
 
 class NavbarActivitySmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('id','slug','activity_title')
+        fields = ('id', 'slug', 'activity_title')
 
 
 class VideoReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoReview
         fields = '__all__'
-
