@@ -12,8 +12,11 @@ from unfold.admin import ModelAdmin
 from solo.admin import SingletonModelAdmin
 
 # Create a base class that combines SingletonModelAdmin and Unfold's ModelAdmin
+
+
 class UnfoldSingletonModelAdmin(SingletonModelAdmin, ModelAdmin):
     pass
+
 
 class TeamMemberForm(forms.ModelForm):
     class Meta:
@@ -23,6 +26,7 @@ class TeamMemberForm(forms.ModelForm):
             'about': TinyMCE(),
         }
 
+
 class TeamMemberAdmin(ModelAdmin):
     form = TeamMemberForm
     list_display = ('name', 'role', 'type', 'email', 'order')
@@ -30,15 +34,18 @@ class TeamMemberAdmin(ModelAdmin):
     search_fields = ('name', 'role', 'email')
     ordering = ('order', 'name')
 
+
 class TestimonialAdmin(ModelAdmin):
     list_display = ('name', 'role', 'source', 'rating', 'created_at')
     list_filter = ('source', 'rating')
     search_fields = ('name', 'title', 'review')
     date_hierarchy = 'created_at'
 
+
 class LegalDocumentAdmin(ModelAdmin):
     list_display = ('title',)
     search_fields = ('title', 'description')
+
 
 class FAQAdmin(ModelAdmin):
     list_display = ('question', 'category', 'active', 'created_at')
@@ -46,30 +53,37 @@ class FAQAdmin(ModelAdmin):
     search_fields = ('question', 'answer')
     date_hierarchy = 'created_at'
 
+
 class FAQCategoryAdmin(ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
+
 
 class InnerDropdownAdmin(ModelAdmin):
     list_display = ('activity_region',)
     filter_horizontal = ('activites',)
 
+
 class NewsletterSubscriptionAdmin(ModelAdmin):
     list_display = ('email',)
     search_fields = ('email',)
+
 
 class EnquiryAdmin(ModelAdmin):
     list_display = ('name', 'email', 'phone', 'date')
     search_fields = ('name', 'email', 'message')
     date_hierarchy = 'date'
 
+
 class AffiliationsAdmin(ModelAdmin):
     list_display = ('name', 'link_to_website')
     search_fields = ('name',)
 
+
 class PartnersAdmin(ModelAdmin):
     list_display = ('name', 'link_to_website')
     search_fields = ('name',)
+
 
 # Register models with their respective admin classes
 admin.site.register(SiteConfiguration, UnfoldSingletonModelAdmin)

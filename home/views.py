@@ -1,13 +1,13 @@
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render, HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ,FAQCategory,LegalDocument,FeaturedTour,TeamMember,Testimonial,SiteConfiguration,Affiliations,Partners,DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown,NewsletterSubscription
-from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer,LegalDocumentSerializer,FeaturedTourSerializer,FAQCategorySerializer,TeamMemberSlugSerializer,TestimonialSerializer,TeamMemberSerializer,AffiliationsSerializer,PartnersSerializer,SiteConfigurationSerializer,DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer,NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
+from .models import FAQ, Enquiry, FAQCategory, LegalDocument, FeaturedTour, TeamMember, Testimonial, SiteConfiguration, Affiliations, Partners, DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown, NewsletterSubscription
+from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer, LegalDocumentSerializer, FeaturedTourSerializer, FAQCategorySerializer, TeamMemberSlugSerializer, TestimonialSerializer, TeamMemberSerializer, AffiliationsSerializer, PartnersSerializer, SiteConfigurationSerializer, DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
-from activity.models import ActivityBookingAddOn, ActivityCategory,Activity,ActivityEnquiry,ActivityBooking
-from activity.serializers import ActivityCategorySerializer,ActivitySmallSerializer,ActivityCategory2Serializer, NavbarActivitySerializer
+from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking
+from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -15,6 +15,19 @@ from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
 import json
+import requests
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get EmailJS credentials from environment variables
+EMAILJS_USER_ID = os.getenv('EMAILJS_USER_ID')
+EMAILJS_SERVICE_ID = os.getenv('EMAILJS_SERVICE_ID')
+EMAILJS_TEMPLATE_ID = os.getenv('EMAILJS_TEMPLATE_ID')
+EMAILJS_PRIVATE_KEY = os.getenv('EMAILJS_PRIVATE_KEY')
+
 
 def validate_name(name):
     """
@@ -26,6 +39,7 @@ def validate_name(name):
     if len(name.strip()) < 2:
         return False
     return True
+
 
 def validate_email(email):
     """
@@ -39,6 +53,7 @@ def validate_email(email):
     if len(email.split('@')[0]) < 1 or len(email.split('@')[1].split('.')[0]) < 1:
         return False
     return True
+
 
 def validate_phone(phone):
     """
@@ -56,19 +71,53 @@ def validate_phone(phone):
     return True
 
 
-""" @api_view(["POST"])
+def send_emailjs(name, email, phone, message):
+    """Helper function to send email via EmailJS"""
+    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]):
+        raise ValueError(
+            "EmailJS configuration is incomplete. Please check your .env file.")
+
+    url = "https://api.emailjs.com/api/v1.0/email/send"
+
+    payload = {
+        "service_id": EMAILJS_SERVICE_ID,
+        "template_id": EMAILJS_TEMPLATE_ID,
+        "user_id": EMAILJS_USER_ID,
+        "accessToken": EMAILJS_PRIVATE_KEY,
+        "template_params": {
+            "name": name,
+            "email": email,
+            "phone": phone or "Not provided",
+            "message": message
+        }
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return True, None
+    except Exception as e:
+        print(f"EmailJS Error: {str(e)}")
+        return False, str(e)
+
+
+@api_view(["POST"])
 def ContactFormSubmission(request):
     if request.method == "POST":
         try:
             # Get data from either POST or request.data (for JSON)
             data = request.POST or request.data
-            
+
             # Get required fields
             name = data.get("name", "").strip()
             email = data.get("email", "").strip()
             phone = data.get("phone", "").strip()
             message = data.get("message", "").strip()
-            
+
             # Validate all fields
             if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
                 return Response({
@@ -76,18 +125,16 @@ def ContactFormSubmission(request):
                     "message": "Please check your input fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            subject = "Contact Form Submission"
-            email_from = "Hiking Bees <info@hikingbees.com>"
-            
-            # Create email body
-            body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
-            
-            try:
-                send_mail(subject, body, email_from, ["info@hikingbees.com"], fail_silently=True)
-            except Exception as e:
+            # Send email using EmailJS
+            success, error = send_emailjs(name, email, phone, message)
+            enquiry = Enquiry.objects.create(
+                name=name, email=email, phone=phone, message=message)
+            enquiry.save()
+
+            if not success:
                 return Response({
-                    "error": "An error occurred while sending the email",
-                    "details": str(e)
+                    "error": "Failed to send email",
+                    "details": error
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
@@ -98,28 +145,17 @@ def ContactFormSubmission(request):
                     "phone": phone or "Not provided"
                 }
             }, status=status.HTTP_200_OK)
-            
+
         except Exception as e:
             return Response({
                 "error": "An error occurred while processing your request",
                 "details": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     return Response({
         "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED) """
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-@api_view(["POST"])
-def ContactFormSubmission(request):
-    data = request.data
-    from django.conf import settings
-    send_mail(
-        data['subject'], 
-        data['message'], 
-        settings.EMAIL_HOST_USER,  # Use email from settings instead of hardcoded value
-        [data['email']] 
-    )
-    return Response({'message': 'Email sent successfully'})
 
 @api_view(["POST"])
 def InquirySubmission(request):
@@ -134,7 +170,8 @@ def InquirySubmission(request):
         else:
             chh = "No Number"
 
-        neww = ActivityEnquiry.objects.create(activity=actt,name=request.POST["name"],email=request.POST["email"],message=request.POST["message"],phone=chh)
+        neww = ActivityEnquiry.objects.create(
+            activity=actt, name=request.POST["name"], email=request.POST["email"], message=request.POST["message"], phone=chh)
         neww.save()
 
         contex = {
@@ -149,13 +186,15 @@ def InquirySubmission(request):
         html_content = render_to_string("contactForm2.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
+                                     "info@hikingbees.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
         return HttpResponse("Sucess")
     else:
         return HttpResponse("Not post req")
+
 
 @api_view(["POST"])
 def PlanTripSubmit(request):
@@ -184,13 +223,15 @@ def PlanTripSubmit(request):
         html_content = render_to_string("ContactForm4.html", contex)
         text_content = strip_tags(html_content)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
+                                     "info@hikingbees.com"], headers=headers)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
 
         return HttpResponse("Sucess")
     else:
         return HttpResponse("Not post req")
+
 
 @api_view(["POST"])
 def BookingSubmission(request):
@@ -223,9 +264,10 @@ def BookingSubmission(request):
                     email=emaill,
                     no_of_guests=no_of_guests,
                     total_price=total_price,
-                    booking_date=datetime.strptime(booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                    booking_date=datetime.strptime(
+                        booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
                 )
-                
+
                 # Set optional fields
                 if private_booking == "True":
                     new_booking.is_private = True
@@ -233,16 +275,18 @@ def BookingSubmission(request):
                     new_booking.phone = phone
                 if message:
                     new_booking.message = message
-                    
+
                 # Handle dates
                 try:
                     if arrival_date_str:
-                        new_booking.arrival_date = datetime.strptime(arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                        new_booking.arrival_date = datetime.strptime(
+                            arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
                     if departure_date_str:
-                        new_booking.departure_date = datetime.strptime(departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                        new_booking.departure_date = datetime.strptime(
+                            departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
                 except ValueError:
                     pass  # Skip if date parsing fails
-                
+
                 # Set emergency contact info
                 emergency_contact_name = data.get("emergency_contact_name", "")
                 emergency_address = data.get("emergency_address", "")
@@ -259,7 +303,7 @@ def BookingSubmission(request):
                     new_booking.emergency_email = emergency_email
                 if emergency_relationship:
                     new_booking.emergency_relationship = emergency_relationship
-                
+
                 # Handle add-ons
                 addons_data = data.get('booking_addons', [])
                 if isinstance(addons_data, str):
@@ -303,10 +347,12 @@ def BookingSubmission(request):
                         "slug": slug
                     }
 
-                    html_content = render_to_string("contactForm3.html", contex)
+                    html_content = render_to_string(
+                        "contactForm3.html", contex)
                     text_content = strip_tags(html_content)
 
-                    msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, ["info@hikingbees.com"], headers=headers)
+                    msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
+                                                 "info@hikingbees.com"], headers=headers)
 
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
@@ -333,6 +379,7 @@ def BookingSubmission(request):
         "error": "Method not allowed"
     }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+
 @api_view(['POST'])
 def Newsletter(request):
     emaill = request.POST.get("email")
@@ -343,37 +390,41 @@ def Newsletter(request):
     """ body = f"Newsletter Subscribed by {emaill}\n" """
 
     """ send_mail(subject, body, "info@hikingbees.com",  [emaill,"info@hikingbees.com"], fail_silently=False) """
-    return Response({'success': "Subscribed Sucessfully"},status=status.HTTP_200_OK)
+    return Response({'success': "Subscribed Sucessfully"}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def legaldocuments(request):
     legal_documents = LegalDocument.objects.all()
-    legal_documents_serializer = LegalDocumentSerializer(legal_documents, many=True)
+    legal_documents_serializer = LegalDocumentSerializer(
+        legal_documents, many=True)
     return Response({'legal_documents': legal_documents_serializer.data})
+
 
 @api_view(['GET'])
 def faq_list(request):
     faqs = FAQ.objects.all()
     serializer = FAQSerializer(faqs, many=True)
-    
+
     faq_cats = FAQCategory.objects.all()
     serializer_cat = FAQCategorySerializer(faq_cats, many=True)
-    
-    return Response({'faqs': serializer.data,"faq_categories":serializer_cat.data})
+
+    return Response({'faqs': serializer.data, "faq_categories": serializer_cat.data})
 
 
 @api_view(['GET'])
 def navbar(request):
     if request.method == 'GET':
         destination_nav = DestinationNavDropdown.objects.get()
-        destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav)
+        destination_nav_serializer = DestinationNavDropdownSerializer(
+            destination_nav)
 
         other_nav = OtherActivitiesNavDropdown.objects.get()
         other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav)
-        
+
         acy = ActivityCategory.objects.get(title="Peak Climbing")
         climb_nav = Activity.objects.filter(activity_category=acy)
-        climb_nav_serializer = ActivitySmallSerializer(climb_nav,many=True)
+        climb_nav_serializer = ActivitySmallSerializer(climb_nav, many=True)
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
@@ -381,13 +432,13 @@ def navbar(request):
         # Add latest 4 posts
         latest_posts = Post.objects.all().order_by('-created_at')[:4]
         latest_posts_serializer = NavbarPostSerializer(latest_posts, many=True)
-        
+
         return Response({
-          "destination_nav":destination_nav_serializer.data,
-          "other_activities_nav":other_nav_serializer.data,
-          "climbing_nav":climb_nav_serializer.data,
-          "trekking_nav":trek_nav_serializer.data,
-          "latest_posts": latest_posts_serializer.data,
+            "destination_nav": destination_nav_serializer.data,
+            "other_activities_nav": other_nav_serializer.data,
+            "climbing_nav": climb_nav_serializer.data,
+            "trekking_nav": trek_nav_serializer.data,
+            "latest_posts": latest_posts_serializer.data,
         })
 
 
@@ -397,56 +448,61 @@ def landing_page(request):
         today = date.today()
 
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = LandingTeamMemberSerializer(teammembers,many=True)
+        teammembers_serializer = LandingTeamMemberSerializer(
+            teammembers, many=True)
 
         testimonial = Testimonial.objects.all()
-        testimonial_serializer = TestimonialSerializer(testimonial,many=True)
-        
+        testimonial_serializer = TestimonialSerializer(testimonial, many=True)
+
         hero_content = SiteConfiguration.objects.get()
         hero_content_serializer = SiteConfigurationSerializer(hero_content)
 
         posts = Post.objects.all()[:5]
-        posts_serializer = LandingPagePostSerializer(posts,many=True)
-        
-        bookings = ActivityBooking.objects.filter(booking_date__gte=today).order_by('-booking_date')[:10]
-        bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
+        posts_serializer = LandingPagePostSerializer(posts, many=True)
+
+        bookings = ActivityBooking.objects.filter(
+            booking_date__gte=today).order_by('-booking_date')[:10]
+        bookings_serializer = ActivityBooking2Serializer(bookings, many=True)
 
         activities = FeaturedTour.objects.get()
         serializer_activities = LandingFeaturedTourSerializer(activities)
 
         activity_category = ActivityCategory.objects.all()
-        serializer_activity_category = ActivityCategory2Serializer(activity_category, many=True)
-        
+        serializer_activity_category = ActivityCategory2Serializer(
+            activity_category, many=True)
+
         affiliations = Affiliations.objects.all()
-        serializer_affiliations = AffiliationsSerializer(affiliations, many=True)
-        
+        serializer_affiliations = AffiliationsSerializer(
+            affiliations, many=True)
+
         partners = Partners.objects.all()
         serializer_partners = PartnersSerializer(partners, many=True)
-        
+
         return Response({
-          "hero_content":hero_content_serializer.data,
-          "recent_posts":posts_serializer.data,
-          "featured_activities":serializer_activities.data["featured_tours"],
-          "popular_activities":serializer_activities.data["popular_tours"],
-          "best_selling_activities":serializer_activities.data["best_selling_tours"],
-          "favourite_activities":serializer_activities.data["favourite_tours"],
-          "banner_activity":serializer_activities.data["banner_tour"],
-          "activity_categories":serializer_activity_category.data,
-          "team_members":teammembers_serializer.data,
-          "testimonials":testimonial_serializer.data,
-          "affiliations":serializer_affiliations.data,
-          "partners":serializer_partners.data,
-          "bookings":bookings_serializer.data,
+            "hero_content": hero_content_serializer.data,
+            "recent_posts": posts_serializer.data,
+            "featured_activities": serializer_activities.data["featured_tours"],
+            "popular_activities": serializer_activities.data["popular_tours"],
+            "best_selling_activities": serializer_activities.data["best_selling_tours"],
+            "favourite_activities": serializer_activities.data["favourite_tours"],
+            "banner_activity": serializer_activities.data["banner_tour"],
+            "activity_categories": serializer_activity_category.data,
+            "team_members": teammembers_serializer.data,
+            "testimonials": testimonial_serializer.data,
+            "affiliations": serializer_affiliations.data,
+            "partners": serializer_partners.data,
+            "bookings": bookings_serializer.data,
         })
+
 
 @api_view(['GET'])
 def all_bookings(request):
     if request.method == 'GET':
         bookings = ActivityBooking.objects.all().order_by('-booking_date')
-        bookings_serializer = ActivityBooking2Serializer(bookings,many=True)
-        
+        bookings_serializer = ActivityBooking2Serializer(bookings, many=True)
+
         return Response({
-          "bookings":bookings_serializer.data,
+            "bookings": bookings_serializer.data,
         })
 
 
@@ -454,48 +510,54 @@ def all_bookings(request):
 def testimonials(request):
     if request.method == 'GET':
         testimonial = Testimonial.objects.all()
-        testimonial_serializer = TestimonialSerializer(testimonial,many=True)
-        
+        testimonial_serializer = TestimonialSerializer(testimonial, many=True)
+
         return Response({
-          "testimonials":testimonial_serializer.data,
+            "testimonials": testimonial_serializer.data,
         })
+
 
 @api_view(['GET'])
 def teams_id(request):
     if request.method == 'GET':
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = TeamMemberSlugSerializer(teammembers,many=True)
-        
+        teammembers_serializer = TeamMemberSlugSerializer(
+            teammembers, many=True)
+
         return Response({
-          "team_members":teammembers_serializer.data,
+            "team_members": teammembers_serializer.data,
         })
+
 
 @api_view(['GET'])
 def teams(request):
     if request.method == 'GET':
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = LandingTeamMemberSerializer(teammembers,many=True)
-        
+        teammembers_serializer = LandingTeamMemberSerializer(
+            teammembers, many=True)
+
         return Response({
-          "team_members":teammembers_serializer.data,
+            "team_members": teammembers_serializer.data,
         })
 
+
 @api_view(['GET'])
-def teams_single(request,id):
+def teams_single(request, id):
     if request.method == 'GET':
         teammembers = TeamMember.objects.get(id=id)
         teammembers_serializer = TeamMemberSerializer(teammembers)
-        
+
         return Response({
-          "team_member":teammembers_serializer.data,
+            "team_member": teammembers_serializer.data,
         })
 
+
 @api_view(['GET'])
-def teams_single_slug(request,slug):
+def teams_single_slug(request, slug):
     if request.method == 'GET':
         teammembers = TeamMember.objects.get(slug=slug)
         teammembers_serializer = TeamMemberSerializer(teammembers)
-        
+
         return Response({
-          "team_member":teammembers_serializer.data,
+            "team_member": teammembers_serializer.data,
         })
