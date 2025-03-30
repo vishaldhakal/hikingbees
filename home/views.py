@@ -172,40 +172,84 @@ def ContactFormSubmission(request):
 @api_view(["POST"])
 def InquirySubmission(request):
     if request.method == "POST":
-        subject = "Enquiry About Activity"
-        email = "Hiking Bees <info@hikingbees.com>"
-        headers = {'Reply-To': request.POST["email"]}
+        try:
+            # Handle both multipart and form-urlencoded data
+            data = request.POST or request.data
 
-        actt = Activity.objects.get(slug=request.POST["slug"])
-        if request.POST["phone"]:
-            chh = request.POST["phone"]
-        else:
-            chh = "No Number"
+            subject = "Enquiry About Activity"
+            email = "Hiking Bees <info@hikingbees.com>"
+            
+            # Safely get form data with defaults
+            user_email = data.get("email")
+            name = data.get("name")
+            phone = data.get("phone", "No Number")
+            message = data.get("message")
+            slug = data.get("slug")
 
-        neww = ActivityEnquiry.objects.create(
-            activity=actt, name=request.POST["name"], email=request.POST["email"], message=request.POST["message"], phone=chh)
-        neww.save()
+            if not all([user_email, name, message, slug]):
+                return Response({
+                    "error": "Missing required fields"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        contex = {
-            "name": request.POST["name"],
-            "email": request.POST["email"],
-            "phone": request.POST["phone"],
-            "message": request.POST["message"],
-            "activity": actt.activity_title,
-            "slug": request.POST["slug"]
-        }
+            headers = {'Reply-To': user_email}
 
-        html_content = render_to_string("contactForm2.html", contex)
-        text_content = strip_tags(html_content)
+            try:
+                actt = Activity.objects.get(slug=slug)
+            except Activity.DoesNotExist:
+                return Response({
+                    "error": "Activity not found"
+                }, status=status.HTTP_404_NOT_FOUND)
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
-                                     "info@hikingbees.com"], headers=headers)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            # Create enquiry record
+            neww = ActivityEnquiry.objects.create(
+                activity=actt,
+                name=name,
+                email=user_email,
+                message=message,
+                phone=phone
+            )
 
-        return HttpResponse("Sucess")
-    else:
-        return HttpResponse("Not post req")
+            contex = {
+                "name": name,
+                "email": user_email,
+                "phone": phone,
+                "message": message,
+                "activity": actt.activity_title,
+                "slug": slug
+            }
+
+            html_content = render_to_string("contactForm2.html", contex)
+            text_content = strip_tags(html_content)
+
+            try:
+                msg = EmailMultiAlternatives(
+                    subject,
+                    "You have been sent a Contact Form Submission. Unable to Receive !",
+                    email,
+                    ["info@hikingbees.com"],
+                    headers=headers
+                )
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+            except Exception as e:
+                return Response({
+                    "error": "Failed to send email",
+                    "details": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response({
+                "message": "Inquiry submitted successfully"
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "error": "An error occurred",
+                "details": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({
+        "error": "Method not allowed"
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 def send_plan_trip_emailjs(name, email, phone, message, no_of_people, no_of_days, arrival, departure, budget_from, budget_to, activity_title, slug):
