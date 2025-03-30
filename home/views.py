@@ -15,16 +15,16 @@ from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
 import json
-import requests
-import os
-from dotenv import load_dotenv
+# import requests
+# import os
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
-EMAILJS_USER_ID = os.getenv("EMAILJS_USER_ID")
-EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID")
-EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID")
-EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY")
+# EMAILJS_USER_ID = os.getenv("EMAILJS_USER_ID")
+# EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID")
+# EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID")
+# EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY")
 
 
 def validate_name(name):
