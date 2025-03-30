@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ, Enquiry, FAQCategory, LegalDocument, FeaturedTour, TeamMember, Testimonial, SiteConfiguration, Affiliations, Partners, DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown, NewsletterSubscription
+from .models import FAQ, FAQCategory, LegalDocument, FeaturedTour, TeamMember, Testimonial, SiteConfiguration, Affiliations, Partners, DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown, NewsletterSubscription
 from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer, LegalDocumentSerializer, FeaturedTourSerializer, FAQCategorySerializer, TeamMemberSlugSerializer, TestimonialSerializer, TeamMemberSerializer, AffiliationsSerializer, PartnersSerializer, SiteConfigurationSerializer, DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
@@ -15,18 +15,6 @@ from datetime import datetime
 from activity.serializers import ActivityBooking2Serializer
 from datetime import date
 import json
-import requests
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-
-# Get EmailJS credentials from environment variables
-EMAILJS_USER_ID = os.getenv('EMAILJS_USER_ID')
-EMAILJS_SERVICE_ID = os.getenv('EMAILJS_SERVICE_ID')
-EMAILJS_TEMPLATE_ID = os.getenv('EMAILJS_TEMPLATE_ID')
-EMAILJS_PRIVATE_KEY = os.getenv('EMAILJS_PRIVATE_KEY')
 
 
 def validate_name(name):
@@ -71,53 +59,19 @@ def validate_phone(phone):
     return True
 
 
-def send_emailjs(name, email, phone, message):
-    """Helper function to send email via EmailJS"""
-    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]):
-        raise ValueError(
-            "EmailJS configuration is incomplete. Please check your .env file.")
-
-    url = "https://api.emailjs.com/api/v1.0/email/send"
-
-    payload = {
-        "service_id": EMAILJS_SERVICE_ID,
-        "template_id": EMAILJS_TEMPLATE_ID,
-        "user_id": EMAILJS_USER_ID,
-        "accessToken": EMAILJS_PRIVATE_KEY,
-        "template_params": {
-            "name": name,
-            "email": email,
-            "phone": phone or "Not provided",
-            "message": message
-        }
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
-        return True, None
-    except Exception as e:
-        print(f"EmailJS Error: {str(e)}")
-        return False, str(e)
-
-
-@api_view(["POST"])
+""" @api_view(["POST"])
 def ContactFormSubmission(request):
     if request.method == "POST":
         try:
             # Get data from either POST or request.data (for JSON)
             data = request.POST or request.data
-
+            
             # Get required fields
             name = data.get("name", "").strip()
             email = data.get("email", "").strip()
             phone = data.get("phone", "").strip()
             message = data.get("message", "").strip()
-
+            
             # Validate all fields
             if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
                 return Response({
@@ -125,16 +79,18 @@ def ContactFormSubmission(request):
                     "message": "Please check your input fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Send email using EmailJS
-            success, error = send_emailjs(name, email, phone, message)
-            enquiry = Enquiry.objects.create(
-                name=name, email=email, phone=phone, message=message)
-            enquiry.save()
-
-            if not success:
+            subject = "Contact Form Submission"
+            email_from = "Hiking Bees <info@hikingbees.com>"
+            
+            # Create email body
+            body = f"Name: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}\n"
+            
+            try:
+                send_mail(subject, body, email_from, ["info@hikingbees.com"], fail_silently=True)
+            except Exception as e:
                 return Response({
-                    "error": "Failed to send email",
-                    "details": error
+                    "error": "An error occurred while sending the email",
+                    "details": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
@@ -145,16 +101,29 @@ def ContactFormSubmission(request):
                     "phone": phone or "Not provided"
                 }
             }, status=status.HTTP_200_OK)
-
+            
         except Exception as e:
             return Response({
                 "error": "An error occurred while processing your request",
                 "details": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    
     return Response({
         "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED) """
+
+
+@api_view(["POST"])
+def ContactFormSubmission(request):
+    data = request.data
+    from django.conf import settings
+    send_mail(
+        data['subject'],
+        data['message'],
+        settings.EMAIL_HOST_USER,  # Use email from settings instead of hardcoded value
+        [data['email']]
+    )
+    return Response({'message': 'Email sent successfully'})
 
 
 @api_view(["POST"])
