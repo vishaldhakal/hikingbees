@@ -23,8 +23,9 @@ load_dotenv()
 
 EMAILJS_USER_ID = os.getenv("EMAILJS_USER_ID")
 EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID")
-EMAILJS_TEMPLATE_ID = os.getenv("EMAILJS_TEMPLATE_ID")
+EMAILJS_CONTACT_TEMPLATE_ID = os.getenv("EMAILJS_CONTACT_TEMPLATE_ID")
 EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY")
+EMAILJS_PLAN_TRIP_TEMPLATE_ID = os.getenv("EMAILJS_PLAN_TRIP_TEMPLATE_ID")
 
 
 def validate_name(name):
@@ -69,9 +70,9 @@ def validate_phone(phone):
     return True
 
 
-def send_emailjs(name, email, phone, message):
+def send_contact_emailjs(name, email, phone, message):
     """Helper function to send email via EmailJS"""
-    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID]):
+    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_CONTACT_TEMPLATE_ID]):
         raise ValueError(
             "EmailJS configuration is incomplete. Please check your .env file.")
 
@@ -79,7 +80,7 @@ def send_emailjs(name, email, phone, message):
 
     payload = {
         "service_id": EMAILJS_SERVICE_ID,
-        "template_id": EMAILJS_TEMPLATE_ID,
+        "template_id": EMAILJS_CONTACT_TEMPLATE_ID,
         "user_id": EMAILJS_USER_ID,
         "accessToken": EMAILJS_PRIVATE_KEY,
         "template_params": {
@@ -124,7 +125,7 @@ def ContactFormSubmission(request):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             # Send email using EmailJS
-            success, error = send_emailjs(name, email, phone, message)
+            success, error = send_contact_emailjs(name, email, phone, message)
             enquiry = Enquiry.objects.create(
                 name=name, email=email, phone=phone, message=message)
             enquiry.save()
@@ -207,41 +208,108 @@ def InquirySubmission(request):
         return HttpResponse("Not post req")
 
 
+def send_plan_trip_emailjs(name, email, phone, message, no_of_people, no_of_days, arrival, departure, budget_from, budget_to, activity_title, slug):
+    """Helper function to send email via EmailJS"""
+    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_PLAN_TRIP_TEMPLATE_ID]):
+        raise ValueError(
+            "EmailJS configuration is incomplete. Please check your .env file.")
+
+    url = "https://api.emailjs.com/api/v1.0/email/send"
+
+    payload = {
+        "service_id": EMAILJS_SERVICE_ID,
+        "template_id": EMAILJS_PLAN_TRIP_TEMPLATE_ID,
+        "user_id": EMAILJS_USER_ID,
+        "accessToken": EMAILJS_PRIVATE_KEY,
+        "template_params": {
+            "name": name,
+            "email": email,
+            "phone": phone or "Not provided",
+            "message": message,
+            "noofpeople": no_of_people,
+            "noofdays": no_of_days,
+            "arrival": arrival,
+            "departure": departure,
+            "budget_from": budget_from,
+            "budget_to": budget_to,
+            "activity_title": activity_title,
+            "slug": slug
+        }
+    }
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return True, None
+    except Exception as e:
+        print(f"EmailJS Error: {str(e)}")
+        return False, str(e)
+
+
 @api_view(["POST"])
 def PlanTripSubmit(request):
     if request.method == "POST":
-        subject = "Customized Trip Enquiry"
-        email = "Hiking Bees <info@hikingbees.com>"
-        headers = {'Reply-To': request.POST["email"]}
+        try:
+            # Get data from either POST or request.data
+            data = request.POST or request.data
+            actt = Activity.objects.get(slug=data.get("slug", "").strip())
 
-        actt = Activity.objects.get(slug=request.POST["slug"])
+            # Get required fields
+            name = data.get("name", "").strip()
+            email = data.get("email", "").strip()
+            phone = data.get("phone", "").strip()
+            message = data.get("message", "").strip()
+            no_of_people = data.get("no_of_people", "").strip()
+            no_of_days = data.get("no_of_days", "").strip()
+            arrival = data.get("arrival", "").strip()
+            departure = data.get("departure", "").strip()
+            budget_from = data.get("budget_from", "").strip()
+            budget_to = data.get("budget_to", "").strip()
+            slug = data.get("slug", "").strip()
+            activity_title = actt.activity_title.strip()
 
-        contex = {
-            "name": request.POST["name"],
-            "email": request.POST["email"],
-            "phone": request.POST["phone"],
-            "message": request.POST["message"],
-            "noofpeople": request.POST["no_of_people"],
-            "noofdays": request.POST["no_of_days"],
-            "arrival": request.POST["arrival"],
-            "departure": request.POST["departure"],
-            "budget_from": request.POST["budget_from"],
-            "budget_to": request.POST["budget_to"],
-            "activity": actt.activity_title,
-            "slug": request.POST["slug"]
-        }
+            # Validate required fields
+            if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
+                return Response({
+                    "error": "Validation failed",
+                    "message": "Please check your input fields"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        html_content = render_to_string("ContactForm4.html", contex)
-        text_content = strip_tags(html_content)
+            # Send email using EmailJS
+            success, error = send_plan_trip_emailjs(
+                name, email, phone, message, no_of_people, no_of_days,
+                arrival, departure, budget_from, budget_to,
+                activity_title, slug
+            )
 
-        msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
-                                     "info@hikingbees.com"], headers=headers)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            if not success:
+                return Response({
+                    "error": "Failed to send email",
+                    "details": error
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return HttpResponse("Sucess")
-    else:
-        return HttpResponse("Not post req")
+            return Response({
+                "message": "Trip plan submitted successfully",
+                "data": {
+                    "name": name,
+                    "email": email,
+                    "activity": actt.activity_title
+                }
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "error": "An error occurred while processing your request",
+                "details": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({
+        "error": "Method not allowed"
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(["POST"])
