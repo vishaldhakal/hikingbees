@@ -18,6 +18,9 @@ import json
 import requests
 import os
 from dotenv import load_dotenv
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+from django.conf import settings
 
 load_dotenv()
 
@@ -26,6 +29,7 @@ EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID")
 EMAILJS_CONTACT_TEMPLATE_ID = os.getenv("EMAILJS_CONTACT_TEMPLATE_ID")
 EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY")
 EMAILJS_PLAN_TRIP_TEMPLATE_ID = os.getenv("EMAILJS_PLAN_TRIP_TEMPLATE_ID")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
 
 def validate_name(name):
@@ -70,38 +74,41 @@ def validate_phone(phone):
     return True
 
 
-def send_contact_emailjs(name, email, phone, message):
-    """Helper function to send email via EmailJS"""
-    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_CONTACT_TEMPLATE_ID]):
-        raise ValueError(
-            "EmailJS configuration is incomplete. Please check your .env file.")
+def send_brevo_email(name, email, phone, message):
+    """Helper function to send email via Brevo API"""
+    try:
+        # Configure API client
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration))
 
-    url = "https://api.emailjs.com/api/v1.0/email/send"
-
-    payload = {
-        "service_id": EMAILJS_SERVICE_ID,
-        "template_id": EMAILJS_CONTACT_TEMPLATE_ID,
-        "user_id": EMAILJS_USER_ID,
-        "accessToken": EMAILJS_PRIVATE_KEY,
-        "template_params": {
+        # Render email template
+        email_html = render_to_string("contact_email.html", {
             "name": name,
             "email": email,
             "phone": phone or "Not provided",
             "message": message
-        }
-    }
+        })
 
-    headers = {
-        "Content-Type": "application/json"
-    }
+        # Prepare email request
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": "info@hikingbees.com"},
+                {"email": email}],  # Your company email
+            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+            subject="New Contact Form Submission",
+            html_content=email_html,
+            reply_to={"email": email, "name": name}
+        )
 
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
+        # Send email
+        api_instance.send_transac_email(send_smtp_email)
         return True, None
+
+    except ApiException as e:
+        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
-        print(f"EmailJS Error: {str(e)}")
-        return False, str(e)
+        return False, f"Error sending email: {str(e)}"
 
 
 @api_view(["POST"])
@@ -124,8 +131,10 @@ def ContactFormSubmission(request):
                     "message": "Please check your input fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Send email using EmailJS
-            success, error = send_contact_emailjs(name, email, phone, message)
+            # Send email using Brevo
+            success, error = send_brevo_email(name, email, phone, message)
+
+            # Create enquiry record
             enquiry = Enquiry.objects.create(
                 name=name, email=email, phone=phone, message=message)
             enquiry.save()
@@ -178,7 +187,7 @@ def InquirySubmission(request):
 
             subject = "Enquiry About Activity"
             email = "Hiking Bees <info@hikingbees.com>"
-            
+
             # Safely get form data with defaults
             user_email = data.get("email")
             name = data.get("name")
