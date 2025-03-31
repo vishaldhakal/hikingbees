@@ -20,15 +20,9 @@ import os
 from dotenv import load_dotenv
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
-from django.conf import settings
 
 load_dotenv()
 
-EMAILJS_USER_ID = os.getenv("EMAILJS_USER_ID")
-EMAILJS_SERVICE_ID = os.getenv("EMAILJS_SERVICE_ID")
-EMAILJS_CONTACT_TEMPLATE_ID = os.getenv("EMAILJS_CONTACT_TEMPLATE_ID")
-EMAILJS_PRIVATE_KEY = os.getenv("EMAILJS_PRIVATE_KEY")
-EMAILJS_PLAN_TRIP_TEMPLATE_ID = os.getenv("EMAILJS_PLAN_TRIP_TEMPLATE_ID")
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
 
@@ -94,9 +88,9 @@ def send_brevo_email(name, email, phone, message):
         # Prepare email request
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
             to=[{"email": "info@hikingbees.com"},
-                {"email": email}],  # Your company email
+                {"email": email}],
             sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
-            subject="New Contact Form Submission",
+            subject=f"New Contact Form Submission from {name}",
             html_content=email_html,
             reply_to={"email": email, "name": name}
         )
@@ -165,28 +159,12 @@ def ContactFormSubmission(request):
     }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-# @api_view(["POST"])
-# def ContactFormSubmission(request):
-#     data = request.data
-#     from django.conf import settings
-#     send_mail(
-#         data['subject'],
-#         data['message'],
-#         settings.EMAIL_HOST_USER,  # Use email from settings instead of hardcoded value
-#         [data['email']]
-#     )
-#     return Response({'message': 'Email sent successfully'})
-
-
 @api_view(["POST"])
 def InquirySubmission(request):
     if request.method == "POST":
         try:
             # Handle both multipart and form-urlencoded data
             data = request.POST or request.data
-
-            subject = "Enquiry About Activity"
-            email = "Hiking Bees <info@hikingbees.com>"
 
             # Safely get form data with defaults
             user_email = data.get("email")
@@ -199,9 +177,6 @@ def InquirySubmission(request):
                 return Response({
                     "error": "Missing required fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
-
-            headers = {'Reply-To': user_email}
-
             try:
                 actt = Activity.objects.get(slug=slug)
             except Activity.DoesNotExist:
@@ -217,29 +192,22 @@ def InquirySubmission(request):
                 message=message,
                 phone=phone
             )
-
-            contex = {
-                "name": name,
-                "email": user_email,
-                "phone": phone,
-                "message": message,
-                "activity": actt.activity_title,
-                "slug": slug
-            }
-
-            html_content = render_to_string("contactForm2.html", contex)
-            text_content = strip_tags(html_content)
+            neww.save()
 
             try:
-                msg = EmailMultiAlternatives(
-                    subject,
-                    "You have been sent a Contact Form Submission. Unable to Receive !",
-                    email,
-                    ["info@hikingbees.com"],
-                    headers=headers
+                success, error = send_inquiry_brevo(
+                    name=name,
+                    email=user_email,
+                    phone=phone,
+                    message=message,
+                    activity_title=actt.activity_title,
+                    slug=slug
                 )
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
+                if not success:
+                    return Response({
+                        "error": "Failed to send email",
+                        "details": error
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             except Exception as e:
                 return Response({
                     "error": "Failed to send email",
@@ -261,46 +229,49 @@ def InquirySubmission(request):
     }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-def send_plan_trip_emailjs(name, email, phone, message, no_of_people, no_of_days, arrival, departure, budget_from, budget_to, activity_title, slug):
-    """Helper function to send email via EmailJS"""
-    if not all([EMAILJS_USER_ID, EMAILJS_SERVICE_ID, EMAILJS_PLAN_TRIP_TEMPLATE_ID]):
-        raise ValueError(
-            "EmailJS configuration is incomplete. Please check your .env file.")
+def send_plan_trip_brevo(name, email, phone, message, no_of_people, no_of_days, arrival, departure, budget_from, budget_to, activity_title, slug):
+    """Helper function to send email via Brevo API"""
+    try:
+        # Configure API client
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration))
 
-    url = "https://api.emailjs.com/api/v1.0/email/send"
-
-    payload = {
-        "service_id": EMAILJS_SERVICE_ID,
-        "template_id": EMAILJS_PLAN_TRIP_TEMPLATE_ID,
-        "user_id": EMAILJS_USER_ID,
-        "accessToken": EMAILJS_PRIVATE_KEY,
-        "template_params": {
+        # Render email template
+        email_html = render_to_string("plan_trip_email.html", {
             "name": name,
             "email": email,
             "phone": phone or "Not provided",
             "message": message,
-            "noofpeople": no_of_people,
-            "noofdays": no_of_days,
+            "no_of_people": no_of_people,
+            "no_of_days": no_of_days,
             "arrival": arrival,
             "departure": departure,
             "budget_from": budget_from,
             "budget_to": budget_to,
             "activity_title": activity_title,
             "slug": slug
-        }
-    }
+        })
 
-    headers = {
-        "Content-Type": "application/json"
-    }
+        # Prepare email request
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": "info@hikingbees.com"},
+                {"email": email}],
+            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+            subject=f"New Trip Plan Submission from {name}",
+            html_content=email_html,
+            reply_to={"email": email, "name": name}
+        )
 
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        response.raise_for_status()
+        # Send email
+        api_instance.send_transac_email(send_smtp_email)
         return True, None
+
+    except ApiException as e:
+        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
-        print(f"EmailJS Error: {str(e)}")
-        return False, str(e)
+        return False, f"Error sending email: {str(e)}"
 
 
 @api_view(["POST"])
@@ -323,7 +294,7 @@ def PlanTripSubmit(request):
             budget_from = data.get("budget_from", "").strip()
             budget_to = data.get("budget_to", "").strip()
             slug = data.get("slug", "").strip()
-            activity_title = actt.activity_title.strip()
+            activity_title = actt.activity_title
 
             # Validate required fields
             if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
@@ -332,8 +303,8 @@ def PlanTripSubmit(request):
                     "message": "Please check your input fields"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Send email using EmailJS
-            success, error = send_plan_trip_emailjs(
+            # Replace EmailJS with Brevo
+            success, error = send_plan_trip_brevo(
                 name, email, phone, message, no_of_people, no_of_days,
                 arrival, departure, budget_from, budget_to,
                 activity_title, slug
@@ -363,6 +334,48 @@ def PlanTripSubmit(request):
     return Response({
         "error": "Method not allowed"
     }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+def send_booking_brevo(name, email, phone, message, total_price, no_of_guests, booking_date, activity_title, slug):
+    """Helper function to send booking confirmation email via Brevo API"""
+    try:
+        # Configure API client
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration))
+
+        # Render email template
+        email_html = render_to_string("booking_email.html", {
+            "name": name,
+            "email": email,
+            "phone": phone or "Not provided",
+            "message": message,
+            "total_price": total_price,
+            "no_of_guests": no_of_guests,
+            "booking_date": booking_date,
+            "activity": activity_title,
+            "slug": slug
+        })
+
+        # Prepare email request
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": "info@hikingbees.com"},
+                {"email": email}],
+            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+            subject=f"Booking Confirmation for {activity_title}",
+            html_content=email_html,
+            reply_to={"email": email, "name": name}
+        )
+
+        # Send email
+        api_instance.send_transac_email(send_smtp_email)
+        return True, None
+
+    except ApiException as e:
+        return False, f"Brevo API error: {str(e)}"
+    except Exception as e:
+        return False, f"Error sending email: {str(e)}"
 
 
 @api_view(["POST"])
@@ -463,31 +476,19 @@ def BookingSubmission(request):
 
                 # Try to send email, but don't fail if it doesn't work
                 try:
-                    subject = "Booking of Activity"
-                    email = "Hiking Bees <info@hikingbees.com>"
-                    headers = {'Reply-To': emaill}
-
-                    contex = {
-                        "name": name,
-                        "email": emaill,
-                        "phone": phone,
-                        "message": message,
-                        "total_price": total_price,
-                        "no_of_guests": no_of_guests,
-                        "booking_date": booking_date_str,
-                        "activity": act.activity_title,
-                        "slug": slug
-                    }
-
-                    html_content = render_to_string(
-                        "contactForm3.html", contex)
-                    text_content = strip_tags(html_content)
-
-                    msg = EmailMultiAlternatives(subject, "You have been sent a Contact Form Submission. Unable to Receive !", email, [
-                                                 "info@hikingbees.com"], headers=headers)
-
-                    msg.attach_alternative(html_content, "text/html")
-                    msg.send()
+                    success, error = send_booking_brevo(
+                        name=name,
+                        email=emaill,
+                        phone=phone,
+                        message=message,
+                        total_price=total_price,
+                        no_of_guests=no_of_guests,
+                        booking_date=booking_date_str,
+                        activity_title=act.activity_title,
+                        slug=slug
+                    )
+                    if not success:
+                        print(f"Email sending failed: {error}")
                 except Exception as e:
                     print(f"Email sending failed: {str(e)}")
                     # Continue anyway since booking was saved
@@ -693,3 +694,42 @@ def teams_single_slug(request, slug):
         return Response({
             "team_member": teammembers_serializer.data,
         })
+
+
+def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
+    """Helper function to send inquiry confirmation email via Brevo API"""
+    try:
+        # Configure API client
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration))
+
+        # Render email template
+        email_html = render_to_string("inquiry_email.html", {
+            "name": name,
+            "email": email,
+            "phone": phone or "Not provided",
+            "message": message,
+            "activity": activity_title,
+            "slug": slug
+        })
+
+        # Prepare email request
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": "info@hikingbees.com"},
+                {"email": email}],
+            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+            subject=f"Inquiry About {activity_title}",
+            html_content=email_html,
+            reply_to={"email": email, "name": name}
+        )
+
+        # Send email
+        api_instance.send_transac_email(send_smtp_email)
+        return True, None
+
+    except ApiException as e:
+        return False, f"Brevo API error: {str(e)}"
+    except Exception as e:
+        return False, f"Error sending email: {str(e)}"
