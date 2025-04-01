@@ -747,7 +747,7 @@ def sitemap(request):
         activity_category_slugs = [{'slug': activity_category.slug}
                                    for activity_category in activity_categories]
         destinations = Destination.objects.all()
-        destination_slugs = [{'slug': destination.slug}
+        destination_slugs = [{'slug': destination.name}
                              for destination in destinations]
 
         return Response({
