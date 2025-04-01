@@ -751,9 +751,11 @@ def sitemap(request):
                              for destination in destinations]
         destination_activity_slugs = []
         for destination in destinations:
-            # Get activity categories for this destination
+            # Get activity categories for this destination using the activity relationship
             activity_categories = ActivityCategory.objects.filter(
-                destination=destination)
+                activity__destination=destination
+            ).distinct()
+
             if activity_categories:
                 for category in activity_categories:
                     destination_activity_slugs.append({
