@@ -749,10 +749,20 @@ def sitemap(request):
         destinations = Destination.objects.all()
         destination_slugs = [{'slug': destination.name}
                              for destination in destinations]
+        destination_activity_slugs = []
+        for destination in destinations:
+            # Get activity categories for this destination
+            activity_categories = ActivityCategory.objects.filter(
+                destination=destination)
+            for category in activity_categories:
+                destination_activity_slugs.append({
+                    'slug': f"destinations/{destination.name}/activity-category/{category.slug}/"
+                })
 
         return Response({
             "posts": post_slugs,
             "activity": activity_slugs,
             "activity_category": activity_category_slugs,
-            "destination": destination_slugs
+            "destination": destination_slugs,
+            "destination_activity": destination_activity_slugs
         }, status=status.HTTP_200_OK)
