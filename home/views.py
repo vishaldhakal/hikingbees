@@ -754,10 +754,11 @@ def sitemap(request):
             # Get activity categories for this destination
             activity_categories = ActivityCategory.objects.filter(
                 destination=destination)
-            for category in activity_categories:
-                destination_activity_slugs.append({
-                    'slug': f"destinations/{destination.name}/activity-category/{category.slug}/"
-                })
+            if activity_categories:
+                for category in activity_categories:
+                    destination_activity_slugs.append({
+                        'slug': f"destinations/{destination.name}/activity-category/{category.slug}"
+                    })
 
         return Response({
             "posts": post_slugs,
