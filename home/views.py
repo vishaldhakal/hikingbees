@@ -733,3 +733,15 @@ def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
         return False, f"Brevo API error: {str(e)}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
+
+
+@api_view(['GET'])
+def sitemap(request):
+    if request.method == 'GET':
+        # Get all posts and their slugs
+        posts = Post.objects.all()
+        post_slugs = [{'slug': post.slug} for post in posts]
+
+        return Response({
+            "posts": post_slugs
+        }, status=status.HTTP_200_OK)
