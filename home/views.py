@@ -743,8 +743,12 @@ def sitemap(request):
         post_slugs = [{'slug': post.slug} for post in posts]
         activities = Activity.objects.all()
         activity_slugs = [{'slug': activity.slug} for activity in activities]
+        activity_categories = ActivityCategory.objects.all()
+        activity_category_slugs = [{'slug': activity_category.slug}
+                                   for activity_category in activity_categories]
 
         return Response({
             "posts": post_slugs,
-            "activity": activity_slugs
+            "activity": activity_slugs,
+            "activity_category": activity_category_slugs
         }, status=status.HTTP_200_OK)
