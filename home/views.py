@@ -6,7 +6,7 @@ from .models import FAQ, Enquiry, FAQCategory, LegalDocument, FeaturedTour, Team
 from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer, LegalDocumentSerializer, FeaturedTourSerializer, FAQCategorySerializer, TeamMemberSlugSerializer, TestimonialSerializer, TeamMemberSerializer, AffiliationsSerializer, PartnersSerializer, SiteConfigurationSerializer, DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
-from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking
+from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking, Destination
 from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
@@ -746,9 +746,13 @@ def sitemap(request):
         activity_categories = ActivityCategory.objects.all()
         activity_category_slugs = [{'slug': activity_category.slug}
                                    for activity_category in activity_categories]
+        destinations = Destination.objects.all()
+        destination_slugs = [{'slug': destination.slug}
+                             for destination in destinations]
 
         return Response({
             "posts": post_slugs,
             "activity": activity_slugs,
-            "activity_category": activity_category_slugs
+            "activity_category": activity_category_slugs,
+            "destination": destination_slugs
         }, status=status.HTTP_200_OK)
