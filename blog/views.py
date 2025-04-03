@@ -22,7 +22,7 @@ def post_list(request):
         paginator = CustomPagination()
 
         # Get all posts and paginate them
-        posts = Post.objects.all()
+        posts = Post.objects.all().order_by('-updated_at')
         paginated_posts = paginator.paginate_queryset(posts, request)
 
         # Serialize paginated posts
