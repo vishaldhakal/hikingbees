@@ -99,7 +99,7 @@ class DestinationSerializerSmall(serializers.ModelSerializer):
 class ActivityCategory2Serializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityCategory
-        fields = ('title', 'image', 'image_alt_description',
+        fields = ('id', 'title', 'image', 'image_alt_description',
                   'subtitle', 'slug')
         depth = 2
 
@@ -243,6 +243,12 @@ class ActivitySmallestSerializer(serializers.ModelSerializer):
         fields = ('id', 'slug', 'activity_title', 'destination', 'duration', 'price',
                   'priceSale', 'trip_grade', 'max_group_size', 'best_time', 'banner_text')
         depth = 1
+
+
+class ClimbingActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ('id', 'slug', 'activity_title', 'coverImg')
 
 
 class ActivitySlugSerializer(serializers.ModelSerializer):

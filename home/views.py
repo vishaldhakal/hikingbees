@@ -7,7 +7,7 @@ from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTe
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
 from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking, Destination
-from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, NavbarActivitySerializer
+from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, ClimbingActivitySerializer, NavbarActivitySerializer
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -557,7 +557,7 @@ def navbar(request):
 
         acy = ActivityCategory.objects.get(title="Peak Climbing")
         climb_nav = Activity.objects.filter(activity_category=acy)
-        climb_nav_serializer = ActivitySmallSerializer(climb_nav, many=True)
+        climb_nav_serializer = ClimbingActivitySerializer(climb_nav, many=True)
 
         trek_nav = TreekingNavDropdown.objects.get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)

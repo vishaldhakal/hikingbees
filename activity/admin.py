@@ -43,6 +43,7 @@ class ActivityAdminForm(forms.ModelForm):
             'tour_includes': TinyMCE(),
             'tour_excludes': TinyMCE(),
             'additional_info': TinyMCE(),
+            'add_on_description': TinyMCE(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -203,6 +204,7 @@ class ActivityAdmin(ModelAdmin):
                     "tour_includes",
                     "tour_excludes",
                     "additional_info",
+                    "add_on_description",
                 ],
             },
         ),

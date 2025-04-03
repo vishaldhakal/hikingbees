@@ -88,6 +88,7 @@ class Activity(models.Model):
     related_activities = models.ManyToManyField(
         'self', blank=True, symmetrical=True)
     per_day_walk = models.CharField(max_length=120, blank=True, null=True)
+    add_on_description = tinymce_models.HTMLField(null=True, blank=True)
 
     class Meta:
         ordering = ['createdAt']
