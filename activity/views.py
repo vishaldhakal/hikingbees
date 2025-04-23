@@ -324,7 +324,7 @@ def activities_single(request, slug):
         serializer_activities = ActivitySerializer(activity)
         review = Review.objects.all()
         review_serializer = ReviewSerializer(review, many=True)
-        return Response({"data": serializer_activities.data, "bookings": grouped_bookings, "dates": unique_dates, "testimonials": testimonials_ser.data, "reviews": review_serializer.data[0].get("trip_advisor_review"), "google_review": review_serializer.data[0].get("google_review")})
+        return Response({"data": serializer_activities.data, "bookings": grouped_bookings, "dates": unique_dates, "testimonials": testimonials_ser.data, "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"), "google_review": review_serializer.data[0].get("google_review")})
 
 
 @api_view(['GET'])
