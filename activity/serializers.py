@@ -1,4 +1,4 @@
-from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, VideoReview
+from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, Review, VideoReview
 from rest_framework import serializers
 
 
@@ -273,3 +273,9 @@ class VideoReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = VideoReview
         fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+

@@ -239,6 +239,7 @@ admin.site.register(ActivityTestimonial, ActivityTestimonialAdmin)
 admin.site.register(AddOns, ModelAdmin)
 admin.site.register(ActivityBookingAddOn, ModelAdmin)
 admin.site.register(VideoReview, ModelAdmin)
+admin.site.register(Review, ModelAdmin)
 
 
 class ActivityBookingAddOnInline(StackedInline):

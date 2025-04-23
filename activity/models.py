@@ -256,3 +256,11 @@ class VideoReview(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class Review(models.Model):
+    trip_advisor_review = models.IntegerField(null=True, blank=True)
+    google_review = models.IntegerField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"Trip Advisor: {self.trip_advisor_review} - Google: {self.google_review}"

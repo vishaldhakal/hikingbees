@@ -6,8 +6,8 @@ from .models import FAQ, Enquiry, FAQCategory, LegalDocument, FeaturedTour, Team
 from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer, LegalDocumentSerializer, FeaturedTourSerializer, FAQCategorySerializer, TeamMemberSlugSerializer, TestimonialSerializer, TeamMemberSerializer, AffiliationsSerializer, PartnersSerializer, SiteConfigurationSerializer, DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
 from blog.models import Post
 from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
-from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking, Destination
-from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, ClimbingActivitySerializer, NavbarActivitySerializer
+from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking, Destination, Review
+from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, ClimbingActivitySerializer, NavbarActivitySerializer, ReviewSerializer
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -643,10 +643,13 @@ def all_bookings(request):
 def testimonials(request):
     if request.method == 'GET':
         testimonial = Testimonial.objects.all()
+        review = Review.objects.all()
         testimonial_serializer = TestimonialSerializer(testimonial, many=True)
+        review_serializer = ReviewSerializer(review, many=True)
 
         return Response({
             "testimonials": testimonial_serializer.data,
+            "reviews": review_serializer.data,
         })
 
 
