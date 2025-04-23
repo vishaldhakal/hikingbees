@@ -20,9 +20,14 @@ def post_list(request):
     if request.method == 'GET':
         # Initialize paginator
         paginator = CustomPagination()
+        search = request.query_params.get('search', '')
 
         # Get all posts and paginate them
         posts = Post.objects.all().order_by('-updated_at')
+        if search:
+            posts = posts.filter(
+                models.Q(title__icontains=search)
+            )
         paginated_posts = paginator.paginate_queryset(posts, request)
 
         # Serialize paginated posts
