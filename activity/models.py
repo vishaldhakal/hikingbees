@@ -261,6 +261,7 @@ class VideoReview(models.Model):
 class Review(models.Model):
     trip_advisor_review = models.IntegerField(null=True, blank=True)
     google_review = models.IntegerField(null=True, blank=True)
+    google_rating = models.FloatField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"Trip Advisor: {self.trip_advisor_review} - Google: {self.google_review}"
+        return f"Trip Advisor: {self.trip_advisor_review} - Google: {self.google_review} - Google Rating: {self.google_rating}"

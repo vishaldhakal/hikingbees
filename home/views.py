@@ -630,6 +630,7 @@ def landing_page(request):
             "bookings": bookings_serializer.data,
             "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
             "google_review": review_serializer.data[0].get("google_review"),
+            "google_rating": review_serializer.data[0].get("google_rating")
         })
 
 
@@ -656,6 +657,7 @@ def testimonials(request):
             "testimonials": testimonial_serializer.data,
             "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
             "google_review": review_serializer.data[0].get("google_review"),
+            "google_rating": review_serializer.data[0].get("google_rating")
         })
 
 
