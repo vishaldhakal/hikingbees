@@ -611,6 +611,9 @@ def landing_page(request):
         partners = Partners.objects.all()
         serializer_partners = PartnersSerializer(partners, many=True)
 
+        review = Review.objects.all()
+        review_serializer = ReviewSerializer(review, many=True)
+
         return Response({
             "hero_content": hero_content_serializer.data,
             "recent_posts": posts_serializer.data,
@@ -625,6 +628,8 @@ def landing_page(request):
             "affiliations": serializer_affiliations.data,
             "partners": serializer_partners.data,
             "bookings": bookings_serializer.data,
+            "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
+            "google_review": review_serializer.data[0].get("google_review"),
         })
 
 
@@ -649,7 +654,8 @@ def testimonials(request):
 
         return Response({
             "testimonials": testimonial_serializer.data,
-            "reviews": review_serializer.data,
+            "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
+            "google_review": review_serializer.data[0].get("google_review"),
         })
 
 

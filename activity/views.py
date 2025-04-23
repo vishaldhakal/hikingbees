@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Activity,ActivityCategory,ActivityBooking,Destination,ActivityTestimonial,ItineraryActivity,ActivityImage,ActivityRegion, VideoReview
-from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers,ActivityTestimonialSerializer,ActivityBookingSerializer,ActivityRegionSlugSerializer,DestinationSerializerSmall,ActivitySlugSerializer,DestinationSerializer,ActivityCategorySerializer,ActivitySerializer, DestinationSmallSerializer,ItineraryActivitySerializer,ActivityImageSerializer,ActivitySmallSerializer,ActivityRegionSerializer,ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer, VideoReviewSerializer
+from .models import Activity, ActivityCategory, ActivityBooking, Destination, ActivityTestimonial, ItineraryActivity, ActivityImage, ActivityRegion, Review, VideoReview
+from .serializers import ActivityCategorySerializerSmall, ActivityCategorySlugSerializer, ActivityCategorySmallSerializer, ActivitySearchSerializers, ActivityTestimonialSerializer, ActivityBookingSerializer, ActivityRegionSlugSerializer, DestinationSerializerSmall, ActivitySlugSerializer, DestinationSerializer, ActivityCategorySerializer, ActivitySerializer, DestinationSmallSerializer, ItineraryActivitySerializer, ActivityImageSerializer, ActivitySmallSerializer, ActivityRegionSerializer, ActivityRegionSmallSerializer, LandingActivityRegionSmallSerializer, LandingBannerActivitySmallSerializer, NavbarActivityCategorySerializer, ReviewSerializer, VideoReviewSerializer
 import json
 from django.core import serializers
 from django.db.models import DateField
@@ -89,21 +89,26 @@ sentence_array = [
 
 SECRET_KEY = 'wXuq97YlFNPM2OU2i/Y1bGukJuY0LUl6u9nAg1Y91uQ='
 
+
 @api_view(['POST'])
 def sign_view(request):
     try:
         # Get the signed field names from the request
-        signed_field_names = request.data.get('signed_field_names', '').split(',')
+        signed_field_names = request.data.get(
+            'signed_field_names', '').split(',')
 
         # Create a list of field values
-        field_values = [f"{item}={request.data.get(item, '')}" for item in signed_field_names]
+        field_values = [
+            f"{item}={request.data.get(item, '')}" for item in signed_field_names]
 
         # Join the field values with a comma
         field_values_joined = ",".join(field_values)
 
         # Create a SHA-256 HMAC hash using the secret key
-        hash_obj = hmac.new(force_bytes(SECRET_KEY), msg=force_bytes(field_values_joined), digestmod=hashlib.sha256)
-        hash_value = base64.b64encode(hash_obj.digest()).decode('utf-8').strip()
+        hash_obj = hmac.new(force_bytes(SECRET_KEY), msg=force_bytes(
+            field_values_joined), digestmod=hashlib.sha256)
+        hash_value = base64.b64encode(
+            hash_obj.digest()).decode('utf-8').strip()
 
         # Log the details (you may want to replace this with your actual logging mechanism)
         print({
@@ -119,33 +124,38 @@ def sign_view(request):
     except Exception as e:
         # Handle exceptions appropriately
         return Response({'error': str(e)})
-    
+
+
 @api_view(['GET'])
 def activities_collection(request):
     if request.method == 'GET':
 
-        act_cat = request.GET.get("category","All")
-        act_reg = request.GET.get("region","All")
-        act_des = request.GET.get("destination","All")
+        act_cat = request.GET.get("category", "All")
+        act_reg = request.GET.get("region", "All")
+        act_des = request.GET.get("destination", "All")
 
         activities = Activity.objects.all()
         serializer_activities = ActivitySmallSerializer(activities, many=True)
-        
+
         activities_cat = ActivityCategory.objects.all()
-        serializer_activities_cat = ActivityCategorySerializer(activities_cat, many=True)
-        
+        serializer_activities_cat = ActivityCategorySerializer(
+            activities_cat, many=True)
+
         activities_reg = ActivityRegion.objects.all()
-        serializer_activities_reg = ActivityRegionSerializer(activities_reg, many=True)
-        
+        serializer_activities_reg = ActivityRegionSerializer(
+            activities_reg, many=True)
+
         destinations = Destination.objects.all()
-        serializer_destinations = DestinationSerializer(destinations, many=True)
-        
+        serializer_destinations = DestinationSerializer(
+            destinations, many=True)
+
         return Response({
-            "activities":serializer_activities.data,
-            "categories":serializer_activities_cat.data,
-            "regions":serializer_activities_reg.data,
-            "destinations":serializer_destinations.data,
+            "activities": serializer_activities.data,
+            "categories": serializer_activities_cat.data,
+            "regions": serializer_activities_reg.data,
+            "destinations": serializer_destinations.data,
         })
+
 
 @api_view(['GET'])
 def activities_slug(request):
@@ -154,40 +164,51 @@ def activities_slug(request):
         serializer_activities = ActivitySlugSerializer(activities, many=True)
         return Response(serializer_activities.data)
 
+
 @api_view(['GET'])
 def activities_search(request):
     if request.method == 'GET':
         activities = Activity.objects.all()
-        serializer_activities = ActivitySearchSerializers(activities, many=True)
+        serializer_activities = ActivitySearchSerializers(
+            activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def activities_cat_slug(request):
     if request.method == 'GET':
         activities = ActivityCategory.objects.all()
-        serializer_activities = ActivityCategorySlugSerializer(activities, many=True)
+        serializer_activities = ActivityCategorySlugSerializer(
+            activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def activities_reg_slug(request):
     if request.method == 'GET':
         activities = ActivityRegion.objects.all()
-        serializer_activities = ActivityRegionSlugSerializer(activities, many=True)
+        serializer_activities = ActivityRegionSlugSerializer(
+            activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def destination_slug(request):
     if request.method == 'GET':
         activities = Destination.objects.all()
-        serializer_activities = DestinationSerializerSmall(activities, many=True)
+        serializer_activities = DestinationSerializerSmall(
+            activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def destination_view(request):
     if request.method == 'GET':
         activities = Destination.objects.all().order_by('order')
-        serializer_activities = DestinationSmallSerializer(activities, many=True)
+        serializer_activities = DestinationSmallSerializer(
+            activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def activities_featured(request):
@@ -195,6 +216,7 @@ def activities_featured(request):
         activities = Activity.objects.all()[0:6]
         serializer_activities = ActivitySmallSerializer(activities, many=True)
         return Response(serializer_activities.data)
+
 
 @api_view(['GET'])
 def activities_all(request, slug):
@@ -207,16 +229,18 @@ def activities_all(request, slug):
             activities = Activity.objects.filter(destination=deatt)
         else:
             act_category = ActivityCategory.objects.get(slug=act_cat)
-            activities = Activity.objects.filter(activity_category=act_category, destination=deatt)
+            activities = Activity.objects.filter(
+                activity_category=act_category, destination=deatt)
 
         # Get only activity categories that have activities in this destination
         activity_category = ActivityCategory.objects.filter(
             activity__destination=deatt
         ).distinct()
-        
 
-        serializer_activities = LandingBannerActivitySmallSerializer(activities, many=True)
-        serializer_activity_category = ActivityCategorySmallSerializer(activity_category, many=True)
+        serializer_activities = LandingBannerActivitySmallSerializer(
+            activities, many=True)
+        serializer_activity_category = ActivityCategorySmallSerializer(
+            activity_category, many=True)
         serializer_destination = DestinationSerializer(deatt)
 
         return Response({
@@ -225,93 +249,110 @@ def activities_all(request, slug):
             "destination_details": serializer_destination.data
         })
 
+
 @api_view(['GET'])
-def activities_all_region(request,slug):
+def activities_all_region(request, slug):
     if request.method == 'GET':
 
-        act_region = request.GET.get("region","All")
-        
+        act_region = request.GET.get("region", "All")
+
         act_category = ActivityCategory.objects.get(slug=slug)
-        
+
         act_categoriess = ActivityCategory.objects.all()
 
         if act_region == "All":
-            activities = Activity.objects.filter(activity_category=act_category)
+            activities = Activity.objects.filter(
+                activity_category=act_category)
         else:
             act_regionn = ActivityRegion.objects.get(slug=act_region)
-            activities = Activity.objects.filter(activity_category=act_category,activity_region=act_regionn)
-        
-        acts = LandingBannerActivitySmallSerializer(activities,many=True)
+            activities = Activity.objects.filter(
+                activity_category=act_category, activity_region=act_regionn)
 
+        acts = LandingBannerActivitySmallSerializer(activities, many=True)
 
-        activity_region = ActivityRegion.objects.filter(activity_category=act_category)
-        serializer_activity_region = LandingActivityRegionSmallSerializer(activity_region, many=True)
-        serializer_activity_category = ActivityCategorySerializerSmall(act_category)
+        activity_region = ActivityRegion.objects.filter(
+            activity_category=act_category)
+        serializer_activity_region = LandingActivityRegionSmallSerializer(
+            activity_region, many=True)
+        serializer_activity_category = ActivityCategorySerializerSmall(
+            act_category)
         return Response(
             {
-                "activities":acts.data,
-                "activity_regions":serializer_activity_region.data,
-                "activity_category_details":serializer_activity_category.data
-                }
-                )
-
+                "activities": acts.data,
+                "activity_regions": serializer_activity_region.data,
+                "activity_category_details": serializer_activity_category.data
+            }
+        )
 
 
 @api_view(['GET'])
 def activities_regions(request):
     if request.method == 'GET':
         activities = ActivityRegion.objects.all()
-        serializer_activities = ActivityRegionSmallSerializer(activities, many=True)
+        serializer_activities = ActivityRegionSmallSerializer(
+            activities, many=True)
         return Response(serializer_activities.data)
 
+
 @api_view(['GET'])
-def activities_single(request,slug):
+def activities_single(request, slug):
     if request.method == 'GET':
         today = timezone.now().date()
         activity = Activity.objects.get(slug=slug)
-        bookings = ActivityBooking.objects.filter(activity=activity,booking_date__gte=today)
+        bookings = ActivityBooking.objects.filter(
+            activity=activity, booking_date__gte=today)
         testimonials = ActivityTestimonial.objects.filter(activity=activity)
-        testimonials_ser = ActivityTestimonialSerializer(testimonials,many=True)
+        testimonials_ser = ActivityTestimonialSerializer(
+            testimonials, many=True)
         bookings = bookings.order_by('booking_date')
         grouped_bookings = []
-        booking_dates = ActivityBooking.objects.filter(is_verified=True,is_private=False).annotate(
+        booking_dates = ActivityBooking.objects.filter(is_verified=True, is_private=False).annotate(
             booking_date_date=Cast('booking_date', output_field=DateField())
         ).values('booking_date_date').distinct()
 
-        unique_dates = [booking['booking_date_date'] for booking in booking_dates]
+        unique_dates = [booking['booking_date_date']
+                        for booking in booking_dates]
 
         for datee in unique_dates:
             start_date = datetime.combine(datee, time.min)
             end_date = datetime.combine(datee, time.max)
-            boki = ActivityBooking.objects.filter(booking_date__range=(start_date, end_date),is_verified=True,is_private=False)
-            grouped_bookings.append(ActivityBookingSerializer(boki, many=True).data)
+            boki = ActivityBooking.objects.filter(booking_date__range=(
+                start_date, end_date), is_verified=True, is_private=False)
+            grouped_bookings.append(
+                ActivityBookingSerializer(boki, many=True).data)
 
         serializer_activities = ActivitySerializer(activity)
-        return Response({"data":serializer_activities.data,"bookings":grouped_bookings,"dates":unique_dates,"testimonials":testimonials_ser.data})
-    
-
+        review = Review.objects.all()
+        review_serializer = ReviewSerializer(review, many=True)
+        return Response({"data": serializer_activities.data, "bookings": grouped_bookings, "dates": unique_dates, "testimonials": testimonials_ser.data, "reviews": review_serializer.data[0].get("trip_advisor_review"), "google_review": review_serializer.data[0].get("google_review")})
 
 
 @api_view(['GET'])
 def activity_categories_collection(request):
     if request.method == 'GET':
         activity_category = ActivityCategory.objects.all()
-        serializer_activity_category = ActivityCategorySerializer(activity_category, many=True)
+        serializer_activity_category = ActivityCategorySerializer(
+            activity_category, many=True)
         return Response(serializer_activity_category.data)
+
 
 @api_view(['GET'])
 def activity_itenaries_collection(request):
     if request.method == 'GET':
         activity_itenaries = ItineraryActivity.objects.all()
-        serializer_activity_itenaries = ItineraryActivitySerializer(activity_itenaries, many=True)
+        serializer_activity_itenaries = ItineraryActivitySerializer(
+            activity_itenaries, many=True)
         return Response(serializer_activity_itenaries.data)
+
 
 @api_view(['GET'])
 def activity_images_collection(request):
     if request.method == 'GET':
         activity_images = ActivityImage.objects.all()
-        serializer_activity_images = ActivityImageSerializer(activity_images, many=True)
+        serializer_activity_images = ActivityImageSerializer(
+            activity_images, many=True)
         return Response(serializer_activity_images.data)
+
 
 def generate_pdf(temp_html_path):
     """Synchronous function to generate PDF using Playwright"""
@@ -319,7 +360,7 @@ def generate_pdf(temp_html_path):
         browser = playwright.chromium.launch()
         page = browser.new_page()
         page.goto(f'file://{temp_html_path}')
-        
+
         # Generate PDF
         pdf_bytes = page.pdf(
             format='A4',
@@ -332,16 +373,17 @@ def generate_pdf(temp_html_path):
             print_background=True,
             prefer_css_page_size=True
         )
-        
+
         page.close()
         browser.close()
         return pdf_bytes
+
 
 @require_http_methods(["GET"])
 @api_view(['GET'])
 def activity_pdf_detail(request, slug):
     activity = get_object_or_404(Activity, slug=slug)
-    
+
     # If PDF URL exists, return it directly
     if activity.pdf_url:
         return Response({'pdf_url': activity.pdf_url})
@@ -350,7 +392,7 @@ def activity_pdf_detail(request, slug):
     itineraries = ItineraryActivity.objects.filter(activity=activity)
     trek_map_url = activity.trek_map.url if activity.trek_map else None
     altitude_chart_url = activity.altitude_chart.url if activity.altitude_chart else None
-    
+
     html_content = render_to_string(
         'activity_pdf_template.html',
         {
@@ -360,7 +402,7 @@ def activity_pdf_detail(request, slug):
             'altitude_chart_url': altitude_chart_url,
         }
     )
-    
+
     with tempfile.NamedTemporaryFile(delete=False, suffix='.html', mode='w', encoding='utf-8') as f:
         f.write(html_content)
         temp_html_path = f.name
@@ -368,20 +410,21 @@ def activity_pdf_detail(request, slug):
     try:
         # Generate PDF
         pdf_bytes = generate_pdf(temp_html_path)
-        
+
         # Save PDF file and store URL
         pdf_filename = f"activity_pdfs/{slug}.pdf"
         pdf_path = default_storage.save(pdf_filename, ContentFile(pdf_bytes))
-        
+
         # Update activity with PDF URL
         activity.pdf_url = default_storage.url(pdf_path)
         activity.save()
-        
+
         return Response({'pdf_url': activity.pdf_url})
-        
+
     finally:
         if os.path.exists(temp_html_path):
             os.unlink(temp_html_path)
+
 
 @api_view(['GET'])
 def video_review_list(request):
