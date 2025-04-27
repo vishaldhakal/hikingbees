@@ -31,9 +31,9 @@ def post_list(request):
                 models.Q(title__icontains=search)
             )
         if category:
-            posts = posts.filter(category__category_name=category)
+            posts = posts.filter(category__category_name__icontains=category)
         if tag:
-            posts = posts.filter(tags__tag_name=tag)
+            posts = posts.filter(tags__tag_name__icontains=tag)
         paginated_posts = paginator.paginate_queryset(posts, request)
 
         # Serialize paginated posts
