@@ -26,14 +26,19 @@ def post_list(request):
 
         # Get all posts and paginate them
         posts = Post.objects.all().order_by('-updated_at')
+        query = models.Q()
         if search:
-            posts = posts.filter(
-                models.Q(title__icontains=search)
-            )
+            query |= models.Q(title__icontains=search)
         if category:
-            posts = posts.filter(category__category_name__icontains=category)
+            query |= models.Q(category__category_name__icontains=category)
         if tag:
-            posts = posts.filter(tags__tag_name__icontains=tag)
+            tag_list = [t.strip() for t in tag.split(',') if t.strip()]
+            tag_query = models.Q()
+            for t in tag_list:
+                tag_query |= models.Q(tags__tag_name__icontains=t)
+            query |= tag_query
+        if query:
+            posts = posts.filter(query).distinct()
         paginated_posts = paginator.paginate_queryset(posts, request)
 
         # Serialize paginated posts
