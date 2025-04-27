@@ -21,6 +21,8 @@ def post_list(request):
         # Initialize paginator
         paginator = CustomPagination()
         search = request.query_params.get('search', '')
+        category = request.query_params.get('category', '')
+        tag = request.query_params.get('tag', '')
 
         # Get all posts and paginate them
         posts = Post.objects.all().order_by('-updated_at')
@@ -28,6 +30,10 @@ def post_list(request):
             posts = posts.filter(
                 models.Q(title__icontains=search)
             )
+        if category:
+            posts = posts.filter(category__category_name=category)
+        if tag:
+            posts = posts.filter(tags__tag_name=tag)
         paginated_posts = paginator.paginate_queryset(posts, request)
 
         # Serialize paginated posts
