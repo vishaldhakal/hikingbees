@@ -1,8 +1,9 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin
-from .models import GuideAuthour, TravelGuide, TravelGuideCategory, TravelGuideRegion
+from unfold.admin import ModelAdmin, TabularInline
+from .models import GuideAuthour, TravelGuide, TravelGuideCategory, TravelGuideRegion, RegionWeatherPeriod
 from tinymce.widgets import TinyMCE
 from django import forms
+
 
 class GuideAuthourForm(forms.ModelForm):
     class Meta:
@@ -12,6 +13,7 @@ class GuideAuthourForm(forms.ModelForm):
             'about': TinyMCE(),
         }
 
+
 class TravelGuideForm(forms.ModelForm):
     class Meta:
         model = TravelGuide
@@ -20,20 +22,45 @@ class TravelGuideForm(forms.ModelForm):
             'guide_content': TinyMCE(),
         }
 
+
+class RegionWeatherPeriodAdmin(TabularInline):
+    model = RegionWeatherPeriod
+    fields = ('start_month', 'end_month', 'high_temp', 'low_temp')
+    autocomplete_fields = ('region',)
+    tab = True
+
+
+class TravelGuideRegionForm(forms.ModelForm):
+
+    class Meta:
+        model = TravelGuideRegion
+        fields = '__all__'
+        widgets = {
+            'description': TinyMCE(),
+        }
+
+
 class GuideAuthourAdmin(ModelAdmin):
     form = GuideAuthourForm
     list_display = ('name', 'role', 'phone', 'created_at')
     search_fields = ('name', 'role')
     date_hierarchy = 'created_at'
 
+
 class TravelGuideRegionAdmin(ModelAdmin):
+    form = TravelGuideRegionForm
     list_display = ('title',)
     search_fields = ('title',)
     prepopulated_fields = {'slug': ('title',)}
+    inlines = [RegionWeatherPeriodAdmin]
+    autocomplete_fields = ('blogs', 'activities')
+    filter_horizontal = ('blogs', 'activities')
+
 
 class TravelGuideCategoryAdmin(ModelAdmin):
     list_display = ('category_name',)
     search_fields = ('category_name',)
+
 
 class TravelGuideAdmin(ModelAdmin):
     form = TravelGuideForm
@@ -43,6 +70,7 @@ class TravelGuideAdmin(ModelAdmin):
     filter_horizontal = ('guide_category', 'guide_region')
     date_hierarchy = 'created_at'
     prepopulated_fields = {'slug': ('title',)}
+
 
 admin.site.register(GuideAuthour, GuideAuthourAdmin)
 admin.site.register(TravelGuide, TravelGuideAdmin)

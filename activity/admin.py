@@ -134,6 +134,8 @@ class ActivityAdmin(ModelAdmin):
         "best_selling",
         "popular",
     )
+    search_fields = ('activity_title', 'location',
+                     'meta_title')
     list_filter = ("featured", "best_selling", "popular", "destination")
 
     inlines = [

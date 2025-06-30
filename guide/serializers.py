@@ -1,8 +1,12 @@
 from rest_framework import serializers
-from .models import GuideAuthour,TravelGuide,TravelGuideCategory,TravelGuideRegion
+
+from activity.serializers import LandingActivitySmallSerializer
+from blog.serializers import LandingPagePostSerializer
+from .models import GuideAuthour, TravelGuide, TravelGuideCategory, TravelGuideRegion, RegionWeatherPeriod
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
+
 
 class HTMLField(serializers.CharField):
     def to_representation(self, value):
@@ -11,11 +15,13 @@ class HTMLField(serializers.CharField):
     def to_internal_value(self, data):
         return data
 
+
 class GuideAuthourSerializer(serializers.ModelSerializer):
     class Meta:
         model = GuideAuthour
         fields = '__all__'
         depth = 2
+
 
 class TravelGuideCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,23 +29,36 @@ class TravelGuideCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 2
 
+
+class RegionWeatherPeriodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegionWeatherPeriod
+        fields = '__all__'
+
+
 class TravelGuideRegionSerializer(serializers.ModelSerializer):
+    weather_periods = RegionWeatherPeriodSerializer(many=True, read_only=True)
+    blogs = LandingPagePostSerializer(many=True, read_only=True)
+    activities = LandingActivitySmallSerializer(many=True, read_only=True)
+
     class Meta:
         model = TravelGuideRegion
         fields = '__all__'
         depth = 2
 
+
 class TravelGuideSerializer(serializers.ModelSerializer):
-    blog_content = serializers.SerializerMethodField()
-    guide_regions = TravelGuideRegionSerializer(many=True)
-    guide_categories = TravelGuideCategorySerializer(many=True)
+    guide_content = serializers.SerializerMethodField()
+    guide_region = TravelGuideRegionSerializer(many=True)
+    guide_category = TravelGuideCategorySerializer(many=True)
+
     class Meta:
         model = TravelGuide
         fields = '__all__'
         depth = 2
         ordering = ['-created_at']
-    
-    def get_blog_content(self, obj):
+
+    def get_guide_content(self, obj):
         html_string = obj.guide_content
         soup = BeautifulSoup(html_string, 'html.parser')
         toc_div = soup.find('div', class_='mce-toc')
@@ -48,12 +67,14 @@ class TravelGuideSerializer(serializers.ModelSerializer):
         updated_html_string = str(soup)
         return mark_safe(updated_html_string)
 
+
 class TravelGuideSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelGuide
         exclude = ['guide_content']
         depth = 1
         ordering = ['-created_at']
+
 
 class TravelGuideSlugSerializer(serializers.ModelSerializer):
     class Meta:
