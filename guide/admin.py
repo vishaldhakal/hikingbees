@@ -3,6 +3,11 @@ from unfold.admin import ModelAdmin, TabularInline
 from .models import TravelGuide, TravelGuideRegion, RegionWeatherPeriod
 from tinymce.widgets import TinyMCE
 from django import forms
+from solo.admin import SingletonModelAdmin
+
+
+class UnfoldSingletonModelAdmin(SingletonModelAdmin, ModelAdmin):
+    pass
 
 
 class TravelGuideForm(forms.ModelForm):
@@ -40,7 +45,7 @@ class TravelGuideRegionAdmin(ModelAdmin):
     filter_horizontal = ('blogs', 'activities')
 
 
-class TravelGuideAdmin(ModelAdmin):
+class TravelGuideAdmin(UnfoldSingletonModelAdmin):
     form = TravelGuideForm
 
 

@@ -1,4 +1,5 @@
 from django.db import models
+from solo.models import SingletonModel
 from tinymce import models as tinymce_models
 from blog.models import Post
 from activity.models import Activity
@@ -44,7 +45,7 @@ class TravelGuideRegion(models.Model):
         return self.title
 
 
-class TravelGuide(models.Model):
+class TravelGuide(SingletonModel):
     thumbnail_image = models.FileField(blank=True)
     thumbnail_image_alt_description = models.CharField(max_length=300)
     guide_content = tinymce_models.HTMLField(blank=True)
