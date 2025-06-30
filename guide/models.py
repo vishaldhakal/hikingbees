@@ -1,21 +1,8 @@
 from django.db import models
-
 from tinymce import models as tinymce_models
 from blog.models import Post
 from activity.models import Activity
-
-
-class GuideAuthour(models.Model):
-    name = models.CharField(max_length=200)
-    role = models.CharField(max_length=200, default="Travel Guide")
-    phone = models.CharField(max_length=200)
-    picture = models.FileField()
-    about = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return self.name
+from blog.models import Author
 
 
 class RegionWeatherPeriod(models.Model):
@@ -55,14 +42,6 @@ class TravelGuideRegion(models.Model):
         return self.title
 
 
-class TravelGuideCategory(models.Model):
-    category_name = models.CharField(max_length=200, primary_key=True)
-    category_image = models.FileField(blank=True)
-
-    def __str__(self):
-        return self.category_name
-
-
 class TravelGuide(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -72,9 +51,7 @@ class TravelGuide(models.Model):
     thumbnail_image = models.FileField()
     thumbnail_image_alt_description = models.CharField(max_length=300)
     guide_content = tinymce_models.HTMLField(blank=True)
-    guide = models.ForeignKey(GuideAuthour, on_delete=models.DO_NOTHING)
-    guide_category = models.ManyToManyField(
-        TravelGuideCategory, related_name='guide_categories')
+    guide = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
     guide_region = models.ManyToManyField(
         TravelGuideRegion, related_name='guide_regions')
     meta_title = models.CharField(max_length=200)

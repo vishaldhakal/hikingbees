@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from activity.serializers import LandingActivitySmallSerializer
 from blog.serializers import LandingPagePostSerializer
-from .models import GuideAuthour, TravelGuide, TravelGuideCategory, TravelGuideRegion, RegionWeatherPeriod
+from .models import TravelGuide, TravelGuideRegion, RegionWeatherPeriod
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 from bs4 import BeautifulSoup
@@ -14,20 +14,6 @@ class HTMLField(serializers.CharField):
 
     def to_internal_value(self, data):
         return data
-
-
-class GuideAuthourSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GuideAuthour
-        fields = '__all__'
-        depth = 2
-
-
-class TravelGuideCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TravelGuideCategory
-        fields = '__all__'
-        depth = 2
 
 
 class RegionWeatherPeriodSerializer(serializers.ModelSerializer):
@@ -50,7 +36,6 @@ class TravelGuideRegionSerializer(serializers.ModelSerializer):
 class TravelGuideSerializer(serializers.ModelSerializer):
     guide_content = serializers.SerializerMethodField()
     guide_region = TravelGuideRegionSerializer(many=True)
-    guide_category = TravelGuideCategorySerializer(many=True)
 
     class Meta:
         model = TravelGuide
