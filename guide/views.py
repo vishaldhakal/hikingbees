@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import TravelGuide, TravelGuideRegion
-from .serializers import TravelGuideSerializer, TravelGuideSlugSerializer, TravelGuideSmallSerializer, TravelGuideRegionSerializer
+from .serializers import TravelGuideRegionSmallSerializer, TravelGuideSerializer, TravelGuideSlugSerializer, TravelGuideSmallSerializer, TravelGuideRegionSerializer
 from bs4 import BeautifulSoup
 
 
@@ -13,7 +13,8 @@ def guide_list(request):
         posts = TravelGuide.objects.all()
         serializer = TravelGuideSmallSerializer(posts, many=True)
         regions = TravelGuideRegion.objects.all()
-        regions_serializer = TravelGuideRegionSerializer(regions, many=True)
+        regions_serializer = TravelGuideRegionSmallSerializer(
+            regions, many=True)
         return Response({
             "guides": serializer.data,
             "regions": regions_serializer.data,
@@ -29,16 +30,19 @@ def guide_list_slug(request):
 
 
 @api_view(['GET'])
-def guide_single(request, slug):
+def guide_region(request, slug):
     if request.method == 'GET':
-        posts = TravelGuide.objects.get(slug=slug)
-        html_string = posts.guide_content
+        try:
+            posts = TravelGuideRegion.objects.get(slug=slug)
+        except TravelGuideRegion.DoesNotExist:
+            return Response({"error": "Region not found"}, status=status.HTTP_404_NOT_FOUND)
+        html_string = posts.description
         soup = BeautifulSoup(html_string, 'html.parser')
         toc_div = soup.find('div', class_='mce-toc')
         if toc_div is not None:
             toc_div.extract()
         updated_html_string = str(toc_div)
-        serializer = TravelGuideSerializer(posts)
+        serializer = TravelGuideRegionSerializer(posts)
         return Response({
             "data": serializer.data,
             "toc": updated_html_string,

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from activity.serializers import LandingActivitySmallSerializer
-from blog.serializers import LandingPagePostSerializer
+from blog.serializers import AuthorSmallSerializer, LandingPagePostSerializer
 from .models import TravelGuide, TravelGuideRegion, RegionWeatherPeriod
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
@@ -22,6 +22,13 @@ class RegionWeatherPeriodSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TravelGuideRegionSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelGuideRegion
+        fields = ['title', 'slug', 'image',
+                  'image_alt_description', 'description']
+
+
 class TravelGuideRegionSerializer(serializers.ModelSerializer):
     weather_periods = RegionWeatherPeriodSerializer(many=True, read_only=True)
     blogs = LandingPagePostSerializer(many=True, read_only=True)
@@ -30,12 +37,11 @@ class TravelGuideRegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelGuideRegion
         fields = '__all__'
-        depth = 2
 
 
 class TravelGuideSerializer(serializers.ModelSerializer):
     guide_content = serializers.SerializerMethodField()
-    guide_region = TravelGuideRegionSerializer(many=True)
+    guide_region = TravelGuideRegionSerializer(many=True, read_only=True)
 
     class Meta:
         model = TravelGuide
@@ -54,9 +60,11 @@ class TravelGuideSerializer(serializers.ModelSerializer):
 
 
 class TravelGuideSmallSerializer(serializers.ModelSerializer):
+    guide = AuthorSmallSerializer(read_only=True)
+
     class Meta:
         model = TravelGuide
-        exclude = ['guide_content']
+        exclude = ['guide_content', 'guide_region']
         depth = 1
         ordering = ['-created_at']
 

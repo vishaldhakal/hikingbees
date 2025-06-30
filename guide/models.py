@@ -15,8 +15,10 @@ class RegionWeatherPeriod(models.Model):
     ]
     region = models.ForeignKey(
         'TravelGuideRegion', on_delete=models.CASCADE, related_name='weather_periods', null=True, blank=True)
-    start_month = models.CharField(max_length=50, choices=MONTH_CHOICES)
-    end_month = models.CharField(max_length=50, choices=MONTH_CHOICES)
+    start_month = models.CharField(
+        max_length=50, choices=MONTH_CHOICES, null=True, blank=True)
+    end_month = models.CharField(
+        max_length=50, choices=MONTH_CHOICES, null=True, blank=True)
     high_temp = models.IntegerField(
         help_text="High temperature (°C)", null=True, blank=True)
     low_temp = models.IntegerField(

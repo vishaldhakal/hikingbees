@@ -17,7 +17,6 @@ class TravelGuideForm(forms.ModelForm):
 class RegionWeatherPeriodAdmin(TabularInline):
     model = RegionWeatherPeriod
     fields = ('start_month', 'end_month', 'high_temp', 'low_temp')
-    autocomplete_fields = ('region',)
     tab = True
 
 
