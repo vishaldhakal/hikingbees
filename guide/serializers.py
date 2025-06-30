@@ -66,11 +66,4 @@ class TravelGuideSmallSerializer(serializers.ModelSerializer):
         model = TravelGuide
         exclude = ['guide_content', 'guide_region']
         depth = 1
-        ordering = ['-created_at']
 
-
-class TravelGuideSlugSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TravelGuide
-        fields = ('slug',)
-        depth = 1

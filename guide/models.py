@@ -45,23 +45,13 @@ class TravelGuideRegion(models.Model):
 
 
 class TravelGuide(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    slug = models.CharField(max_length=300)
-    title = models.CharField(max_length=500)
-    guide_duration_to_read = models.CharField(max_length=100, blank=True)
-    thumbnail_image = models.FileField()
+    thumbnail_image = models.FileField(blank=True)
     thumbnail_image_alt_description = models.CharField(max_length=300)
     guide_content = tinymce_models.HTMLField(blank=True)
-    guide = models.ForeignKey(Author, on_delete=models.DO_NOTHING)
     guide_region = models.ManyToManyField(
         TravelGuideRegion, related_name='guide_regions')
     meta_title = models.CharField(max_length=200)
     meta_description = models.TextField()
-    name = models.CharField(max_length=200)
-
-    class Meta:
-        ordering = ['-created_at']
 
     def __str__(self):
-        return self.title
+        return self.meta_title

@@ -42,12 +42,6 @@ class TravelGuideRegionAdmin(ModelAdmin):
 
 class TravelGuideAdmin(ModelAdmin):
     form = TravelGuideForm
-    list_display = ('title', 'name', 'guide', 'created_at')
-    list_filter = ('guide_region', 'guide')
-    search_fields = ('title', 'name', 'meta_title')
-    filter_horizontal = ('guide_region',)
-    date_hierarchy = 'created_at'
-    prepopulated_fields = {'slug': ('title',)}
 
 
 admin.site.register(TravelGuide, TravelGuideAdmin)

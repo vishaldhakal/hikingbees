@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import TravelGuide, TravelGuideRegion
-from .serializers import TravelGuideRegionSmallSerializer, TravelGuideSerializer, TravelGuideSlugSerializer, TravelGuideSmallSerializer, TravelGuideRegionSerializer
+from .serializers import TravelGuideRegionSmallSerializer, TravelGuideSerializer, TravelGuideSmallSerializer, TravelGuideRegionSerializer
 from bs4 import BeautifulSoup
 
 
@@ -19,14 +19,6 @@ def guide_list(request):
             "guides": serializer.data,
             "regions": regions_serializer.data,
         })
-
-
-@api_view(['GET'])
-def guide_list_slug(request):
-    if request.method == 'GET':
-        posts = TravelGuide.objects.all()
-        serializer = TravelGuideSlugSerializer(posts, many=True)
-        return Response(serializer.data)
 
 
 @api_view(['GET'])
