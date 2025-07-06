@@ -22,6 +22,12 @@ class RegionWeatherPeriodSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class RegionWeatherPeriodSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RegionWeatherPeriod
+        fields = ['start_month', 'end_month', 'high_temp', 'low_temp']
+
+
 class TravelGuideRegionSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelGuideRegion
@@ -30,7 +36,8 @@ class TravelGuideRegionSmallSerializer(serializers.ModelSerializer):
 
 
 class TravelGuideRegionSerializer(serializers.ModelSerializer):
-    weather_periods = RegionWeatherPeriodSerializer(many=True, read_only=True)
+    weather_periods = RegionWeatherPeriodSmallSerializer(
+        many=True, read_only=True)
     blogs = LandingPagePostSerializer(many=True, read_only=True)
     activities = LandingActivitySmallSerializer(many=True, read_only=True)
 
