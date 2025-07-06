@@ -32,6 +32,7 @@ class TravelGuideRegionForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'description': TinyMCE(),
+            'short_description': TinyMCE(),
         }
 
 
