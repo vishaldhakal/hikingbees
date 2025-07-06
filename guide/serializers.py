@@ -64,6 +64,5 @@ class TravelGuideSmallSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TravelGuide
-        exclude = ['guide_content', 'guide_region']
+        exclude = ['guide_region']
         depth = 1
-

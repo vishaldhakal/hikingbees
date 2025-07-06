@@ -12,7 +12,8 @@ def guide_list(request):
     if request.method == 'GET':
         posts = TravelGuide.objects.all()
         serializer = TravelGuideSmallSerializer(posts, many=True)
-        regions = TravelGuideRegion.objects.all()
+        regions = TravelGuideRegion.objects.filter(
+            guide_regions__isnull=False).distinct()
         regions_serializer = TravelGuideRegionSmallSerializer(
             regions, many=True)
         return Response({
@@ -28,12 +29,18 @@ def guide_region(request, slug):
             posts = TravelGuideRegion.objects.get(slug=slug)
         except TravelGuideRegion.DoesNotExist:
             return Response({"error": "Region not found"}, status=status.HTTP_404_NOT_FOUND)
-        html_string = posts.description
-        soup = BeautifulSoup(html_string, 'html.parser')
-        toc_div = soup.find('div', class_='mce-toc')
-        if toc_div is not None:
-            toc_div.extract()
-        updated_html_string = str(toc_div)
+
+        # Handle case where description is None
+        if posts.description is not None:
+            html_string = posts.description
+            soup = BeautifulSoup(html_string, 'html.parser')
+            toc_div = soup.find('div', class_='mce-toc')
+            if toc_div is not None:
+                toc_div.extract()
+            updated_html_string = str(soup)  # Use soup instead of toc_div
+        else:
+            updated_html_string = ""
+
         serializer = TravelGuideRegionSerializer(posts)
         return Response({
             "data": serializer.data,
