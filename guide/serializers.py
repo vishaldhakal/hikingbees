@@ -32,7 +32,7 @@ class TravelGuideRegionSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelGuideRegion
         fields = ['title', 'slug', 'image',
-                  'image_alt_description', 'description']
+                  'image_alt_description', 'short_description', 'description']
 
 
 class TravelGuideRegionSerializer(serializers.ModelSerializer):

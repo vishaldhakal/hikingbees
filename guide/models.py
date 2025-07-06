@@ -31,6 +31,7 @@ class RegionWeatherPeriod(models.Model):
 
 class TravelGuideRegion(models.Model):
     title = models.CharField(max_length=200)
+    short_description = tinymce_models.HTMLField(null=True, blank=True)
     description = tinymce_models.HTMLField(null=True, blank=True)
     blogs = models.ManyToManyField(
         Post, related_name='guide_region', blank=True)
