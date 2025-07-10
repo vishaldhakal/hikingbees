@@ -10,8 +10,20 @@ from tinymce.widgets import TinyMCE
 from django import forms
 from unfold.admin import ModelAdmin
 from solo.admin import SingletonModelAdmin
+from django.contrib.auth.models import User
+
 
 # Create a base class that combines SingletonModelAdmin and Unfold's ModelAdmin
+
+admin.site.unregister(User)
+
+
+class UserAdmin(ModelAdmin):
+    list_display = ('username', 'email', 'is_staff')
+    search_fields = ('username', 'email')
+
+
+admin.site.register(User, UserAdmin)
 
 
 class UnfoldSingletonModelAdmin(SingletonModelAdmin, ModelAdmin):
