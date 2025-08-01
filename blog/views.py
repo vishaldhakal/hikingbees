@@ -65,7 +65,7 @@ def post_list(request):
 @api_view(['GET'])
 def post_list_slug(request):
     if request.method == 'GET':
-        posts = Post.objects.all()
+        posts = Post.objects.only('slug')
         serializer = PostSlugSerializer(posts, many=True)
         return Response(serializer.data)
 
