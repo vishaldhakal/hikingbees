@@ -7,7 +7,7 @@ urlpatterns = [
     path('activities/', views.activities_collection),
     path('activities-slug/', views.activities_slug),
     path('activities-search/', views.activities_search),
-    path('activitiy-categories-slug/', views.activities_cat_slug),
+    path('activities-categories-slug/', views.activities_cat_slug),
     path('activities-regions/', views.activities_regions),
     path('activities-region-slug/', views.activities_reg_slug),
     path('destinations-slug/', views.destination_slug),
@@ -17,7 +17,6 @@ urlpatterns = [
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
     path('activities-featured/', views.activities_featured),
     path('sign/', views.sign_view, name='sign_view'),
-    path('activity-pdf/<str:slug>/', activity_pdf_detail,
-         name='activity_pdf_detail'),
+    path('activity-pdf/<str:slug>/', activity_pdf_detail, name='activity_pdf_detail'),
     path('video-reviews/', views.video_review_list, name='video-review-list'),
 ]
