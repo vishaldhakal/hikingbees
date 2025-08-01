@@ -664,7 +664,7 @@ def testimonials(request):
 @api_view(['GET'])
 def teams_id(request):
     if request.method == 'GET':
-        teammembers = TeamMember.objects.all()
+        teammembers = TeamMember.objects.only('id', 'slug')
         teammembers_serializer = TeamMemberSlugSerializer(
             teammembers, many=True)
 
