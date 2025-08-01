@@ -17,6 +17,7 @@ urlpatterns = [
     path('activities-region-wise/<str:slug>/', views.activities_all_region),
     path('activities-featured/', views.activities_featured),
     path('sign/', views.sign_view, name='sign_view'),
-    path('activity-pdf/<str:slug>/', activity_pdf_detail, name='activity_pdf_detail'),
+    path('activity-pdf/<str:slug>/', activity_pdf_detail,
+         name='activity_pdf_detail'),
     path('video-reviews/', views.video_review_list, name='video-review-list'),
 ]

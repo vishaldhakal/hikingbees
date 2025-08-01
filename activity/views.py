@@ -177,7 +177,7 @@ def activities_search(request):
 @api_view(['GET'])
 def activities_cat_slug(request):
     if request.method == 'GET':
-        activities = ActivityCategory.objects.all()
+        activities = ActivityCategory.objects.only('id', 'slug')
         serializer_activities = ActivityCategorySlugSerializer(
             activities, many=True)
         return Response(serializer_activities.data)
@@ -186,7 +186,7 @@ def activities_cat_slug(request):
 @api_view(['GET'])
 def activities_reg_slug(request):
     if request.method == 'GET':
-        activities = ActivityRegion.objects.all()
+        activities = ActivityRegion.objects.only('id', 'slug')
         serializer_activities = ActivityRegionSlugSerializer(
             activities, many=True)
         return Response(serializer_activities.data)
