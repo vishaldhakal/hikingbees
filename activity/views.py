@@ -160,7 +160,7 @@ def activities_collection(request):
 @api_view(['GET'])
 def activities_slug(request):
     if request.method == 'GET':
-        activities = Activity.objects.all()
+        activities = Activity.objects.only('slug')
         serializer_activities = ActivitySlugSerializer(activities, many=True)
         return Response(serializer_activities.data)
 
