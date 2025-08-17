@@ -192,6 +192,18 @@ class ActivityBookingAddOn(models.Model):
         return f"{self.booking.name} - {self.addon.name} x{self.quantity}"
 
 
+class AdditionalTiles(models.Model):
+    title = models.CharField(max_length=255)
+    description = tinymce_models.HTMLField(null=True, blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name='additional_tiles')
+
+    def __str__(self):
+        return self.title
+
+
 class ActivityFAQ(models.Model):
     question = tinymce_models.HTMLField(blank=True)
     answer = tinymce_models.HTMLField(blank=True)
@@ -224,6 +236,15 @@ class ActivityImage(models.Model):
 
     def __str__(self) -> str:
         return self.image.url + ', '+self.image_alt_description
+
+
+class ItineraryImages(models.Model):
+    image = models.FileField(upload_to='itinerary_images/')
+    itinerary = models.ForeignKey(
+        'ItineraryActivity', on_delete=models.CASCADE, related_name='images')
+
+    def __str__(self) -> str:
+        return self.image.url
 
 
 class ItineraryActivity(models.Model):

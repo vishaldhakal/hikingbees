@@ -1,4 +1,4 @@
-from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, Review, VideoReview
+from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ItineraryImages, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, Review, VideoReview, AdditionalTiles
 from rest_framework import serializers
 
 
@@ -160,16 +160,66 @@ class ActivityFAQSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ItineraryImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ItineraryImages
+        fields = ('image_url', 'image_alt_description')
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+
+class ItineraryImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ItineraryImages
+        fields = ('image_url', 'image_alt_description')
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            if request is not None:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+
 class ItineraryActivitySerializer(serializers.ModelSerializer):
+    images = serializers.SerializerMethodField()
+
     class Meta:
         model = ItineraryActivity
         fields = '__all__'
+
+    def get_images(self, obj):
+        images = obj.images.all()
+        return [request.build_absolute_uri(img.image.url) for img in images] if hasattr(self.context.get('request'), 'build_absolute_uri') else [img.image.url for img in images]
 
 
 class AddOnsSerializer(serializers.ModelSerializer):
     class Meta:
         model = AddOns
         fields = ('id', 'name', 'subtitle', 'price', 'unit')
+
+
+class AdditionalTilesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalTiles
+        fields = '__all__'
+
+
+class AdditionalTilesSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdditionalTiles
+        fields = ('id', 'title', 'description')
 
 
 class LandingActivitySmallSerializer(serializers.ModelSerializer):
@@ -184,6 +234,8 @@ class ActivitySerializer(serializers.ModelSerializer):
     itinerary = ItineraryActivitySerializer(many=True, read_only=True)
     gallery = ActivityImageSerializer(many=True, read_only=True)
     faqs = ActivityFAQSerializer(many=True, read_only=True)
+    additional_tiles = AdditionalTilesSmallSerializer(
+        many=True, read_only=True)
     enquiries = ActivityEnquirySerializer(many=True, read_only=True)
     testimonials = ActivityTestimonialSerializer(many=True, read_only=True)
     prices = ActivityPricingSerializer(many=True, read_only=True)

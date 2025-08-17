@@ -80,6 +80,12 @@ class ItineraryActivityForm(forms.ModelForm):
         }
 
 
+class ItineraryImagesInline(StackedInline):
+    model = ItineraryImages
+    tab = True
+    extra = 1
+
+
 class ItineraryActivityInline(StackedInline):
     model = ItineraryActivity
     form = ItineraryActivityForm
@@ -100,6 +106,22 @@ class ActivityImageInline(StackedInline):
 class ActivityTestimonialImageInline(StackedInline):
     model = ActivityTestimonialImage
     tab = True
+
+
+class AdditionalTilesForm(forms.ModelForm):
+    class Meta:
+        model = AdditionalTiles
+        fields = '__all__'
+        widgets = {
+            'description': TinyMCE(),
+        }
+
+
+class AdditionalTilesInline(StackedInline):
+    model = AdditionalTiles
+    form = AdditionalTilesForm
+    tab = True
+    extra = 1
 
 
 class ActivityPricingInline(StackedInline):
@@ -144,6 +166,7 @@ class ActivityAdmin(ModelAdmin):
         ActivityFAQInline,
         ActivityPricingInline,
         AddOnsInline,
+        AdditionalTilesInline,
     ]
 
     fieldsets = (
@@ -225,6 +248,7 @@ class ActivityFAQAdmin(ModelAdmin):
 
 class ItineraryActivityAdmin(ModelAdmin):
     form = ItineraryActivityForm
+    inlines = [ItineraryImagesInline]
 
 
 # Register all models with their respective admin classes
