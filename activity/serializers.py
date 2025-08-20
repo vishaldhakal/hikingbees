@@ -161,47 +161,25 @@ class ActivityFAQSerializer(serializers.ModelSerializer):
 
 
 class ItineraryImageSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        if instance.image and hasattr(instance.image, 'url'):
+            if request is not None:
+                return request.build_absolute_uri(instance.image.url)
+            return instance.image.url
+        return None
 
     class Meta:
         model = ItineraryImages
-        fields = ('image_url', 'image_alt_description')
-
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.image and hasattr(obj.image, 'url'):
-            if request is not None:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
-
-
-class ItineraryImageSerializer(serializers.ModelSerializer):
-    image_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ItineraryImages
-        fields = ('image_url', 'image_alt_description')
-
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.image and hasattr(obj.image, 'url'):
-            if request is not None:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+        fields = ('image',)  # This will be overridden by to_representation
 
 
 class ItineraryActivitySerializer(serializers.ModelSerializer):
-    images = serializers.SerializerMethodField()
+    images = ItineraryImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = ItineraryActivity
         fields = '__all__'
-
-    def get_images(self, obj):
-        images = obj.images.all()
-        return [request.build_absolute_uri(img.image.url) for img in images] if hasattr(self.context.get('request'), 'build_absolute_uri') else [img.image.url for img in images]
 
 
 class AddOnsSerializer(serializers.ModelSerializer):

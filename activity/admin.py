@@ -66,7 +66,6 @@ class ActivityFAQForm(forms.ModelForm):
         model = ActivityFAQ
         fields = '__all__'
         widgets = {
-            'question': TinyMCE(),
             'answer': TinyMCE(),
         }
 
@@ -78,12 +77,6 @@ class ItineraryActivityForm(forms.ModelForm):
         widgets = {
             'description': TinyMCE(),
         }
-
-
-class ItineraryImagesInline(StackedInline):
-    model = ItineraryImages
-    tab = True
-    extra = 1
 
 
 class ItineraryActivityInline(StackedInline):
@@ -248,7 +241,6 @@ class ActivityFAQAdmin(ModelAdmin):
 
 class ItineraryActivityAdmin(ModelAdmin):
     form = ItineraryActivityForm
-    inlines = [ItineraryImagesInline]
 
 
 # Register all models with their respective admin classes
@@ -266,6 +258,7 @@ admin.site.register(AddOns, ModelAdmin)
 admin.site.register(ActivityBookingAddOn, ModelAdmin)
 admin.site.register(VideoReview, ModelAdmin)
 admin.site.register(Review, ModelAdmin)
+admin.site.register(ItineraryImages, ModelAdmin)
 
 
 class ActivityBookingAddOnInline(StackedInline):

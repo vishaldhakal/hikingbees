@@ -205,7 +205,7 @@ class AdditionalTiles(models.Model):
 
 
 class ActivityFAQ(models.Model):
-    question = tinymce_models.HTMLField(blank=True)
+    question = models.TextField(blank=True)
     answer = tinymce_models.HTMLField(blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -240,8 +240,6 @@ class ActivityImage(models.Model):
 
 class ItineraryImages(models.Model):
     image = models.FileField(upload_to='itinerary_images/')
-    itinerary = models.ForeignKey(
-        'ItineraryActivity', on_delete=models.CASCADE, related_name='images')
 
     def __str__(self) -> str:
         return self.image.url
@@ -255,6 +253,8 @@ class ItineraryActivity(models.Model):
     highest_altitude = models.CharField(max_length=100, blank=True)
     meals = models.CharField(max_length=100, blank=True)
     description = tinymce_models.HTMLField(blank=True)
+    images = models.ManyToManyField(
+        ItineraryImages, blank=True, related_name='itinerary')
     activity = models.ForeignKey(
         Activity, on_delete=models.CASCADE, related_name='itinerary')
 
