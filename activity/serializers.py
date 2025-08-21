@@ -1,4 +1,4 @@
-from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ItineraryImages, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, Review, VideoReview, AdditionalTiles
+from .models import Activity, ActivityTestimonialImage, ActivityPricing, ActivityBooking, ActivityEnquiry, ActivityCategory, ItineraryActivity, ActivityImage, Destination, ActivityRegion, ActivityFAQ, ActivityTestimonial, AddOns, ActivityBookingAddOn, Review, VideoReview, AdditionalTiles
 from rest_framework import serializers
 
 
@@ -160,26 +160,29 @@ class ActivityFAQSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ItineraryImageSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        if instance.image and hasattr(instance.image, 'url'):
-            if request is not None:
-                return request.build_absolute_uri(instance.image.url)
-            return instance.image.url
-        return None
-
-    class Meta:
-        model = ItineraryImages
-        fields = ('image',)  # This will be overridden by to_representation
-
-
 class ItineraryActivitySerializer(serializers.ModelSerializer):
-    images = ItineraryImageSerializer(many=True, read_only=True)
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = ItineraryActivity
-        fields = '__all__'
+        fields = [
+            'id', 'day', 'title', 'trek_distance', 'trek_duration',
+            'highest_altitude', 'meals', 'description', 'images'
+        ]
+
+    def get_images(self, obj):
+        images = []
+        for i in range(1, 5):  # For image_1 to image_4 as per the model
+            image_field = f'image_{i}'
+            image = getattr(obj, image_field, None)
+            if image:
+                alt_description = getattr(
+                    obj, f'image_{i}_alt_description', '')
+                images.append({
+                    'url': self.context['request'].build_absolute_uri(image.url) if hasattr(self.context.get('request'), 'build_absolute_uri') and image.url else image.url,
+                    'description': alt_description or ''
+                })
+        return images
 
 
 class AddOnsSerializer(serializers.ModelSerializer):

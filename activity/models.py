@@ -238,13 +238,6 @@ class ActivityImage(models.Model):
         return self.image.url + ', '+self.image_alt_description
 
 
-class ItineraryImages(models.Model):
-    image = models.FileField(upload_to='itinerary_images/')
-
-    def __str__(self) -> str:
-        return self.image.url
-
-
 class ItineraryActivity(models.Model):
     day = models.IntegerField()
     title = models.CharField(max_length=100)
@@ -253,10 +246,24 @@ class ItineraryActivity(models.Model):
     highest_altitude = models.CharField(max_length=100, blank=True)
     meals = models.CharField(max_length=100, blank=True)
     description = tinymce_models.HTMLField(blank=True)
-    images = models.ManyToManyField(
-        ItineraryImages, blank=True, related_name='itinerary')
     activity = models.ForeignKey(
         Activity, on_delete=models.CASCADE, related_name='itinerary')
+    image_1 = models.FileField(
+        upload_to='itinerary_images/', blank=True, null=True)
+    image_1_alt_description = models.CharField(
+        max_length=428, null=True, blank=True)
+    image_2 = models.FileField(
+        upload_to='itinerary_images/', blank=True, null=True)
+    image_2_alt_description = models.CharField(
+        max_length=428, null=True, blank=True)
+    image_3 = models.FileField(
+        upload_to='itinerary_images/', blank=True, null=True)
+    image_3_alt_description = models.CharField(
+        max_length=428, null=True, blank=True)
+    image_4 = models.FileField(
+        upload_to='itinerary_images/', blank=True, null=True)
+    image_4_alt_description = models.CharField(
+        max_length=428, null=True, blank=True)
 
     class Meta:
         ordering = ['day']
