@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'hikingbees.wsgi.application'
 } """
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
-DATABASES = {
+""" DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "hikingbees",
@@ -95,8 +95,18 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "",
     }
-}
+} """
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres",
+        "PASSWORD": "GhMB4Yz3VDCahlPzeaLWf7fsO6aYhNPyJtdofEr5eurOcs8jshQL3mn2CoNxXFgo",
+        "HOST": "fw0gg8kc4kc488o0wwoksww8",
+        "PORT": "5432",
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
