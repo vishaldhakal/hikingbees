@@ -1,27 +1,64 @@
-from django.shortcuts import render, HttpResponse
+import json
+import os
+from datetime import date, datetime
+
+import sib_api_v3_sdk
+from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FAQ, Enquiry, FAQCategory, LegalDocument, FeaturedTour, TeamMember, Testimonial, SiteConfiguration, Affiliations, Partners, DestinationNavDropdown, OtherActivitiesNavDropdown, InnerDropdown, ClimbingNavDropdown, TreekingNavDropdown, NewsletterSubscription
-from .serializers import FAQSerializer, LandingFeaturedTourSerializer, LandingTeamMemberSerializer, LegalDocumentSerializer, FeaturedTourSerializer, FAQCategorySerializer, TeamMemberSlugSerializer, TestimonialSerializer, TeamMemberSerializer, AffiliationsSerializer, PartnersSerializer, SiteConfigurationSerializer, DestinationNavDropdownSerializer, OtherActivitiesNavDropdownSerializer, NavbarOtherActivitiesSerializer, ClimbingNavDropdownSerializer, TreekingNavDropdownSerializer
-from blog.models import Post
-from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer, PostSmallSerializer
-from activity.models import ActivityBookingAddOn, ActivityCategory, Activity, ActivityEnquiry, ActivityBooking, Destination, Review
-from activity.serializers import ActivityCategorySerializer, ActivitySmallSerializer, ActivityCategory2Serializer, ClimbingActivitySerializer, NavbarActivitySerializer, ReviewSerializer
-from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from datetime import datetime
-from activity.serializers import ActivityBooking2Serializer
-from datetime import date
-import json
-import requests
-import os
-from dotenv import load_dotenv
-import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
-load_dotenv()
+from activity.models import (
+    Activity,
+    ActivityBooking,
+    ActivityBookingAddOn,
+    ActivityCategory,
+    ActivityEnquiry,
+    Destination,
+    Review,
+)
+from activity.serializers import (
+    ActivityBooking2Serializer,
+    ActivityCategory2Serializer,
+    ClimbingActivitySerializer,
+    ReviewSerializer,
+)
+from blog.models import Post
+from blog.serializers import LandingPagePostSerializer, NavbarPostSerializer
+
+from .models import (
+    FAQ,
+    Affiliations,
+    DestinationNavDropdown,
+    Enquiry,
+    FAQCategory,
+    FeaturedTour,
+    LegalDocument,
+    NewsletterSubscription,
+    OtherActivitiesNavDropdown,
+    Partners,
+    SiteConfiguration,
+    TeamMember,
+    Testimonial,
+    TreekingNavDropdown,
+)
+from .serializers import (
+    AffiliationsSerializer,
+    DestinationNavDropdownSerializer,
+    FAQCategorySerializer,
+    FAQSerializer,
+    LandingFeaturedTourSerializer,
+    LandingTeamMemberSerializer,
+    LegalDocumentSerializer,
+    OtherActivitiesNavDropdownSerializer,
+    PartnersSerializer,
+    SiteConfigurationSerializer,
+    TeamMemberSerializer,
+    TeamMemberSlugSerializer,
+    TestimonialSerializer,
+    TreekingNavDropdownSerializer,
+)
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
@@ -45,9 +82,9 @@ def validate_email(email):
     """
     if not email or not isinstance(email, str):
         return False
-    if '@' not in email or '.' not in email:
+    if "@" not in email or "." not in email:
         return False
-    if len(email.split('@')[0]) < 1 or len(email.split('@')[1].split('.')[0]) < 1:
+    if len(email.split("@")[0]) < 1 or len(email.split("@")[1].split(".")[0]) < 1:
         return False
     return True
 
@@ -62,7 +99,7 @@ def validate_phone(phone):
     if not isinstance(phone, str):
         return False
     # Remove any non-digit characters
-    phone_digits = ''.join(filter(str.isdigit, phone))
+    phone_digits = "".join(filter(str.isdigit, phone))
     if len(phone_digits) < 10:
         return False
     return True
@@ -73,26 +110,29 @@ def send_brevo_email(name, email, phone, message):
     try:
         # Configure API client
         configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = BREVO_API_KEY
+        configuration.api_key["api-key"] = BREVO_API_KEY
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration))
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
 
         # Render email template
-        email_html = render_to_string("contact_email.html", {
-            "name": name,
-            "email": email,
-            "phone": phone or "Not provided",
-            "message": message
-        })
+        email_html = render_to_string(
+            "contact_email.html",
+            {
+                "name": name,
+                "email": email,
+                "phone": phone or "Not provided",
+                "message": message,
+            },
+        )
 
         # Prepare email request
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"},
-                {"email": email}],
+            to=[{"email": "info@hikingbees.com"}, {"email": email}],
             sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
             subject=f"New Contact Form Submission from {name}",
             html_content=email_html,
-            reply_to={"email": email, "name": name}
+            reply_to={"email": email, "name": name},
         )
 
         # Send email
@@ -119,44 +159,58 @@ def ContactFormSubmission(request):
             message = data.get("message", "").strip()
 
             # Validate all fields
-            if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
-                return Response({
-                    "error": "Validation failed",
-                    "message": "Please check your input fields"
-                }, status=status.HTTP_400_BAD_REQUEST)
+            if (
+                not validate_name(name)
+                or not validate_email(email)
+                or not validate_phone(phone)
+            ):
+                return Response(
+                    {
+                        "error": "Validation failed",
+                        "message": "Please check your input fields",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             # Send email using Brevo
             success, error = send_brevo_email(name, email, phone, message)
 
             # Create enquiry record
             enquiry = Enquiry.objects.create(
-                name=name, email=email, phone=phone, message=message)
+                name=name, email=email, phone=phone, message=message
+            )
             enquiry.save()
 
             if not success:
-                return Response({
-                    "error": "Failed to send email",
-                    "details": error
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": "Failed to send email", "details": error},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
-            return Response({
-                "message": "Contact form submitted successfully",
-                "data": {
-                    "name": name,
-                    "email": email,
-                    "phone": phone or "Not provided"
-                }
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "message": "Contact form submitted successfully",
+                    "data": {
+                        "name": name,
+                        "email": email,
+                        "phone": phone or "Not provided",
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
 
         except Exception as e:
-            return Response({
-                "error": "An error occurred while processing your request",
-                "details": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "error": "An error occurred while processing your request",
+                    "details": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-    return Response({
-        "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response(
+        {"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
 
 
 @api_view(["POST"])
@@ -174,23 +228,20 @@ def InquirySubmission(request):
             slug = data.get("slug")
 
             if not all([user_email, name, message, slug]):
-                return Response({
-                    "error": "Missing required fields"
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Missing required fields"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             try:
                 actt = Activity.objects.get(slug=slug)
             except Activity.DoesNotExist:
-                return Response({
-                    "error": "Activity not found"
-                }, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"error": "Activity not found"}, status=status.HTTP_404_NOT_FOUND
+                )
 
             # Create enquiry record
             neww = ActivityEnquiry.objects.create(
-                activity=actt,
-                name=name,
-                email=user_email,
-                message=message,
-                phone=phone
+                activity=actt, name=name, email=user_email, message=message, phone=phone
             )
             neww.save()
 
@@ -201,67 +252,83 @@ def InquirySubmission(request):
                     phone=phone,
                     message=message,
                     activity_title=actt.activity_title,
-                    slug=slug
+                    slug=slug,
                 )
                 if not success:
-                    return Response({
-                        "error": "Failed to send email",
-                        "details": error
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response(
+                        {"error": "Failed to send email", "details": error},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
             except Exception as e:
-                return Response({
-                    "error": "Failed to send email",
-                    "details": str(e)
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": "Failed to send email", "details": str(e)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
-            return Response({
-                "message": "Inquiry submitted successfully"
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Inquiry submitted successfully"}, status=status.HTTP_200_OK
+            )
 
         except Exception as e:
-            return Response({
-                "error": "An error occurred",
-                "details": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "An error occurred", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-    return Response({
-        "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response(
+        {"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
 
 
-def send_plan_trip_brevo(name, email, phone, message, no_of_people, no_of_days, arrival, departure, budget_from, budget_to, activity_title, slug):
+def send_plan_trip_brevo(
+    name,
+    email,
+    phone,
+    message,
+    no_of_people,
+    no_of_days,
+    arrival,
+    departure,
+    budget_from,
+    budget_to,
+    activity_title,
+    slug,
+):
     """Helper function to send email via Brevo API"""
     try:
         # Configure API client
         configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = BREVO_API_KEY
+        configuration.api_key["api-key"] = BREVO_API_KEY
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration))
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
 
         # Render email template
-        email_html = render_to_string("plan_trip_email.html", {
-            "name": name,
-            "email": email,
-            "phone": phone or "Not provided",
-            "message": message,
-            "no_of_people": no_of_people,
-            "no_of_days": no_of_days,
-            "arrival": arrival,
-            "departure": departure,
-            "budget_from": budget_from,
-            "budget_to": budget_to,
-            "activity_title": activity_title,
-            "slug": slug
-        })
+        email_html = render_to_string(
+            "plan_trip_email.html",
+            {
+                "name": name,
+                "email": email,
+                "phone": phone or "Not provided",
+                "message": message,
+                "no_of_people": no_of_people,
+                "no_of_days": no_of_days,
+                "arrival": arrival,
+                "departure": departure,
+                "budget_from": budget_from,
+                "budget_to": budget_to,
+                "activity_title": activity_title,
+                "slug": slug,
+            },
+        )
 
         # Prepare email request
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"},
-                {"email": email}],
+            to=[{"email": "info@hikingbees.com"}, {"email": email}],
             sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
             subject=f"New Trip Plan Submission from {name}",
             html_content=email_html,
-            reply_to={"email": email, "name": name}
+            reply_to={"email": email, "name": name},
         )
 
         # Send email
@@ -297,75 +364,110 @@ def PlanTripSubmit(request):
             activity_title = actt.activity_title
 
             # Validate required fields
-            if not validate_name(name) or not validate_email(email) or not validate_phone(phone):
-                return Response({
-                    "error": "Validation failed",
-                    "message": "Please check your input fields"
-                }, status=status.HTTP_400_BAD_REQUEST)
+            if (
+                not validate_name(name)
+                or not validate_email(email)
+                or not validate_phone(phone)
+            ):
+                return Response(
+                    {
+                        "error": "Validation failed",
+                        "message": "Please check your input fields",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             # Replace EmailJS with Brevo
             success, error = send_plan_trip_brevo(
-                name, email, phone, message, no_of_people, no_of_days,
-                arrival, departure, budget_from, budget_to,
-                activity_title, slug
+                name,
+                email,
+                phone,
+                message,
+                no_of_people,
+                no_of_days,
+                arrival,
+                departure,
+                budget_from,
+                budget_to,
+                activity_title,
+                slug,
             )
 
             if not success:
-                return Response({
-                    "error": "Failed to send email",
-                    "details": error
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": "Failed to send email", "details": error},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
-            return Response({
-                "message": "Trip plan submitted successfully",
-                "data": {
-                    "name": name,
-                    "email": email,
-                    "activity": actt.activity_title
-                }
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "message": "Trip plan submitted successfully",
+                    "data": {
+                        "name": name,
+                        "email": email,
+                        "activity": actt.activity_title,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
 
         except Exception as e:
-            return Response({
-                "error": "An error occurred while processing your request",
-                "details": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {
+                    "error": "An error occurred while processing your request",
+                    "details": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
-    return Response({
-        "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response(
+        {"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
 
 
-def send_booking_brevo(name, email, phone, message, total_price, no_of_guests, booking_date, activity_title, slug):
+def send_booking_brevo(
+    name,
+    email,
+    phone,
+    message,
+    total_price,
+    no_of_guests,
+    booking_date,
+    activity_title,
+    slug,
+):
     """Helper function to send booking confirmation email via Brevo API"""
     try:
         # Configure API client
         configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = BREVO_API_KEY
+        configuration.api_key["api-key"] = BREVO_API_KEY
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration))
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
 
         # Render email template
-        email_html = render_to_string("booking_email.html", {
-            "name": name,
-            "email": email,
-            "phone": phone or "Not provided",
-            "message": message,
-            "total_price": total_price,
-            "no_of_guests": no_of_guests,
-            "booking_date": booking_date,
-            "activity": activity_title,
-            "slug": slug
-        })
+        email_html = render_to_string(
+            "booking_email.html",
+            {
+                "name": name,
+                "email": email,
+                "phone": phone or "Not provided",
+                "message": message,
+                "total_price": total_price,
+                "no_of_guests": no_of_guests,
+                "booking_date": booking_date,
+                "activity": activity_title,
+                "slug": slug,
+            },
+        )
 
         # Prepare email request
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"},
-                {"email": email}],
+            to=[{"email": "info@hikingbees.com"}, {"email": email}],
             sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
             subject=f"Booking Confirmation for {activity_title}",
             html_content=email_html,
-            reply_to={"email": email, "name": name}
+            reply_to={"email": email, "name": name},
         )
 
         # Send email
@@ -410,7 +512,8 @@ def BookingSubmission(request):
                     no_of_guests=no_of_guests,
                     total_price=total_price,
                     booking_date=datetime.strptime(
-                        booking_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                        booking_date_str, "%Y-%m-%dT%H:%M:%S.%fZ"
+                    ),
                 )
 
                 # Set optional fields
@@ -425,10 +528,12 @@ def BookingSubmission(request):
                 try:
                     if arrival_date_str:
                         new_booking.arrival_date = datetime.strptime(
-                            arrival_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                            arrival_date_str, "%Y-%m-%dT%H:%M:%S.%fZ"
+                        )
                     if departure_date_str:
                         new_booking.departure_date = datetime.strptime(
-                            departure_date_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+                            departure_date_str, "%Y-%m-%dT%H:%M:%S.%fZ"
+                        )
                 except ValueError:
                     pass  # Skip if date parsing fails
 
@@ -450,7 +555,7 @@ def BookingSubmission(request):
                     new_booking.emergency_relationship = emergency_relationship
 
                 # Handle add-ons
-                addons_data = data.get('booking_addons', [])
+                addons_data = data.get("booking_addons", [])
                 if isinstance(addons_data, str):
                     # If it's a string (from form data), try to parse it as JSON
                     try:
@@ -460,13 +565,13 @@ def BookingSubmission(request):
 
                 for addon in addons_data:
                     try:
-                        addon_id = addon.get('id')
-                        quantity = addon.get('quantity', 0)
+                        addon_id = addon.get("id")
+                        quantity = addon.get("quantity", 0)
                         if addon_id and quantity > 0:
                             ActivityBookingAddOn.objects.create(
                                 booking=new_booking,
                                 addon_id=addon_id,
-                                quantity=quantity
+                                quantity=quantity,
                             )
                     except Exception as e:
                         print(f"Failed to add addon: {str(e)}")
@@ -485,7 +590,7 @@ def BookingSubmission(request):
                         no_of_guests=no_of_guests,
                         booking_date=booking_date_str,
                         activity_title=act.activity_title,
-                        slug=slug
+                        slug=slug,
                     )
                     if not success:
                         print(f"Email sending failed: {error}")
@@ -493,27 +598,32 @@ def BookingSubmission(request):
                     print(f"Email sending failed: {str(e)}")
                     # Continue anyway since booking was saved
 
-                return Response({
-                    "message": "Booking created successfully",
-                    "booking_id": new_booking.id
-                }, status=status.HTTP_201_CREATED)
+                return Response(
+                    {
+                        "message": "Booking created successfully",
+                        "booking_id": new_booking.id,
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
 
             except Exception as e:
-                return Response({
-                    "error": f"Failed to create booking: {str(e)}"
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    {"error": f"Failed to create booking: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
 
         except Exception as e:
-            return Response({
-                "error": f"Request processing failed: {str(e)}"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Request processing failed: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-    return Response({
-        "error": "Method not allowed"
-    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    return Response(
+        {"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+    )
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 def Newsletter(request):
     emaill = request.POST.get("email")
     nsss = NewsletterSubscription.objects.create(email=emaill)
@@ -523,18 +633,17 @@ def Newsletter(request):
     """ body = f"Newsletter Subscribed by {emaill}\n" """
 
     """ send_mail(subject, body, "info@hikingbees.com",  [emaill,"info@hikingbees.com"], fail_silently=False) """
-    return Response({'success': "Subscribed Sucessfully"}, status=status.HTTP_200_OK)
+    return Response({"success": "Subscribed Sucessfully"}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def legaldocuments(request):
     legal_documents = LegalDocument.objects.all()
-    legal_documents_serializer = LegalDocumentSerializer(
-        legal_documents, many=True)
-    return Response({'legal_documents': legal_documents_serializer.data})
+    legal_documents_serializer = LegalDocumentSerializer(legal_documents, many=True)
+    return Response({"legal_documents": legal_documents_serializer.data})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def faq_list(request):
     faqs = FAQ.objects.all()
     serializer = FAQSerializer(faqs, many=True)
@@ -542,15 +651,14 @@ def faq_list(request):
     faq_cats = FAQCategory.objects.all()
     serializer_cat = FAQCategorySerializer(faq_cats, many=True)
 
-    return Response({'faqs': serializer.data, "faq_categories": serializer_cat.data})
+    return Response({"faqs": serializer.data, "faq_categories": serializer_cat.data})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def navbar(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         destination_nav = DestinationNavDropdown.objects.get()
-        destination_nav_serializer = DestinationNavDropdownSerializer(
-            destination_nav)
+        destination_nav_serializer = DestinationNavDropdownSerializer(destination_nav)
 
         other_nav = OtherActivitiesNavDropdown.objects.get()
         other_nav_serializer = OtherActivitiesNavDropdownSerializer(other_nav)
@@ -563,26 +671,27 @@ def navbar(request):
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
 
         # Add latest 4 posts
-        latest_posts = Post.objects.all().order_by('-created_at')[:4]
+        latest_posts = Post.objects.all().order_by("-created_at")[:4]
         latest_posts_serializer = NavbarPostSerializer(latest_posts, many=True)
 
-        return Response({
-            "destination_nav": destination_nav_serializer.data,
-            "other_activities_nav": other_nav_serializer.data,
-            "climbing_nav": climb_nav_serializer.data,
-            "trekking_nav": trek_nav_serializer.data,
-            "latest_posts": latest_posts_serializer.data,
-        })
+        return Response(
+            {
+                "destination_nav": destination_nav_serializer.data,
+                "other_activities_nav": other_nav_serializer.data,
+                "climbing_nav": climb_nav_serializer.data,
+                "trekking_nav": trek_nav_serializer.data,
+                "latest_posts": latest_posts_serializer.data,
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def landing_page(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         today = date.today()
 
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = LandingTeamMemberSerializer(
-            teammembers, many=True)
+        teammembers_serializer = LandingTeamMemberSerializer(teammembers, many=True)
 
         testimonial = Testimonial.objects.all()
         testimonial_serializer = TestimonialSerializer(testimonial, many=True)
@@ -593,8 +702,9 @@ def landing_page(request):
         posts = Post.objects.all()[:5]
         posts_serializer = LandingPagePostSerializer(posts, many=True)
 
-        bookings = ActivityBooking.objects.filter(
-            booking_date__gte=today).order_by('-booking_date')[:10]
+        bookings = ActivityBooking.objects.filter(booking_date__gte=today).order_by(
+            "-booking_date"
+        )[:10]
         bookings_serializer = ActivityBooking2Serializer(bookings, many=True)
 
         activities = FeaturedTour.objects.get()
@@ -602,11 +712,11 @@ def landing_page(request):
 
         activity_category = ActivityCategory.objects.all()
         serializer_activity_category = ActivityCategory2Serializer(
-            activity_category, many=True)
+            activity_category, many=True
+        )
 
         affiliations = Affiliations.objects.all()
-        serializer_affiliations = AffiliationsSerializer(
-            affiliations, many=True)
+        serializer_affiliations = AffiliationsSerializer(affiliations, many=True)
 
         partners = Partners.objects.all()
         serializer_partners = PartnersSerializer(partners, many=True)
@@ -614,97 +724,115 @@ def landing_page(request):
         review = Review.objects.all()
         review_serializer = ReviewSerializer(review, many=True)
 
-        return Response({
-            "hero_content": hero_content_serializer.data,
-            "recent_posts": posts_serializer.data,
-            "featured_activities": serializer_activities.data["featured_tours"],
-            "popular_activities": serializer_activities.data["popular_tours"],
-            "best_selling_activities": serializer_activities.data["best_selling_tours"],
-            "favourite_activities": serializer_activities.data["favourite_tours"],
-            "banner_activity": serializer_activities.data["banner_tour"],
-            "activity_categories": serializer_activity_category.data,
-            "team_members": teammembers_serializer.data,
-            "testimonials": testimonial_serializer.data,
-            "affiliations": serializer_affiliations.data,
-            "partners": serializer_partners.data,
-            "bookings": bookings_serializer.data,
-            "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
-            "google_review": review_serializer.data[0].get("google_review"),
-            "google_rating": review_serializer.data[0].get("google_rating")
-        })
+        return Response(
+            {
+                "hero_content": hero_content_serializer.data,
+                "recent_posts": posts_serializer.data,
+                "featured_activities": serializer_activities.data["featured_tours"],
+                "popular_activities": serializer_activities.data["popular_tours"],
+                "best_selling_activities": serializer_activities.data[
+                    "best_selling_tours"
+                ],
+                "favourite_activities": serializer_activities.data["favourite_tours"],
+                "banner_activity": serializer_activities.data["banner_tour"],
+                "activity_categories": serializer_activity_category.data,
+                "team_members": teammembers_serializer.data,
+                "testimonials": testimonial_serializer.data,
+                "affiliations": serializer_affiliations.data,
+                "partners": serializer_partners.data,
+                "bookings": bookings_serializer.data,
+                "trip_advisor_review": review_serializer.data[0].get(
+                    "trip_advisor_review"
+                ),
+                "google_review": review_serializer.data[0].get("google_review"),
+                "google_rating": review_serializer.data[0].get("google_rating"),
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def all_bookings(request):
-    if request.method == 'GET':
-        bookings = ActivityBooking.objects.all().order_by('-booking_date')
+    if request.method == "GET":
+        bookings = ActivityBooking.objects.all().order_by("-booking_date")
         bookings_serializer = ActivityBooking2Serializer(bookings, many=True)
 
-        return Response({
-            "bookings": bookings_serializer.data,
-        })
+        return Response(
+            {
+                "bookings": bookings_serializer.data,
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def testimonials(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         testimonial = Testimonial.objects.all()
         review = Review.objects.all()
         testimonial_serializer = TestimonialSerializer(testimonial, many=True)
         review_serializer = ReviewSerializer(review, many=True)
 
-        return Response({
-            "testimonials": testimonial_serializer.data,
-            "trip_advisor_review": review_serializer.data[0].get("trip_advisor_review"),
-            "google_review": review_serializer.data[0].get("google_review"),
-            "google_rating": review_serializer.data[0].get("google_rating")
-        })
+        return Response(
+            {
+                "testimonials": testimonial_serializer.data,
+                "trip_advisor_review": review_serializer.data[0].get(
+                    "trip_advisor_review"
+                ),
+                "google_review": review_serializer.data[0].get("google_review"),
+                "google_rating": review_serializer.data[0].get("google_rating"),
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def teams_id(request):
-    if request.method == 'GET':
-        teammembers = TeamMember.objects.only('id', 'slug')
-        teammembers_serializer = TeamMemberSlugSerializer(
-            teammembers, many=True)
+    if request.method == "GET":
+        teammembers = TeamMember.objects.only("id", "slug")
+        teammembers_serializer = TeamMemberSlugSerializer(teammembers, many=True)
 
-        return Response({
-            "team_members": teammembers_serializer.data,
-        })
+        return Response(
+            {
+                "team_members": teammembers_serializer.data,
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def teams(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         teammembers = TeamMember.objects.all()
-        teammembers_serializer = LandingTeamMemberSerializer(
-            teammembers, many=True)
+        teammembers_serializer = LandingTeamMemberSerializer(teammembers, many=True)
 
-        return Response({
-            "team_members": teammembers_serializer.data,
-        })
+        return Response(
+            {
+                "team_members": teammembers_serializer.data,
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def teams_single(request, id):
-    if request.method == 'GET':
+    if request.method == "GET":
         teammembers = TeamMember.objects.get(id=id)
         teammembers_serializer = TeamMemberSerializer(teammembers)
 
-        return Response({
-            "team_member": teammembers_serializer.data,
-        })
+        return Response(
+            {
+                "team_member": teammembers_serializer.data,
+            }
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def teams_single_slug(request, slug):
-    if request.method == 'GET':
+    if request.method == "GET":
         teammembers = TeamMember.objects.get(slug=slug)
         teammembers_serializer = TeamMemberSerializer(teammembers)
 
-        return Response({
-            "team_member": teammembers_serializer.data,
-        })
+        return Response(
+            {
+                "team_member": teammembers_serializer.data,
+            }
+        )
 
 
 def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
@@ -712,28 +840,31 @@ def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
     try:
         # Configure API client
         configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key['api-key'] = BREVO_API_KEY
+        configuration.api_key["api-key"] = BREVO_API_KEY
         api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration))
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
 
         # Render email template
-        email_html = render_to_string("inquiry_email.html", {
-            "name": name,
-            "email": email,
-            "phone": phone or "Not provided",
-            "message": message,
-            "activity": activity_title,
-            "slug": slug
-        })
+        email_html = render_to_string(
+            "inquiry_email.html",
+            {
+                "name": name,
+                "email": email,
+                "phone": phone or "Not provided",
+                "message": message,
+                "activity": activity_title,
+                "slug": slug,
+            },
+        )
 
         # Prepare email request
         send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"},
-                {"email": email}],
+            to=[{"email": "info@hikingbees.com"}, {"email": email}],
             sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
             subject=f"Inquiry About {activity_title}",
             html_content=email_html,
-            reply_to={"email": email, "name": name}
+            reply_to={"email": email, "name": name},
         )
 
         # Send email
@@ -746,20 +877,21 @@ def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
         return False, f"Error sending email: {str(e)}"
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def sitemap(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         # Get all posts and their slugs
         posts = Post.objects.all()
-        post_slugs = [{'slug': post.slug} for post in posts]
+        post_slugs = [{"slug": post.slug} for post in posts]
         activities = Activity.objects.all()
-        activity_slugs = [{'slug': activity.slug} for activity in activities]
+        activity_slugs = [{"slug": activity.slug} for activity in activities]
         activity_categories = ActivityCategory.objects.all()
-        activity_category_slugs = [{'slug': activity_category.slug}
-                                   for activity_category in activity_categories]
+        activity_category_slugs = [
+            {"slug": activity_category.slug}
+            for activity_category in activity_categories
+        ]
         destinations = Destination.objects.all()
-        destination_slugs = [{'slug': destination.name}
-                             for destination in destinations]
+        destination_slugs = [{"slug": destination.name} for destination in destinations]
         destination_activity_slugs = []
         for destination in destinations:
             # Get activity categories for this destination using the activity relationship
@@ -769,14 +901,19 @@ def sitemap(request):
 
             if activity_categories:
                 for category in activity_categories:
-                    destination_activity_slugs.append({
-                        'slug': f"destinations/{destination.name}/activity-category/{category.slug}"
-                    })
+                    destination_activity_slugs.append(
+                        {
+                            "slug": f"destinations/{destination.name}/activity-category/{category.slug}"
+                        }
+                    )
 
-        return Response({
-            "posts": post_slugs,
-            "activity": activity_slugs,
-            "activity_category": activity_category_slugs,
-            "destination": destination_slugs,
-            "destination_activity": destination_activity_slugs
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "posts": post_slugs,
+                "activity": activity_slugs,
+                "activity_category": activity_category_slugs,
+                "destination": destination_slugs,
+                "destination_activity": destination_activity_slugs,
+            },
+            status=status.HTTP_200_OK,
+        )
