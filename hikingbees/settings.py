@@ -244,8 +244,17 @@ TINYMCE_DEFAULT_CONFIG = {
     "content_style": "body { font-family:Roboto,Helvetica,Arial,sans-serif; font-size:14px }",
 }
 
+CORS_ALLOWED_ORIGINS = [
+    "https://latina-trail-yards-encyclopedia.trycloudflare.com",
+    "https://hikingbees.com",
+    "https://www.hikingbees.com",
+    "https://api.hikingbees.com",
+]
 CSRF_TRUSTED_ORIGINS = [
-    "https://4963-110-44-120-22.ngrok.io",
+    "https://latina-trail-yards-encyclopedia.trycloudflare.com",
+    "https://api.hikingbees.com",
+    "https://hikingbees.com",
+    "https://www.hikingbees.com",
 ]
 
 
