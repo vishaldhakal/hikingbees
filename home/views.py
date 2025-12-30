@@ -659,6 +659,9 @@ def faq_list(request):
     return Response({"faqs": serializer.data, "faq_categories": serializer_cat.data})
 
 
+# added order
+
+
 @api_view(["GET"])
 def navbar(request):
     if request.method == "GET":
