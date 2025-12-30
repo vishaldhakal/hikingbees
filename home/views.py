@@ -3,7 +3,9 @@ import os
 from datetime import date, datetime
 
 import sib_api_v3_sdk
+from django.db.models import Prefetch
 from django.template.loader import render_to_string
+from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -34,6 +36,7 @@ from .models import (
     Enquiry,
     FAQCategory,
     FeaturedTour,
+    InnerDropdown,
     LegalDocument,
     NewsletterSubscription,
     OtherActivitiesNavDropdown,
@@ -59,6 +62,8 @@ from .serializers import (
     TestimonialSerializer,
     TreekingNavDropdownSerializer,
 )
+
+load_dotenv()
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 
@@ -667,7 +672,12 @@ def navbar(request):
         climb_nav = Activity.objects.filter(activity_category=acy)
         climb_nav_serializer = ClimbingActivitySerializer(climb_nav, many=True)
 
-        trek_nav = TreekingNavDropdown.objects.get()
+        trek_nav = TreekingNavDropdown.objects.prefetch_related(
+            Prefetch(
+                "innerdropdowns",
+                queryset=InnerDropdown.objects.order_by("activity_region__order"),
+            )
+        ).get()
         trek_nav_serializer = TreekingNavDropdownSerializer(trek_nav)
 
         # Add latest 4 posts
