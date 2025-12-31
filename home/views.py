@@ -1,15 +1,13 @@
 import json
-import os
 from datetime import date, datetime
 
-import sib_api_v3_sdk
+from django.core.mail import send_mail
 from django.db.models import Prefetch
 from django.template.loader import render_to_string
 from dotenv import load_dotenv
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from sib_api_v3_sdk.rest import ApiException
 
 from activity.models import (
     Activity,
@@ -65,8 +63,6 @@ from .serializers import (
 
 load_dotenv()
 
-BREVO_API_KEY = os.getenv("BREVO_API_KEY")
-
 
 def validate_name(name):
     """
@@ -111,15 +107,8 @@ def validate_phone(phone):
 
 
 def send_brevo_email(name, email, phone, message):
-    """Helper function to send email via Brevo API"""
+    """Helper function to send email via Django SMTP"""
     try:
-        # Configure API client
-        configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key["api-key"] = BREVO_API_KEY
-        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration)
-        )
-
         # Render email template
         email_html = render_to_string(
             "contact_email.html",
@@ -131,21 +120,17 @@ def send_brevo_email(name, email, phone, message):
             },
         )
 
-        # Prepare email request
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"}, {"email": email}],
-            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+        # Send email using Django's send_mail
+        send_mail(
             subject=f"New Contact Form Submission from {name}",
-            html_content=email_html,
-            reply_to={"email": email, "name": name},
+            message="",  # Plain text message (empty since we're using HTML)
+            from_email="info@hikingbees.com",
+            recipient_list=["info@hikingbees.com", email],
+            html_message=email_html,
+            fail_silently=False,
         )
-
-        # Send email
-        api_instance.send_transac_email(send_smtp_email)
         return True, None
 
-    except ApiException as e:
-        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
 
@@ -299,15 +284,8 @@ def send_plan_trip_brevo(
     activity_title,
     slug,
 ):
-    """Helper function to send email via Brevo API"""
+    """Helper function to send email via Django SMTP"""
     try:
-        # Configure API client
-        configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key["api-key"] = BREVO_API_KEY
-        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration)
-        )
-
         # Render email template
         email_html = render_to_string(
             "plan_trip_email.html",
@@ -327,21 +305,17 @@ def send_plan_trip_brevo(
             },
         )
 
-        # Prepare email request
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"}, {"email": email}],
-            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+        # Send email using Django's send_mail
+        send_mail(
             subject=f"New Trip Plan Submission from {name}",
-            html_content=email_html,
-            reply_to={"email": email, "name": name},
+            message="",  # Plain text message (empty since we're using HTML)
+            from_email="info@hikingbees.com",
+            recipient_list=["info@hikingbees.com", email],
+            html_message=email_html,
+            fail_silently=False,
         )
-
-        # Send email
-        api_instance.send_transac_email(send_smtp_email)
         return True, None
 
-    except ApiException as e:
-        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
 
@@ -441,15 +415,8 @@ def send_booking_brevo(
     activity_title,
     slug,
 ):
-    """Helper function to send booking confirmation email via Brevo API"""
+    """Helper function to send booking confirmation email via Django SMTP"""
     try:
-        # Configure API client
-        configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key["api-key"] = BREVO_API_KEY
-        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration)
-        )
-
         # Render email template
         email_html = render_to_string(
             "booking_email.html",
@@ -466,21 +433,17 @@ def send_booking_brevo(
             },
         )
 
-        # Prepare email request
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"}, {"email": email}],
-            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+        # Send email using Django's send_mail
+        send_mail(
             subject=f"Booking Confirmation for {activity_title}",
-            html_content=email_html,
-            reply_to={"email": email, "name": name},
+            message="",  # Plain text message (empty since we're using HTML)
+            from_email="info@hikingbees.com",
+            recipient_list=["info@hikingbees.com", email],
+            html_message=email_html,
+            fail_silently=False,
         )
-
-        # Send email
-        api_instance.send_transac_email(send_smtp_email)
         return True, None
 
-    except ApiException as e:
-        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
 
@@ -849,15 +812,8 @@ def teams_single_slug(request, slug):
 
 
 def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
-    """Helper function to send inquiry confirmation email via Brevo API"""
+    """Helper function to send inquiry confirmation email via Django SMTP"""
     try:
-        # Configure API client
-        configuration = sib_api_v3_sdk.Configuration()
-        configuration.api_key["api-key"] = BREVO_API_KEY
-        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
-            sib_api_v3_sdk.ApiClient(configuration)
-        )
-
         # Render email template
         email_html = render_to_string(
             "inquiry_email.html",
@@ -871,21 +827,17 @@ def send_inquiry_brevo(name, email, phone, message, activity_title, slug):
             },
         )
 
-        # Prepare email request
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=[{"email": "info@hikingbees.com"}, {"email": email}],
-            sender={"email": "info@hikingbees.com", "name": "Hiking Bees"},
+        # Send email using Django's send_mail
+        send_mail(
             subject=f"Inquiry About {activity_title}",
-            html_content=email_html,
-            reply_to={"email": email, "name": name},
+            message="",  # Plain text message (empty since we're using HTML)
+            from_email="info@hikingbees.com",
+            recipient_list=["info@hikingbees.com", email],
+            html_message=email_html,
+            fail_silently=False,
         )
-
-        # Send email
-        api_instance.send_transac_email(send_smtp_email)
         return True, None
 
-    except ApiException as e:
-        return False, f"Brevo API error: {str(e)}"
     except Exception as e:
         return False, f"Error sending email: {str(e)}"
 

@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+# from dotenv import load_dotenv
+# load_dotenv()
 from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -79,12 +81,12 @@ WSGI_APPLICATION = "hikingbees.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-""" DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-} """
+}
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = None
 """ DATABASES = {
@@ -98,16 +100,16 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = None
     }
 } """
 
-DATABASES = {
+""" DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "HZJDQRX5WI0YMu0ZIcxXYOszI4bUKmUsfyBjaliAojBWzQ4NiQ9tvmFjLUF2OR9B",
-        "HOST": "agsks8c0owoswc0cg8wwkosc",
-        "PORT": "5432",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
-}
+} """
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -249,12 +251,14 @@ CORS_ALLOWED_ORIGINS = [
     "https://hikingbees.com",
     "https://www.hikingbees.com",
     "https://api.hikingbees.com",
+    "https://reliable-responding-indicator-tar.trycloudflare.com",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://latina-trail-yards-encyclopedia.trycloudflare.com",
     "https://api.hikingbees.com",
     "https://hikingbees.com",
     "https://www.hikingbees.com",
+    "https://reliable-responding-indicator-tar.trycloudflare.com",
 ]
 
 
@@ -275,3 +279,12 @@ UNFOLD = {
     "HIDE_APPS": ["auth"],
     "ORDER_WITH_RESPECT_TO": ["home", "activity", "blog"],
 }
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.zoho.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
