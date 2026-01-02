@@ -2,9 +2,37 @@ from django import forms
 from django.contrib import admin
 from django.utils import timezone
 from tinymce.widgets import TinyMCE
-from unfold.admin import ModelAdmin, StackedInline
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
+from unfold.decorators import display
 
-from .models import *
+from .models import (
+    Activity,
+    ActivityBooking,
+    ActivityBookingAddOn,
+    ActivityCategory,
+    ActivityEnquiry,
+    ActivityFAQ,
+    ActivityFAQCategory,
+    ActivityImage,
+    ActivityPricing,
+    ActivityRegion,
+    ActivityTestimonial,
+    ActivityTestimonialImage,
+    AdditionalTiles,
+    AddOns,
+    Destination,
+    ItineraryActivity,
+    Review,
+    VideoReview,
+)
+
+
+# Fix the "ActivityFAQ_activities object" labels in the inline
+def activity_faq_through_str(self):
+    return ""
+
+
+ActivityFAQ.activities.through.__str__ = activity_faq_through_str
 
 
 class DestinationAdminForm(forms.ModelForm):
@@ -71,6 +99,33 @@ class ActivityFAQForm(forms.ModelForm):
         }
 
 
+class ActivityFAQInlineForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=ActivityFAQCategory.objects.all(),
+        required=False,
+        label="FAQ Category",
+    )
+
+    class Meta:
+        model = ActivityFAQ.activities.through
+        fields = ["activityfaq", "category"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk and self.instance.activityfaq:
+            self.fields["category"].initial = self.instance.activityfaq.category
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        category = self.cleaned_data.get("category")
+        if instance.activityfaq and category:
+            instance.activityfaq.category = category
+            instance.activityfaq.save()
+        if commit:
+            instance.save()
+        return instance
+
+
 class ItineraryActivityForm(forms.ModelForm):
     class Meta:
         model = ItineraryActivity
@@ -86,8 +141,9 @@ class ItineraryActivityInline(StackedInline):
     tab = True
 
 
-class ActivityFAQInline(StackedInline):
+class ActivityFAQInline(TabularInline):
     model = ActivityFAQ.activities.through
+    form = ActivityFAQInlineForm
     extra = 1
     verbose_name = "Activity FAQ"
     verbose_name_plural = "Activity FAQs"
@@ -248,17 +304,23 @@ class ActivityFAQCategoryAdmin(ModelAdmin):
     list_display = ["name", "slug", "order", "active"]
     prepopulated_fields = {"slug": ("name",)}
     list_filter = ["active"]
+    search_fields = ["name"]
     ordering = ["order", "name"]
 
 
 class ActivityFAQAdmin(ModelAdmin):
     form = ActivityFAQForm
-    list_display = ["question", "category", "order", "active"]
+    list_display = ["question", "category", "display_activities", "order", "active"]
     list_editable = ["category"]
     list_filter = ["category", "active"]
     search_fields = ["question", "answer"]
+    autocomplete_fields = ["category"]
     filter_horizontal = ["activities"]
     ordering = ["order", "category"]
+
+    @display(description="Activities", label=True)
+    def display_activities(self, obj):
+        return [activity.activity_title for activity in obj.activities.all()]
 
 
 class ItineraryActivityAdmin(ModelAdmin):
