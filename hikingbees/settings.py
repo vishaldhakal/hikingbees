@@ -247,14 +247,14 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "https://latina-trail-yards-encyclopedia.trycloudflare.com",
+    "https://configure-alleged-das-promotional.trycloudflare.com",
     "https://hikingbees.com",
     "https://www.hikingbees.com",
     "https://api.hikingbees.com",
     "https://reliable-responding-indicator-tar.trycloudflare.com",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://latina-trail-yards-encyclopedia.trycloudflare.com",
+    "https://configure-alleged-das-promotional.trycloudflare.com",
     "https://api.hikingbees.com",
     "https://hikingbees.com",
     "https://www.hikingbees.com",

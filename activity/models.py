@@ -211,15 +211,42 @@ class AdditionalTiles(models.Model):
         return self.title
 
 
-class ActivityFAQ(models.Model):
-    question = models.TextField(blank=True)
-    answer = tinymce_models.HTMLField(blank=True)
+class ActivityFAQCategory(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    order = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    activity = models.ForeignKey(
-        Activity, on_delete=models.CASCADE, related_name="faqs"
+
+    class Meta:
+        verbose_name_plural = "FAQ Categories"
+        ordering = ["order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class ActivityFAQ(models.Model):
+    category = models.ForeignKey(
+        ActivityFAQCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="faqs",
     )
+    question = models.TextField()
+    answer = tinymce_models.HTMLField()
+    activities = models.ManyToManyField(Activity, related_name="faqs", blank=True)
+    active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Activity FAQs"
+        ordering = ["category__order", "order", "created_at"]
 
     def __str__(self):
         return self.question

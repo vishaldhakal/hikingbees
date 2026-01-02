@@ -404,7 +404,6 @@ def generate_pdf(temp_html_path):
         browser = playwright.chromium.launch()
         page = browser.new_page()
         page.goto(f"file://{temp_html_path}")
-
         # Generate PDF
         pdf_bytes = page.pdf(
             format="A4",
@@ -412,10 +411,10 @@ def generate_pdf(temp_html_path):
             print_background=True,
             prefer_css_page_size=True,
         )
-
         page.close()
         browser.close()
         return pdf_bytes
+    return b""
 
 
 @require_http_methods(["GET"])

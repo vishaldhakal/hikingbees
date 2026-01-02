@@ -1,49 +1,50 @@
-from django.contrib import admin
-from unfold.admin import ModelAdmin, StackedInline
-from .models import *
-from tinymce.widgets import TinyMCE
 from django import forms
+from django.contrib import admin
 from django.utils import timezone
+from tinymce.widgets import TinyMCE
+from unfold.admin import ModelAdmin, StackedInline
+
+from .models import *
 
 
 class DestinationAdminForm(forms.ModelForm):
     class Meta:
         model = Destination
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'destination_detail': TinyMCE(),
+            "destination_detail": TinyMCE(),
         }
 
 
 class ActivityCategoryAdminForm(forms.ModelForm):
     class Meta:
         model = ActivityCategory
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'content': TinyMCE(),
+            "content": TinyMCE(),
         }
 
 
 class ActivityRegionAdminForm(forms.ModelForm):
     class Meta:
         model = ActivityRegion
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'content': TinyMCE(),
+            "content": TinyMCE(),
         }
 
 
 class ActivityAdminForm(forms.ModelForm):
     class Meta:
         model = Activity
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'tour_description': TinyMCE(),
-            'tour_highlights': TinyMCE(),
-            'tour_includes': TinyMCE(),
-            'tour_excludes': TinyMCE(),
-            'additional_info': TinyMCE(),
-            'add_on_description': TinyMCE(),
+            "tour_description": TinyMCE(),
+            "tour_highlights": TinyMCE(),
+            "tour_includes": TinyMCE(),
+            "tour_excludes": TinyMCE(),
+            "additional_info": TinyMCE(),
+            "add_on_description": TinyMCE(),
         }
 
     def __init__(self, *args, **kwargs):
@@ -55,27 +56,27 @@ class ActivityAdminForm(forms.ModelForm):
 class ActivityTestimonialForm(forms.ModelForm):
     class Meta:
         model = ActivityTestimonial
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'review': TinyMCE(),
+            "review": TinyMCE(),
         }
 
 
 class ActivityFAQForm(forms.ModelForm):
     class Meta:
         model = ActivityFAQ
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'answer': TinyMCE(),
+            "answer": TinyMCE(),
         }
 
 
 class ItineraryActivityForm(forms.ModelForm):
     class Meta:
         model = ItineraryActivity
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'description': TinyMCE(),
+            "description": TinyMCE(),
         }
 
 
@@ -86,8 +87,11 @@ class ItineraryActivityInline(StackedInline):
 
 
 class ActivityFAQInline(StackedInline):
-    model = ActivityFAQ
-    form = ActivityFAQForm
+    model = ActivityFAQ.activities.through
+    extra = 1
+    verbose_name = "Activity FAQ"
+    verbose_name_plural = "Activity FAQs"
+    autocomplete_fields = ["activityfaq"]
     tab = True
 
 
@@ -104,9 +108,9 @@ class ActivityTestimonialImageInline(StackedInline):
 class AdditionalTilesForm(forms.ModelForm):
     class Meta:
         model = AdditionalTiles
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
-            'description': TinyMCE(),
+            "description": TinyMCE(),
         }
 
 
@@ -149,8 +153,7 @@ class ActivityAdmin(ModelAdmin):
         "best_selling",
         "popular",
     )
-    search_fields = ('activity_title', 'location',
-                     'meta_title')
+    search_fields = ("activity_title", "location", "meta_title")
     list_filter = ("featured", "best_selling", "popular", "destination")
 
     inlines = [
@@ -181,10 +184,7 @@ class ActivityAdmin(ModelAdmin):
             "Meta Information",
             {
                 "classes": ["tab"],
-                "fields": [
-                    "meta_title",
-                    "meta_description"
-                ],
+                "fields": ["meta_title", "meta_description"],
             },
         ),
         (
@@ -192,13 +192,23 @@ class ActivityAdmin(ModelAdmin):
             {
                 "classes": ["tab"],
                 "fields": [
-
-                    ("heroImg", "coverImg",),
+                    (
+                        "heroImg",
+                        "coverImg",
+                    ),
                     ("location", "duration", "per_day_walk"),
-                    ("trip_grade", "max_group_size",),
-                    ("best_time", "ratings",),
-                    ("availableStart", "availableEnd",)
-
+                    (
+                        "trip_grade",
+                        "max_group_size",
+                    ),
+                    (
+                        "best_time",
+                        "ratings",
+                    ),
+                    (
+                        "availableStart",
+                        "availableEnd",
+                    ),
                 ],
             },
         ),
@@ -209,8 +219,8 @@ class ActivityAdmin(ModelAdmin):
                 "fields": [
                     "trek_map",
                     "altitude_chart",
-                ]
-            }
+                ],
+            },
         ),
         (
             "Tour Description",
@@ -226,7 +236,6 @@ class ActivityAdmin(ModelAdmin):
                 ],
             },
         ),
-
     )
 
 
@@ -235,8 +244,20 @@ class ActivityTestimonialAdmin(ModelAdmin):
     inlines = [ActivityTestimonialImageInline]
 
 
+class ActivityFAQCategoryAdmin(ModelAdmin):
+    list_display = ["name", "slug", "order", "active"]
+    prepopulated_fields = {"slug": ("name",)}
+    list_filter = ["active"]
+    ordering = ["order", "name"]
+
+
 class ActivityFAQAdmin(ModelAdmin):
     form = ActivityFAQForm
+    list_display = ["question", "category", "order", "active"]
+    list_filter = ["category", "active"]
+    search_fields = ["question", "answer"]
+    filter_horizontal = ["activities"]
+    ordering = ["order", "category"]
 
 
 class ItineraryActivityAdmin(ModelAdmin):
@@ -250,6 +271,7 @@ admin.site.register(ActivityRegion, ActivityRegionAdmin)
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ItineraryActivity, ItineraryActivityAdmin)
 admin.site.register(ActivityImage, ModelAdmin)
+admin.site.register(ActivityFAQCategory, ActivityFAQCategoryAdmin)
 admin.site.register(ActivityFAQ, ActivityFAQAdmin)
 admin.site.register(ActivityPricing, ModelAdmin)
 admin.site.register(ActivityEnquiry, ModelAdmin)
