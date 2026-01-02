@@ -254,6 +254,7 @@ class ActivityFAQCategoryAdmin(ModelAdmin):
 class ActivityFAQAdmin(ModelAdmin):
     form = ActivityFAQForm
     list_display = ["question", "category", "order", "active"]
+    list_editable = ["category"]
     list_filter = ["category", "active"]
     search_fields = ["question", "answer"]
     filter_horizontal = ["activities"]
